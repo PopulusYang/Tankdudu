@@ -164,15 +164,16 @@ public:
 	obstacle(int x, int y, int w, int h, int s,int blood,int kind) :Entity(x, y, w, h, 0, s),kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
-		loadimage(&img1, "sorce/tank1.png",	w, h);
+		loadimage(&img1, "sorce/wall1.png",	w, h);
 		loadimage(&img2, "sorce/tank2.png", w, h);
-		loadimage(&img3, "sorce/tank3.png", w, h);
+		loadimage(&img3, "sorce/wall3.png", w, h);
 		    //此处被注释掉的代码应该在调用函数时确定kind类型时候使用
 			/*std::random_device rd;  // 获取随机数种子
 			std::mt19937 gen(rd());
 			std::uniform_int_distribution<> distrib(1, 2);
 			kind = distrib(gen);*/
 	}
+	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)
