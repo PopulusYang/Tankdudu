@@ -10,6 +10,7 @@
 #include <random>
 #include<array>
 #include <time.h>
+
 class Function 
 {
 	public:
@@ -74,7 +75,7 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(120) {}
+	Vec() :x(0.0), y(1.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
@@ -164,9 +165,9 @@ public:
 	obstacle(int x, int y, int w, int h, int s,int blood,int kind) :Entity(x, y, w, h, 0, s),kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
-		loadimage(&img1, "sorce/tank1.png",	w, h);
-		loadimage(&img2, "sorce/tank2.png", w, h);
-		loadimage(&img3, "sorce/tank3.png", w, h);
+		loadimage(&img1, "sorce/tank1.png",	w, h,0);
+		loadimage(&img2, "sorce/tank2.png", w, h,0);
+		loadimage(&img3, "sorce/tank3.png", w, h,0);
 		    //此处被注释掉的代码应该在调用函数时确定kind类型时候使用
 			/*std::random_device rd;  // 获取随机数种子
 			std::mt19937 gen(rd());
@@ -376,6 +377,7 @@ public:
 			my -= vec.y * speed;
 		}
 	}
+	
 	void Dead() override
 	{
 		if (!IsAlive)
@@ -486,40 +488,28 @@ public:
 			Sleep(250);
 		}
 	}
-	void control(bool game)
+
+	void control(bool& game)
 	{
+		ExMessage msg;
 		while (game)
-		{
-			if (_kbhit())
+		{	
+			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
 			{
-				int input = _getch();
-				switch (input)
-				{
-				case 'a':
-				case 'A':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
 					Move(1);
-					break;
-				case 'D':
-				case 'd':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
 					Move(2);
-					break;
-				case 'w':
-				case 'W':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
 					Move(3);
-					break;
-				case 's':
-				case 'S':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
 					Move(4);
-					break;
-				case 'j':
-				case 'J':
-					//攻击
-					shoot(bulkind);
-					break;
-				}
 			}
 		}
 	}
+
+
+
 };
 
 

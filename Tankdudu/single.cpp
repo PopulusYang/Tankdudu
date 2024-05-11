@@ -4,6 +4,8 @@ extern std::vector<ColliderBox> allbox;
 bool isgaming = 1;
 
 
+
+
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
@@ -20,7 +22,7 @@ void singlegame()
 	int kind = distrib(gen);
 	obstacle o1(100, 100, 20, 20, 0, SUPER_OBSTACLE, kind);
 	std::thread thread1(&Player::changepng, &player ,isgaming);
-	std::thread thread2(&Player::control, &player, isgaming);
+	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Player::footprint, &player, isgaming);
 	setbkcolor(WHITE);
 	BeginBatchDraw();
@@ -28,7 +30,6 @@ void singlegame()
 	{
 		cleardevice();
 		player.display();
-		o1.display();
 		ColliderBox::drawColliderbox(player);
 		FlushBatchDraw();
 	}
