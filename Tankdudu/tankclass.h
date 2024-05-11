@@ -10,9 +10,17 @@
 #include <random>
 #include<array>
 #include <time.h>
-class Function 
+#include<mutex>
+extern std::mutex lock;
+extern std::mutex lock2;
+extern std::vector<std::thread> allthread;
+extern bool isgaming;
+class bullet;
+extern std::vector<bullet> allbullet;
+
+class Function
 {
-	public:
+public:
 	// transparentimage 函数：
 		// 根据 png 的 alpha 信息实现半透明贴图（基于直接操作显示缓冲区）
 		//x,y图片左上角坐标
@@ -110,7 +118,7 @@ class ColliderBox
 public:
 	//坐标以及长宽
 	ColliderBox() :mx(0), my(0), height(0), width(0) {};
-	ColliderBox(int x, int y, int h, int w) :mx(x), my(y), height(h), width(w) {
+	ColliderBox(double x, double y, int h, int w) :mx(x), my(y), height(h), width(w) {
 		allbox.push_back(*this);
 	};
 	friend bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
@@ -135,7 +143,7 @@ class Entity :public  ColliderBox//继承了碰撞箱的属性
 protected:
 	int mhealth;//健康值/血量
 	//位置
-	int speed;
+	double speed;
 	bool IsAlive;
 	Vec vec;//方向
 	ColliderBox mybox;
@@ -161,17 +169,17 @@ private:
 public:
 	//原点指图片左上角
 	//原点的x坐标，原点的y坐标，宽度，高度,速度，血量,障碍物类型
-	obstacle(int x, int y, int w, int h, int s,int blood,int kind) :Entity(x, y, w, h, 0, s),kind(kind)
+	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :Entity(x, y, w, h, 0, s), kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
-		loadimage(&img1, "sorce/tank1.png",	w, h);
-		loadimage(&img2, "sorce/tank2.png", w, h);
-		loadimage(&img3, "sorce/tank3.png", w, h);
-		    //此处被注释掉的代码应该在调用函数时确定kind类型时候使用
-			/*std::random_device rd;  // 获取随机数种子
-			std::mt19937 gen(rd());
-			std::uniform_int_distribution<> distrib(1, 2);
-			kind = distrib(gen);*/
+		loadimage(&img1, "sorce/wall1.png", w, h);
+		loadimage(&img2, "sorce/wall2.png", w, h);
+		loadimage(&img3, "sorce/wall3.png", w, h);
+		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
+		/*std::random_device rd;  // 获取随机数种子
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> distrib(1, 2);
+		kind = distrib(gen);*/
 	}
 	void Dead() override
 	{
@@ -184,8 +192,7 @@ public:
 
 		}
 	}
-	void Move(int) override
-	{}
+	void Move(int) override {}
 	void display()
 	{
 		IMAGE temp;
@@ -193,21 +200,16 @@ public:
 		{
 		case 1:
 			temp = img1;
-			Function::transparentimage(NULL,mx, my, &temp);
 			break;
 		case 2:
 			temp = img2;
-			Function::transparentimage(NULL, mx, my, &temp);
-		    break;
+			break;
 		case 3:
 			temp = img3;
-			Function::transparentimage(NULL, mx, my, &temp);
-			break;
-
 		}
+		putimage((int)mx, (int)my, &temp);
 	}
 };
-class Tank;
 class bullet : public Entity//子弹类
 {
 private://private function
@@ -231,30 +233,41 @@ private://private function
 private:
 	int kind;
 public:
-	friend Tank;
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
-	bullet(double x, double y, int kind, Vec vec) :Entity(x, y, 3, 3, 20, 1, vec), kind(kind) {}
-
-
-	void Move(int isgaming) override
+	bullet(int x, int y, int kind, Vec vec) :Entity(x, y, 3, 3, 10.0, 1, vec), kind(kind) {}
+	void Move(int) override {}
+	static void bullMove(int isgaming)
 	{
-		while (alive() || isgaming)
+		while (isgaming)
 		{
-			mx += vec.x * speed * 10;
-			my += vec.y * speed * 10;
-			speed--;
+			for (bullet& p : allbullet)
+			{
+				p.mx += p.vec.x * p.speed;
+				p.my += p.vec.y * p.speed;
+				p.speed-=0.08;
+			}
+			Sleep(15);
 		}
 	}
 	void Dead() override
 	{
-		while (speed < 10)
+		while (speed > 10)
 		{
-
+			IsAlive = true;
 		}
-
+		IsAlive = false;
+		Sleep(5);
+		delete this;
+	}
+	static void display()
+	{
+		setfillcolor(0x242424);
+		for (const auto& bullet : allbullet)
+		{
+			fillcircle((int)(bullet.mx), (int)(bullet.my), 3);
+		}
 	}
 };
-
 
 class Tank : public Entity//坦克类
 {
@@ -339,11 +352,6 @@ protected:
 		setorigin(0, 0);
 		SetWorkingImage(pWorking);												// 还原原图坐标
 	}
-
-	
-
-
-
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
 	Tank(int x, int y, int s) :Entity(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
@@ -385,7 +393,9 @@ public:
 	}
 	void shoot(int kind)//发射
 	{
-		bullet mybull(mx + 48.5 + 37.5 * cos(vec.angle), my + 40 + 37.5 * sin(vec.angle), kind, vec);//构造子弹对象
+		lock2.lock();
+		allbullet.push_back(bullet((int)(mx + 48.5 + 37.5 * cos(vec.angle)), (int)(my + 40 + 37.5 * sin(vec.angle)), kind, vec));//构造子弹对象
+		lock2.unlock();
 	}
 	void display()
 	{
@@ -418,7 +428,7 @@ public:
 			temp2 = -temp2;
 		temp1 -= 97.0 / 2;
 		temp2 -= 80.0 / 2;
-		
+
 		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
 	}
 	//检测游戏是否还在进行

@@ -1,6 +1,8 @@
 #include"tankclass.h"
 #include"tankhead.h"
 extern std::vector<ColliderBox> allbox;
+extern std::vector<std::thread> allthread;
+extern std::vector<bullet> allbullet;
 bool isgaming = 1;
 
 
@@ -22,6 +24,7 @@ void singlegame()
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control, &player, isgaming);
 	std::thread thread3(&Player::footprint, &player, isgaming);
+	std::thread thread4(&bullet::bullMove, isgaming);
 	setbkcolor(WHITE);
 	BeginBatchDraw();
 	while (1)
@@ -29,11 +32,15 @@ void singlegame()
 		cleardevice();
 		player.display();
 		o1.display();
+		bullet::display();
 		ColliderBox::drawColliderbox(player);
+		bullet::display();
 		FlushBatchDraw();
 	}
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();
 	thread3.join();
+	thread4.join();
+	while (!allthread.empty());
 }
