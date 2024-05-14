@@ -13,7 +13,6 @@
 #include<mutex>
 extern std::mutex lock;
 extern std::mutex lock2;
-extern std::vector<std::thread> allthread;
 extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
@@ -181,6 +180,7 @@ public:
 		std::uniform_int_distribution<> distrib(1, 2);
 		kind = distrib(gen);*/
 	}
+	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)
@@ -234,8 +234,9 @@ private:
 	int kind;
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
-	bullet(int x, int y, int kind, Vec vec) :Entity(x, y, 3, 3, 10.0, 1, vec), kind(kind) {}
+	bullet(double x, double y, int kind, Vec vec) :Entity(x, y, 3, 3, 10.0, 1, vec), kind(kind) {}
 	void Move(int) override {}
+	void Dead() override {}
 	static void bullMove(int isgaming)
 	{
 		while (isgaming)
@@ -244,20 +245,24 @@ public:
 			{
 				p.mx += p.vec.x * p.speed;
 				p.my += p.vec.y * p.speed;
-				p.speed-=0.08;
+				p.speed -= 0.08;
 			}
+			checkDead();
 			Sleep(15);
 		}
 	}
-	void Dead() override
+	static void checkDead()
 	{
-		while (speed > 10)
+		int i = 0;
+		for (bullet& p : allbullet)
 		{
-			IsAlive = true;
+			if (p.speed < 4.0)
+			{
+				allbullet.erase(allbullet.begin() + i);
+				i--;
+			}
+			i++;
 		}
-		IsAlive = false;
-		Sleep(5);
-		delete this;
 	}
 	static void display()
 	{
@@ -394,7 +399,7 @@ public:
 	void shoot(int kind)//发射
 	{
 		lock2.lock();
-		allbullet.push_back(bullet((int)(mx + 48.5 + 37.5 * cos(vec.angle)), (int)(my + 40 + 37.5 * sin(vec.angle)), kind, vec));//构造子弹对象
+		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos(vec.angle)), (my + 40 - 37.5 * sin(vec.angle)), kind, vec));//构造子弹对象
 		lock2.unlock();
 	}
 	void display()

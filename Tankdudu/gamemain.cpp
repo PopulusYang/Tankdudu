@@ -5,7 +5,6 @@ std::mutex lock;
 std::mutex lock2;
 
 std::vector<ColliderBox> allbox;
-std::vector<std::thread> allthread;
 std::vector<bullet> allbullet;
 
 //创建按钮类
