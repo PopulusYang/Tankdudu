@@ -181,6 +181,7 @@ public:
 		std::uniform_int_distribution<> distrib(1, 2);
 		kind = distrib(gen);*/
 	}
+	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)

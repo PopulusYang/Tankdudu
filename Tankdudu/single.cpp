@@ -20,7 +20,13 @@ void singlegame()
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(1, 2);
 	int kind = distrib(gen);
-	obstacle o1(100, 100, 20, 20, 0, SUPER_OBSTACLE, kind);
+	obstacle wall3[3] =
+	{
+		obstacle(320, 240, 10, 10, 0, SUPER_OBSTACLE, 3),
+		obstacle(320, 220, 10, 10, 0, SUPER_OBSTACLE, 3),
+		obstacle(320, 260,10, 10, 0, SUPER_OBSTACLE, 3),
+			
+	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control, &player, isgaming);
 	std::thread thread3(&Player::footprint, &player, isgaming);
@@ -31,8 +37,10 @@ void singlegame()
 	{
 		cleardevice();
 		player.display();
-		o1.display();
-		bullet::display();
+		for (int i=0; i < 3; i++)
+		{
+			wall3[i].display();
+		}
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
 		FlushBatchDraw();
