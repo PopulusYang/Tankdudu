@@ -110,42 +110,52 @@ class ColliderBox
 public:
 	//坐标以及长宽
 	ColliderBox() :mx(0), my(0), height(0), width(0) {};
-	ColliderBox(int x, int y, int h, int w) :mx(x), my(y), height(h), width(w) {
+	ColliderBox(int x, int y, int h, int w) :mx(x), my(y), height(h), width(w)
+	{	
 		allbox.push_back(*this);
+		p = &allbox[allbox.size()-1];
 	};
+	ColliderBox fuck(double ix, double iy) {
+	 	return ColliderBox(ix, iy, width,height);
+	}
 	friend bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
-	static inline void drawColliderbox(ColliderBox obj);
+	static inline void drawColliderbox(ColliderBox& obj);
 	virtual ~ColliderBox() {};
+	inline ColliderBox* getp() { return p; };
 protected:
 	double mx;
 	double my;
 	int width;
 	int height;
+	ColliderBox* p;
 };
 
 //调试模式，绘制碰撞箱
-void ColliderBox::drawColliderbox(ColliderBox obj)
+void ColliderBox::drawColliderbox(ColliderBox &obj)
 {
 	setfillcolor(WHITE);
 	rectangle((int)(obj.mx) + 21, (int)(obj.my) + 20, (int)(obj.mx + obj.width) - 25, (int)(obj.my + obj.height) - 15);
 }
 
-class Entity :public  ColliderBox//继承了碰撞箱的属性
+class Entity : public ColliderBox//继承了碰撞箱的属性
 {
 protected:
 	int mhealth;//健康值/血量
 	//位置
+Vec vec;//方向
 	int speed;
 	bool IsAlive;
-	Vec vec;//方向
 	ColliderBox mybox;
 
 public:
 	//默认构造函数
 	Entity() :mhealth(MAXHEALTH), speed(0), IsAlive(true) {};
 	//x坐标，y坐标，宽度，高度，速度，生命值
-	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w), mybox(x, y, h, w), speed(s), IsAlive(true), vec(vec) {};
-	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w), mybox(x, y, h, w), speed(s), IsAlive(true) {};
+	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w),  speed(s), IsAlive(true), vec(vec) //mybox没用
+	{
+		
+	};
+	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w),  speed(s), IsAlive(true) {};
 	virtual ~Entity() {}
 	virtual void Dead() = 0;//死亡
 	virtual void Move(int) = 0;//移动
@@ -164,6 +174,7 @@ public:
 	obstacle(int x, int y, int w, int h, int s,int blood,int kind) :Entity(x, y, w, h, 0, s),kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
+
 		loadimage(&img1, "sorce/wall1.png",	w, h);
 		loadimage(&img2, "sorce/tank2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
@@ -216,14 +227,14 @@ private://private function
 	{
 		size_t size = allbox.size();
 		bool flag = 1;
-		for (int i = 0; i < size; i++)
+		/*for (int i = 0; i < size; i++)
 		{
 			if (ColliderDectect(this->mybox, allbox[i]))
 			{
 				flag = 0;
 				break;
 			}
-		}
+		}*/
 		if (!flag) {
 			return false;
 		}
@@ -369,12 +380,51 @@ public:
 			vec.roundchange(2);
 			break;
 		case 3:
+		{
+			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
+		    //*p=this->fuck(mx, my);
+			for (int i =1; i < allbox.size(); i++)
+			{
+				if (&allbox[i] != this)
+				{
+					if (ColliderDectect(*this, allbox[i]))
+						jug = 0;
+				}
+			}
+			if (jug == 0)
+			{
+				mx -= vec.x * speed;
+				my -= vec.y * speed;
+				//*p = this->fuck(mx, my);
+			}
+			jug = 1;
 			break;
+		}
 		case 4:
+		{
+			int jug = 1;
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
+			//*p = this->fuck(mx, my);
+			for (int i = 1; i < allbox.size(); i++)
+			{
+				if (&allbox[i] != this) 
+				{
+					if (ColliderDectect(*this, allbox[i]))
+						jug = 0;
+				}
+			}
+			if (jug == 0)
+			{
+				mx += vec.x * speed;
+				my += vec.y * speed;
+				//*p = this->fuck(mx, my);
+			}
+			jug = 1;
+			break;
+		}
 		}
 	}
 	void Dead() override
