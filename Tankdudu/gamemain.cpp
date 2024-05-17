@@ -88,7 +88,7 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - 
 		box2.my + box2.height >= box1.my;
 	// 只有两个轴向都有碰撞时才碰撞
 	return collisionX && collisionY;
-}
+}*/
 
 void starting()
 {
