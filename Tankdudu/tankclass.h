@@ -117,8 +117,9 @@ class ColliderBox
 {
 public:
 	//坐标以及长宽
+
 	ColliderBox() :mx(0), my(0), height(0), width(0),p(NULL) {}
-	ColliderBox(int x, int y, int h, int w) :mx(x), my(y), height(h), width(w)
+	ColliderBox(int x, int y, int h, int w) :mx(x+12), my(y+30), height(h-12), width(w-22)
 	{	
 		allbox.push_back(*this);
 		p = &allbox[allbox.size()-1];
@@ -144,7 +145,8 @@ public:
 void ColliderBox::drawColliderbox(ColliderBox &obj)
 {
 	setfillcolor(WHITE);
-	rectangle((int)(obj.mx) + 21, (int)(obj.my) + 20, (int)(obj.mx + obj.width) - 25, (int)(obj.my + obj.height) - 15);
+	//+21 +20 -25 -15
+	rectangle((int)(obj.mx), (int)(obj.my), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
 }
 
 class Entity : public ColliderBox//继承了碰撞箱的属性
