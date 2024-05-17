@@ -1,7 +1,13 @@
 #include"tankclass.h"
 #include"tankhead.h"
+class bullet;
+std::mutex lock;
+std::mutex lock2;
 
 std::vector<ColliderBox> allbox;
+std::vector<std::thread> allthread;
+std::vector<bullet> allbullet;
+
 //创建按钮类
 class button
 {
@@ -44,7 +50,8 @@ public:
 
 
 //检测是否碰撞,只需传入两个对象的碰撞箱对象，即可检测是否碰撞
-bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
+bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) 
+{
 	if (!((box1.mx > box2.mx + box2.width) ||//右边
 		(box1.mx + box1.width < box2.mx) ||//左边
 		(box1.my > box2.my + box2.height) ||//下边
@@ -81,7 +88,7 @@ void starting()
 	settextstyle(24, 0, "华文隶书");
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	starting();
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
