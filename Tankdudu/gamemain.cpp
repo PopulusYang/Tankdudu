@@ -1,7 +1,12 @@
 #include"tankclass.h"
 #include"tankhead.h"
+class bullet;
+std::mutex lock;
+std::mutex lock2;
 
 std::vector<ColliderBox> allbox;
+std::vector<bullet> allbullet;
+
 //创建按钮类
 class button
 {
@@ -104,7 +109,7 @@ void starting()
 	settextstyle(24, 0, "华文隶书");
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	starting();
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
@@ -159,3 +164,7 @@ int main()
 	closegraph();
 	return 0;
 }
+
+
+
+
