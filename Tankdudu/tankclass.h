@@ -129,7 +129,7 @@ public:
 	 	return ColliderBox((int)ix, (int)iy, width,height);
 	}
 	*/
-	friend bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
+	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
 	virtual ~ColliderBox() {};
 	inline ColliderBox* getp() { return p; };
@@ -399,8 +399,8 @@ public:
 			}
 			if (jug == 0)
 			{
-				mx -= vec.x * speed;
-				my -= vec.y * speed;
+				mx -= vec.x * speed*2;
+				my -= vec.y * speed*2;
 				allbox[0].mx = mx;
 				allbox[0].my = my;
 			}
