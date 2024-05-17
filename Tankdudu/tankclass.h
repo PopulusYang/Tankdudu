@@ -397,7 +397,8 @@ public:
 						jug = 0;
 				}
 			}
-			if (jug == 0)
+
+			if (!jug)
 			{
 				mx -= vec.x * speed*2;
 				my -= vec.y * speed*2;
