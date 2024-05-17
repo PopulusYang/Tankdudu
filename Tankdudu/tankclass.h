@@ -211,33 +211,17 @@ public:
 		putimage((int)mx, (int)my, &temp);
 	}
 };
-class bullet : public Entity//子弹类
+class bullet//子弹类
 {
-private://private function
-	bool alive() const
-	{
-		size_t size = allbox.size();
-		bool flag = 1;
-		for (int i = 0; i < size; i++)
-		{
-			if (ColliderDectect(this->mybox, allbox[i]))
-			{
-				flag = 0;
-				break;
-			}
-		}
-		if (!flag) {
-			return false;
-		}
-		return true;
-	}
 private:
 	int kind;
+	double mx;
+	double my;
+	Vec vec;
+	double speed;
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
-	bullet(double x, double y, int kind, Vec vec) :Entity(x, y, 3, 3, 10.0, 1, vec), kind(kind) {}
-	void Move(int) override {}
-	void Dead() override {}
+	bullet(double x, double y, int kind, Vec vec) :mx(x),my(y),vec(vec), kind(kind) ,speed(10.0){}
 	static void bullMove(int isgaming)
 	{
 		while (isgaming)
@@ -405,6 +389,7 @@ public:
 	{
 		lock2.lock();
 		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle/180.0*PI)), (my + 40 + 37.5 * sin((double)vec.angle/180.0*PI)), kind, vec));//构造子弹对象
+
 		lock2.unlock();
 	}
 	void display()
