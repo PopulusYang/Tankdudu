@@ -8,6 +8,7 @@
 #define PI 3.14159265359
 #include"tankhead.h"
 #include <random>
+//666
 #include<array>
 #include <time.h>
 #include<mutex>
@@ -81,18 +82,18 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(120) {}
+	Vec() :x(0.0), y(1.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
 		{
 		case 2://沿着向量方向增加
-			angle += 6;
+			angle += 4;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
 		case 1:
-			angle -= 6;
+			angle -= 4;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
@@ -280,7 +281,7 @@ class Tank : public Entity//坦克类
 protected:
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
-	int clip;//弹夹中的子弹数量
+	int clip = 3;//弹夹中的子弹数量
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3;
 
@@ -364,6 +365,8 @@ public:
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
 		loadimage(&img3, "sorce/tank3.png", 97, 80);
+		vec.roundchange(1);
+		vec.roundchange(2);//初始化
 	}
 	/*********************************************
 	杨武显的设计思路：
@@ -388,7 +391,9 @@ public:
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
 		}
+		Sleep(16);
 	}
+	
 	void Dead() override
 	{
 		if (!IsAlive)
@@ -399,7 +404,7 @@ public:
 	void shoot(int kind)//发射
 	{
 		lock2.lock();
-		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos(vec.angle)), (my + 40 - 37.5 * sin(vec.angle)), kind, vec));//构造子弹对象
+		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle/180.0*PI)), (my + 40 + 37.5 * sin((double)vec.angle/180.0*PI)), kind, vec));//构造子弹对象
 		lock2.unlock();
 	}
 	void display()
@@ -480,7 +485,7 @@ private:
 	int bulkind = 1;
 public:
 	std::array<Point, 5> fpt;
-	Player() :Tank(50, 240, 5), fpt()
+	Player() :Tank(50, 240, 2), fpt()
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -501,37 +506,42 @@ public:
 			Sleep(250);
 		}
 	}
-	void control(bool game)
+
+	void control(bool& game)
 	{
+		ExMessage msg;
 		while (game)
-		{
-			if (_kbhit())
+		{	
+			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
 			{
-				int input = _getch();
-				switch (input)
-				{
-				case 'a':
-				case 'A':
-					Move(1);
-					break;
-				case 'D':
-				case 'd':
-					Move(2);
-					break;
-				case 'w':
-				case 'W':
-					Move(3);
-					break;
-				case 's':
-				case 'S':
-					Move(4);
-					break;
-				case 'j':
-				case 'J':
-					//攻击
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(1);
+						peekmessage(&msg, EX_KEY, true);
+					}
+						
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(2);
+						peekmessage(&msg, EX_KEY, true);
+					}
+						
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(3);
+						peekmessage(&msg, EX_KEY, true);
+					}
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(4);
+						peekmessage(&msg, EX_KEY, true);
+					}
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'j' || msg.vkcode == 'J'))
 					shoot(bulkind);
-					break;
-				}
 			}
 		}
 	}
