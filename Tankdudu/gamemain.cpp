@@ -61,7 +61,7 @@ public:
 	return false;
 }*/
 //if collider, return true
-/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)
 		return true;
@@ -72,8 +72,8 @@ public:
 	if (box1.mx +box1.width>= box2.mx && box1.mx+box1.width <= box2.mx + box2.width && box1.my +box1.height>= box2.my && box1.my +box1.height<= box2.my + box2.height)
 		return true;
 	return false;
-}*/
-bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
+}
+/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
 	// x轴方向碰撞？
 	bool collisionX = box1.mx + box1.width >= box2.mx &&
@@ -83,7 +83,7 @@ bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB -
 		box2.my + box2.height >= box1.my;
 	// 只有两个轴向都有碰撞时才碰撞
 	return collisionX && collisionY;
-}
+}*/
 
 void starting()
 {
