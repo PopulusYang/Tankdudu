@@ -8,6 +8,7 @@
 #define PI 3.14159265359
 #include"tankhead.h"
 #include <random>
+//666
 #include<array>
 #include <time.h>
 #include<mutex>
@@ -81,7 +82,7 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(120) {}
+	Vec() :x(0.0), y(1.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
@@ -389,6 +390,7 @@ public:
 			my -= vec.y * speed;
 		}
 	}
+	
 	void Dead() override
 	{
 		if (!IsAlive)
@@ -501,40 +503,28 @@ public:
 			Sleep(250);
 		}
 	}
-	void control(bool game)
+
+	void control(bool& game)
 	{
+		ExMessage msg;
 		while (game)
-		{
-			if (_kbhit())
+		{	
+			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
 			{
-				int input = _getch();
-				switch (input)
-				{
-				case 'a':
-				case 'A':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
 					Move(1);
-					break;
-				case 'D':
-				case 'd':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
 					Move(2);
-					break;
-				case 'w':
-				case 'W':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
 					Move(3);
-					break;
-				case 's':
-				case 'S':
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
 					Move(4);
-					break;
-				case 'j':
-				case 'J':
-					//攻击
-					shoot(bulkind);
-					break;
-				}
 			}
 		}
 	}
+
+
+
 };
 
 

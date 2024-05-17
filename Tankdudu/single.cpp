@@ -5,6 +5,8 @@ extern std::vector<bullet> allbullet;
 bool isgaming = 1;
 
 
+
+
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
@@ -27,7 +29,7 @@ void singlegame()
 			
 	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
-	std::thread thread2(&Player::control, &player, isgaming);
+	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Player::footprint, &player, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	setbkcolor(WHITE);
