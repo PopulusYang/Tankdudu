@@ -23,10 +23,9 @@ void singlegame()
 	int kind = distrib(gen);
 	obstacle wall3[3] =
 	{
-		obstacle(320, 240, 10, 10, 0, SUPER_OBSTACLE, 3),
-		obstacle(320, 220, 10, 10, 0, SUPER_OBSTACLE, 3),
-		obstacle(320, 260,10, 10, 0, SUPER_OBSTACLE, 3),
-			
+		obstacle(100, 100, 100, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
 	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));

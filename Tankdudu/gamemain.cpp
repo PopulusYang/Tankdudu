@@ -49,19 +49,41 @@ public:
 
 
 //检测是否碰撞,只需传入两个对象的碰撞箱对象，即可检测是否碰撞
-bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) 
-{
-	if (!((box1.mx > box2.mx + box2.width) ||//右边
-		(box1.mx + box1.width < box2.mx) ||//左边
-		(box1.my > box2.my + box2.height) ||//下边
+/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
+	if (!((box1.mx > box2.mx + box2.width) &&//右边
+		(box1.mx + box1.width < box2.mx) &&//左边
+		(box1.my > box2.my + box2.height) &&//下边
 		(box1.my + box1.height < box2.my))//上边
 		)
 	{
 		return true;
 	};
 	return false;
+}*/
+//if collider, return true
+/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+{
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)
+		return true;
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my+box1.height >= box2.my && box1.my+box1.height <= box2.my + box2.height)
+		return true;
+	if (box1.mx+box1.width >= box2.mx && box1.mx+box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)
+		return true;
+	if (box1.mx +box1.width>= box2.mx && box1.mx+box1.width <= box2.mx + box2.width && box1.my +box1.height>= box2.my && box1.my +box1.height<= box2.my + box2.height)
+		return true;
+	return false;
+}*/
+bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
+{
+	// x轴方向碰撞？
+	bool collisionX = box1.mx + box1.width >= box2.mx &&
+		box2.mx + box2.width >= box1.mx;
+	// y轴方向碰撞？
+	bool collisionY = box1.my + box1.height >= box2.my &&
+		box2.my + box2.height >= box1.my;
+	// 只有两个轴向都有碰撞时才碰撞
+	return collisionX && collisionY;
 }
-
 
 void starting()
 {
