@@ -18,6 +18,10 @@ extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
 
+
+
+
+
 class Function
 {
 public:
@@ -133,9 +137,10 @@ public:
 	static inline void drawColliderbox(ColliderBox& obj);
 	virtual ~ColliderBox() {};
 	inline ColliderBox* getp() { return p; };
+
+	//override the data to public
 	double mx;
 	double my;
-
 	int width;
 	int height;
 	ColliderBox* p;
@@ -167,6 +172,7 @@ public:
 		
 	};
 	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w),  speed(s), IsAlive(true) {};
+	
 	virtual ~Entity() {}
 	virtual void Dead() = 0;//死亡
 	virtual void Move(int) = 0;//移动
@@ -188,6 +194,7 @@ public:
 		loadimage(&img1, "sorce/wall1.png", w, h);
 		loadimage(&img2, "sorce/wall2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
+
 		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
 		/*std::random_device rd;  // 获取随机数种子
 		std::mt19937 gen(rd());
@@ -235,6 +242,8 @@ private:
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
 	bullet(double x, double y, int kind, Vec vec) :mx(x),my(y),vec(vec), kind(kind) ,speed(10.0){}
+	inline double getx() { return mx; };
+	inline double gety() { return my; }
 	static void bullMove(int isgaming)
 	{
 		while (isgaming)
@@ -249,6 +258,38 @@ public:
 			Sleep(15);
 		}
 	}
+	//检测逻辑优化,不再对子弹套用碰撞箱检测函数，简化检测逻辑，实现子弹的即时生成和销毁而不占用储存空间
+	static bool bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
+	{	
+		int flag = 1;
+		for (int i = 1; i < 4; i++)//OBS number define MAX==4
+		{	
+			if (thisbull.getx() >= allbox[i].mx&& thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
+				flag = 0;
+				break;
+			}
+		}
+		if (flag) {
+			return false;
+		}
+		return true;
+	}
+	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
+	{
+		int flag = 1;
+            #define MAXsize 1 //MAXsize is the number of other player
+			for (int i = 4; i <4+MAXsize ; i++)//Player number define MAXsize==1
+			{	//下面的检测逻辑需要依据玩家具体参数调整
+				if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
+					flag = 0;
+					break;
+				}
+			}
+		if (flag) {
+			return false;
+		}
+		return true;
+	}
 	static void checkDead()
 	{
 		int i = 0;
@@ -256,6 +297,19 @@ public:
 		{
 			if (p.speed < 4.0)
 			{
+				allbullet.erase(allbullet.begin() + i);//子弹消除操作
+				i--;
+			}
+		 	else if (bull_OBSdec(p))
+			{
+				/*加入障碍物掉血操作函数*/
+
+				allbullet.erase(allbullet.begin() + i);
+				i--;
+			}
+			else if (bull_PLAdec(p)) {
+				/*加入人物掉血操作函数*/
+
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
@@ -397,8 +451,10 @@ public:
 						jug = 0;
 				}
 			}
+
 			if (jug == 0)
 			{
+				
 				mx -= vec.x * speed*2;
 				my -= vec.y * speed*2;
 				allbox[0].mx = mx;
@@ -421,12 +477,12 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-				}
+				
 			}
-			if (jug == 0)
-			{
-				mx += vec.x * speed;
-				my += vec.y * speed;
+				if (jug == 0)
+				
+				mx += vec.x * speed*2;
+				my += vec.y * speed*2;
 				allbox[0].mx = mx;
 				allbox[0].my = my;
 			}
