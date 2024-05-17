@@ -8,11 +8,19 @@
 #define PI 3.14159265359
 #include"tankhead.h"
 #include <random>
+//666
 #include<array>
 #include <time.h>
-class Function 
+#include<mutex>
+extern std::mutex lock;
+extern std::mutex lock2;
+extern bool isgaming;
+class bullet;
+extern std::vector<bullet> allbullet;
+
+class Function
 {
-	public:
+public:
 	// transparentimage 函数：
 		// 根据 png 的 alpha 信息实现半透明贴图（基于直接操作显示缓冲区）
 		//x,y图片左上角坐标
@@ -74,18 +82,18 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(120) {}
+	Vec() :x(0.0), y(1.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
 		{
 		case 2://沿着向量方向增加
-			angle += 6;
+			angle += 4;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
 		case 1:
-			angle -= 6;
+			angle -= 4;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
@@ -109,12 +117,12 @@ class ColliderBox
 {
 public:
 	//坐标以及长宽
-	ColliderBox() :mx(0), my(0), height(0), width(0) {};
+	ColliderBox() :mx(0), my(0), height(0), width(0) {}
 	ColliderBox(int x, int y, int h, int w) :mx(x), my(y), height(h), width(w)
 	{	
 		allbox.push_back(*this);
 		p = &allbox[allbox.size()-1];
-	};
+	}
 	ColliderBox fuck(double ix, double iy) {
 	 	return ColliderBox(ix, iy, width,height);
 	}
@@ -122,9 +130,9 @@ public:
 	static inline void drawColliderbox(ColliderBox& obj);
 	virtual ~ColliderBox() {};
 	inline ColliderBox* getp() { return p; };
-protected:
 	double mx;
 	double my;
+
 	int width;
 	int height;
 	ColliderBox* p;
@@ -142,11 +150,10 @@ class Entity : public ColliderBox//继承了碰撞箱的属性
 protected:
 	int mhealth;//健康值/血量
 	//位置
-Vec vec;//方向
-	int speed;
+	double speed;
 	bool IsAlive;
 	ColliderBox mybox;
-
+	Vec vec;
 public:
 	//默认构造函数
 	Entity() :mhealth(MAXHEALTH), speed(0), IsAlive(true) {};
@@ -171,18 +178,17 @@ private:
 public:
 	//原点指图片左上角
 	//原点的x坐标，原点的y坐标，宽度，高度,速度，血量,障碍物类型
-	obstacle(int x, int y, int w, int h, int s,int blood,int kind) :Entity(x, y, w, h, 0, s),kind(kind)
+	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :Entity(x, y, w, h, 0, s), kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
-
-		loadimage(&img1, "sorce/wall1.png",	w, h);
-		loadimage(&img2, "sorce/tank2.png", w, h);
+		loadimage(&img1, "sorce/wall1.png", w, h);
+		loadimage(&img2, "sorce/wall2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
-		    //此处被注释掉的代码应该在调用函数时确定kind类型时候使用
-			/*std::random_device rd;  // 获取随机数种子
-			std::mt19937 gen(rd());
-			std::uniform_int_distribution<> distrib(1, 2);
-			kind = distrib(gen);*/
+		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
+		/*std::random_device rd;  // 获取随机数种子
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> distrib(1, 2);
+		kind = distrib(gen);*/
 	}
 	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
@@ -196,8 +202,7 @@ public:
 
 		}
 	}
-	void Move(int) override
-	{}
+	void Move(int) override {}
 	void display()
 	{
 		IMAGE temp;
@@ -205,21 +210,16 @@ public:
 		{
 		case 1:
 			temp = img1;
-			Function::transparentimage(NULL,mx, my, &temp);
 			break;
 		case 2:
 			temp = img2;
-			Function::transparentimage(NULL, mx, my, &temp);
-		    break;
+			break;
 		case 3:
 			temp = img3;
-			Function::transparentimage(NULL, mx, my, &temp);
-			break;
-
 		}
+		putimage((int)mx, (int)my, &temp);
 	}
 };
-class Tank;
 class bullet : public Entity//子弹类
 {
 private://private function
@@ -243,30 +243,46 @@ private://private function
 private:
 	int kind;
 public:
-	friend Tank;
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
-	bullet(double x, double y, int kind, Vec vec) :Entity(x, y, 3, 3, 20, 1, vec), kind(kind) {}
-
-
-	void Move(int isgaming) override
+	bullet(double x, double y, int kind, Vec vec) :Entity(x, y, 3, 3, 10.0, 1, vec), kind(kind) {}
+	void Move(int) override {}
+	void Dead() override {}
+	static void bullMove(int isgaming)
 	{
-		while (alive() || isgaming)
+		while (isgaming)
 		{
-			mx += vec.x * speed * 10;
-			my += vec.y * speed * 10;
-			speed--;
+			for (bullet& p : allbullet)
+			{
+				p.mx += p.vec.x * p.speed;
+				p.my += p.vec.y * p.speed;
+				p.speed -= 0.08;
+			}
+			checkDead();
+			Sleep(15);
 		}
 	}
-	void Dead() override
+	static void checkDead()
 	{
-		while (speed < 10)
+		int i = 0;
+		for (bullet& p : allbullet)
 		{
-
+			if (p.speed < 4.0)
+			{
+				allbullet.erase(allbullet.begin() + i);
+				i--;
+			}
+			i++;
 		}
-
+	}
+	static void display()
+	{
+		setfillcolor(0x242424);
+		for (const auto& bullet : allbullet)
+		{
+			fillcircle((int)(bullet.mx), (int)(bullet.my), 3);
+		}
 	}
 };
-
 
 class Tank : public Entity//坦克类
 {
@@ -274,7 +290,7 @@ class Tank : public Entity//坦克类
 protected:
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
-	int clip;//弹夹中的子弹数量
+	int clip = 3;//弹夹中的子弹数量
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3;
 
@@ -351,11 +367,6 @@ protected:
 		setorigin(0, 0);
 		SetWorkingImage(pWorking);												// 还原原图坐标
 	}
-
-	
-
-
-
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
 	Tank(int x, int y, int s) :Entity(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
@@ -363,6 +374,8 @@ public:
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
 		loadimage(&img3, "sorce/tank3.png", 97, 80);
+		vec.roundchange(1);
+		vec.roundchange(2);//初始化
 	}
 	/*********************************************
 	杨武显的设计思路：
@@ -380,14 +393,17 @@ public:
 			vec.roundchange(2);
 			break;
 		case 3:
-		{
+		{	
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
-		    //*p=this->fuck(mx, my);
+			allbox[0].mx = mx;
+			allbox[0].my = my;
+
+			ColliderBox* mp = this->getp();
 			for (int i =1; i < allbox.size(); i++)
 			{
-				if (&allbox[i] != this)
+				if (&allbox[i] != mp)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
@@ -397,7 +413,8 @@ public:
 			{
 				mx -= vec.x * speed;
 				my -= vec.y * speed;
-				//*p = this->fuck(mx, my);
+				allbox[0].mx = mx;
+				allbox[0].my = my;
 			}
 			jug = 1;
 			break;
@@ -407,10 +424,12 @@ public:
 			int jug = 1;
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
-			//*p = this->fuck(mx, my);
+			allbox[0].mx = mx;
+			allbox[0].my = my;
+			ColliderBox* mp = this->getp();
 			for (int i = 1; i < allbox.size(); i++)
 			{
-				if (&allbox[i] != this) 
+				if (&allbox[i] != mp) 
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
@@ -420,13 +439,16 @@ public:
 			{
 				mx += vec.x * speed;
 				my += vec.y * speed;
-				//*p = this->fuck(mx, my);
+				allbox[0].mx = mx;
+				allbox[0].my = my;
 			}
 			jug = 1;
 			break;
 		}
 		}
+		Sleep(16);
 	}
+	
 	void Dead() override
 	{
 		if (!IsAlive)
@@ -436,7 +458,9 @@ public:
 	}
 	void shoot(int kind)//发射
 	{
-		bullet mybull(mx + 48.5 + 37.5 * cos(vec.angle), my + 40 + 37.5 * sin(vec.angle), kind, vec);//构造子弹对象
+		lock2.lock();
+		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle/180.0*PI)), (my + 40 + 37.5 * sin((double)vec.angle/180.0*PI)), kind, vec));//构造子弹对象
+		lock2.unlock();
 	}
 	void display()
 	{
@@ -469,7 +493,7 @@ public:
 			temp2 = -temp2;
 		temp1 -= 97.0 / 2;
 		temp2 -= 80.0 / 2;
-		
+
 		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
 	}
 	//检测游戏是否还在进行
@@ -516,7 +540,7 @@ private:
 	int bulkind = 1;
 public:
 	std::array<Point, 5> fpt;
-	Player() :Tank(50, 240, 5), fpt()
+	Player() :Tank(50, 240, 2), fpt()
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -537,37 +561,42 @@ public:
 			Sleep(250);
 		}
 	}
-	void control(bool game)
+
+	void control(bool& game)
 	{
+		ExMessage msg;
 		while (game)
-		{
-			if (_kbhit())
+		{	
+			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
 			{
-				int input = _getch();
-				switch (input)
-				{
-				case 'a':
-				case 'A':
-					Move(1);
-					break;
-				case 'D':
-				case 'd':
-					Move(2);
-					break;
-				case 'w':
-				case 'W':
-					Move(3);
-					break;
-				case 's':
-				case 'S':
-					Move(4);
-					break;
-				case 'j':
-				case 'J':
-					//攻击
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(1);
+						peekmessage(&msg, EX_KEY, true);
+					}
+						
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(2);
+						peekmessage(&msg, EX_KEY, true);
+					}
+						
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(3);
+						peekmessage(&msg, EX_KEY, true);
+					}
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
+					while (msg.message == WM_KEYDOWN)
+					{
+						Move(4);
+						peekmessage(&msg, EX_KEY, true);
+					}
+				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'j' || msg.vkcode == 'J'))
 					shoot(bulkind);
-					break;
-				}
 			}
 		}
 	}
