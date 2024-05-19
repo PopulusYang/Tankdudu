@@ -18,6 +18,11 @@ extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
 
+inline bool KeyDown(int vKey)
+{
+	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
+}
+
 class Function
 {
 public:
@@ -82,7 +87,7 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(0) {}
+	Vec() :x(1.0), y(0.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
@@ -276,6 +281,8 @@ class Tank : public Entity//坦克类
 {
 	friend bullet;
 protected:
+	bool canshoot = true;
+	int waittime = 0;
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
 	int clip = 3;//弹夹中的子弹数量
@@ -362,8 +369,6 @@ public:
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
 		loadimage(&img3, "sorce/tank3.png", 97, 80);
-		vec.roundchange(1);
-		vec.roundchange(2);//初始化
 	}
 	/*********************************************
 	杨武显的设计思路：
@@ -447,10 +452,25 @@ public:
 	}
 	void shoot(int kind)//发射
 	{
-		lock2.lock();
-		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle/180.0*PI)), (my + 40 + 37.5 * sin((double)vec.angle/180.0*PI)), kind, vec));//构造子弹对象
-
-		lock2.unlock();
+		if (canshoot)
+		{
+			canshoot = false;
+			lock2.lock();
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象
+			lock2.unlock();
+		}
+	}
+	void wait(bool isgaming)
+	{
+		while (isgaming)
+		{
+			if (!canshoot)
+			{
+				for (waittime = 250; waittime > 0; waittime--)
+					Sleep(1);
+				canshoot = true;
+			}
+		}
 	}
 	void display()
 	{
@@ -465,6 +485,9 @@ public:
 			break;
 		case 3:
 			RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
+			break;
+		case 4:
+			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		}
 		double temp1, temp2;
@@ -485,32 +508,19 @@ public:
 		temp2 -= 80.0 / 2;
 
 		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
-	}
-	//检测游戏是否还在进行
-	void changepng(bool game)
-	{
-		while (game)
+		
+		if (mhealth < 100)
 		{
-			while (_kbhit())
-			{
-				int key = _getch();
-				switch (key)
-				{
-				case 'a':
-				case 'A':
-				case 'D':
-				case 'd':
-				case 'w':
-				case 'W':
-				case 's':
-				case 'S':
-					movepng++;
-				}
-				if (movepng == 4)
-					movepng = 1;
-			}
+			setfillcolor(RED);
+			fillrectangle(mx, my - 10, mx + 8 + (int)(74.0 * (double)mhealth / (double)MAXHEALTH), my - 5);
+		}
+		if (waittime != 0)
+		{
+			setfillcolor(GREEN);
+			fillrectangle(mx + 8, my - 15, mx + 8 + (int)(74.0 * (double)waittime / 250.0), my - 11);
 		}
 	}
+	
 };
 
 
@@ -527,10 +537,13 @@ typedef struct point
 class Player :public Tank
 {
 private:
+	
 	int bulkind = 1;
+	int up, down, left, right, shift, vshoot;
 public:
 	std::array<Point, 5> fpt;
-	Player() :Tank(50, 240, 2), fpt()
+	Player(int up, int down, int left, int right, int shift, int vshoot)
+	:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -554,40 +567,30 @@ public:
 
 	void control(bool& game)
 	{
-		ExMessage msg;
 		while (game)
 		{	
-			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
-			{
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(1);
-						peekmessage(&msg, EX_KEY, true);
-					}
-						
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(2);
-						peekmessage(&msg, EX_KEY, true);
-					}
-						
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(3);
-						peekmessage(&msg, EX_KEY, true);
-					}
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(4);
-						peekmessage(&msg, EX_KEY, true);
-					}
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'j' || msg.vkcode == 'J'))
-					shoot(bulkind);
-			}
+			if (KeyDown(left))
+				Move(1);
+			if (KeyDown(right))
+				Move(2);
+			if (KeyDown(up))
+				Move(3);
+			if (KeyDown(down))
+				Move(4);
+			if (KeyDown(vshoot))
+				shoot(bulkind);
+			Sleep(5);
+		}
+	}
+
+	void changepng(bool game)
+	{
+		while (game)
+		{
+			if (KeyDown(left) || KeyDown(right) || KeyDown(up) || KeyDown(down))
+				movepng++;
+			if (movepng == 4)
+				movepng = 1;
 		}
 	}
 };
