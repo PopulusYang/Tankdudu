@@ -452,7 +452,7 @@ public:
 				}
 			}
 
-			if (jug == 0)
+			if (!jug)
 			{
 				
 				mx -= vec.x * speed*2;
