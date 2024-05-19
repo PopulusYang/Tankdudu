@@ -27,6 +27,8 @@ void singlegame()
 		obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
 		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
 	};
+
+
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Player::footprint, &player, isgaming);
@@ -44,7 +46,7 @@ void singlegame()
 		}
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
-		FlushBatchDraw();
+	 	FlushBatchDraw();
 	}
 	EndBatchDraw();
 	thread1.join();

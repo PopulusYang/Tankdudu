@@ -6,6 +6,15 @@ std::mutex lock2;
 
 std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
+/*
+PROMISE of
+allbox distrub:
+[0]:player
+[1]-[n]:OBS
+[n+1]:enemies
+ (ensure dynamic space for enemy generating)
+*/
+
 
 //创建按钮类
 class button
