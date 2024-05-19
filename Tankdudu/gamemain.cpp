@@ -3,9 +3,10 @@
 class bullet;
 std::mutex lock;
 std::mutex lock2;
-
+int IDnum = 0;
 std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
+
 /*
 PROMISE of
 allbox distrub:
@@ -15,12 +16,6 @@ allbox distrub:
  (ensure dynamic space for enemy generating)
 */
 
-obstacle  wall3[3] =
-{
-	obstacle(100, 100, 100, 100, 0, SUPER_OBSTACLE, 3),
-	obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
-	obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),
-};
 
 //创建按钮类
 class button

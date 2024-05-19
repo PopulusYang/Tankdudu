@@ -28,10 +28,6 @@ void singlegame()
 		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
 	};
 
-	Player play2[2] = {
-		/*在此给予游戏成员信息，包括ai的*/
-	};
-
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Player::footprint, &player, isgaming);
