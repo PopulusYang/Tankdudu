@@ -1,7 +1,6 @@
 #include"tankclass.h"
 #include"tankhead.h"
-extern std::vector<ColliderBox> allbox;
-extern std::vector<bullet> allbullet;
+
 bool isgaming = 1;
 
 
@@ -46,6 +45,9 @@ void singlegame()
 		}
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
+		HWND hWnd = GetHWnd();
+		if (!IsWindow(hWnd))
+			exit(0);
 	 	FlushBatchDraw();
 	}
 	EndBatchDraw();

@@ -105,6 +105,15 @@ void starting()
 	//为了方便调试，我把控制台打开，完成后关掉即可
 	
 	initgraph(640, 480, EX_SHOWCONSOLE);
+	// 获得窗口句柄
+	HWND hWnd = GetHWnd();
+	// 使用 Windows API 修改窗口名称
+	SetWindowText(hWnd, "坦克大战");
+	//设置图标
+	HICON newIcon = (HICON)LoadImage(NULL, TEXT("sorce/tankico.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+	SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)newIcon);
+	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)newIcon);
+
 	IMAGE img;
 	loadimage(&img, "sorce/start.jpg", 640, 480, true);
 	putimage(0, 0, &img);
@@ -134,6 +143,9 @@ int main(int argc, char* argv[])
 	bool jug = true;
 	while (jug)
 	{
+		HWND hWnd = GetHWnd();
+		if (!IsWindow(hWnd))
+			exit(0);
 		if (peekmessage(&msg, EX_MOUSE))
 		{
 			switch (msg.message)
