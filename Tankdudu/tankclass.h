@@ -20,9 +20,10 @@ extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
 
-
-
-
+inline bool KeyDown(int vKey)
+{
+	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
+}
 
 class Function
 {
@@ -88,7 +89,7 @@ public:
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
-	Vec() :x(0.0), y(1.0), angle(0) {}
+	Vec() :x(1.0), y(0.0), angle(0) {}
 	void roundchange(int userKey)
 	{
 		switch (userKey)
@@ -124,13 +125,20 @@ class ColliderBox
 public:
 	//坐标以及长宽
 
-	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum) {}
-	ColliderBox(int x, int y, int h, int w) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum)
+	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true) {}
+	ColliderBox(int x, int y,int w ,int h ,int s, int health, Vec vec) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum) , mhealth(health), speed(s), IsAlive(true), vec(vec)
 	{	
 		allbox.push_back(*this);
 		p = &allbox[allbox.size()-1];
 		IDnum++;
 	}
+	ColliderBox(int x, int y,int w, int h,  int s, int health) :mx(x + 12), my(y + 30), height(h - 12), width(w - 22), ID(IDnum), mhealth(health), speed(s), IsAlive(true)
+	{
+		allbox.push_back(*this);
+		p = &allbox[allbox.size() - 1];
+		IDnum++;
+	}
+	virtual ~ColliderBox() {}
 	/*
 	ColliderBox fuck(double ix, double iy) {
 	 	return ColliderBox((int)ix, (int)iy, width,height);
@@ -138,7 +146,6 @@ public:
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
-	virtual ~ColliderBox() {};
 
 	inline ColliderBox* getp() { return p; };
 	inline int getID() { return ID; };
@@ -150,6 +157,16 @@ public:
 	int height;
 	int ID;
 	ColliderBox* p;
+	int mhealth;//健康值/血量
+	//位置
+	double speed;
+	bool IsAlive;
+	Vec vec;
+public:
+	virtual void Dead()//死亡
+	{}
+	virtual void Move(int)//移动
+	{}
 };
 
 //调试模式，绘制碰撞箱
@@ -160,7 +177,7 @@ void ColliderBox::drawColliderbox(ColliderBox &obj)
 	rectangle((int)(obj.mx), (int)(obj.my), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
 }
 
-class Entity : public ColliderBox//继承了碰撞箱的属性
+/*class Entity : public ColliderBox//继承了碰撞箱的属性
 {
 protected:
 	int mhealth;//健康值/血量
@@ -182,9 +199,9 @@ public:
 	virtual ~Entity() {}
 	virtual void Dead() = 0;//死亡
 	virtual void Move(int) = 0;//移动
-};
+};*/
 
-class obstacle : public Entity//障碍物
+class obstacle : public ColliderBox//障碍物
 {
 private:
 	int kind;
@@ -194,7 +211,7 @@ private:
 public:
 	//原点指图片左上角
 	//原点的x坐标，原点的y坐标，宽度，高度,速度，血量,障碍物类型
-	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :Entity(x, y, w, h, 0, s), kind(kind)
+	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :ColliderBox(x, y, w, h, s, blood), kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
 		loadimage(&img1, "sorce/wall1.png", w, h);
@@ -207,7 +224,7 @@ public:
 		std::uniform_int_distribution<> distrib(1, 2);
 		kind = distrib(gen);*/
 	}
-	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
+	obstacle() :ColliderBox(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)
@@ -220,6 +237,12 @@ public:
 		}
 	}
 	void Move(int) override {}
+	void deblood()
+	{
+		mhealth = allbox[this->ID].mhealth;
+		if (mhealth < 0)
+			IsAlive = false;
+	}
 	void display()
 	{
 		IMAGE temp;
@@ -265,21 +288,21 @@ public:
 		}
 	}
 	//检测逻辑优化,不再对子弹套用碰撞箱检测函数，简化检测逻辑，实现子弹的即时生成和销毁而不占用储存空间
-	static bool bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
+	//逻辑上更改一下：碰上返回allbox数，没碰上返回0。
+	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
 	{	
-		int flag = 1;
+		int jug = 0;
 		for (int i = 1; i < 4; i++)//OBS number define MAX==4
 		{	
-			if (thisbull.getx() >= allbox[i].mx&& thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
-				flag = 0;
+			if (thisbull.getx() >= allbox[i].mx&& thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) 
+			{
+				jug = allbox[i].ID;
 				break;
 			}
 		}
-		if (flag) {
-			return false;
-		}
-		return true;
+		return jug;
 	}
+	//子弹检测可以改的和上面那个一样，或者直接合并
 	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int flag = 1;
@@ -309,14 +332,28 @@ public:
 		 	else if (bull_OBSdec(p))
 			{
 				/*加入障碍物掉血操作函数*/
-
+				int t = bull_OBSdec(p);
+				for (int i = 0; i < allbox.size(); i++)
+				{
+					if (allbox[i].ID == t)
+					{
+						allbox[i].mhealth = allbox[i].mhealth - 30;
+					}
+				}
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
 			else if (bull_PLAdec(p)) {
 
 				/*加入人物掉血操作函数*/
-
+				int t = bull_OBSdec(p);
+				for (int i = 0; i < allbox.size(); i++)
+				{
+					if (allbox[i].ID == t)
+					{
+						allbox[i].mhealth = allbox[i].mhealth - 30;
+					}
+				}
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
@@ -333,10 +370,12 @@ public:
 	}
 };
 
-class Tank : public Entity//坦克类
+class Tank : public ColliderBox//坦克类
 {
 	friend bullet;
 protected:
+	bool canshoot = true;
+	int waittime = 0;
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
 	int clip = 3;//弹夹中的子弹数量
@@ -418,13 +457,11 @@ protected:
 	}
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :Entity(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
 		loadimage(&img3, "sorce/tank3.png", 97, 80);
-		vec.roundchange(1);
-		vec.roundchange(2);//初始化
 	}
 	/*********************************************
 	杨武显的设计思路：
@@ -477,10 +514,9 @@ public:
 			my -= vec.y * speed;
 			allbox[0].mx = mx;
 			allbox[0].my = my;
-			ColliderBox* mp = this->getp();
 			for (int i = 1; i < allbox.size(); i++)
 			{
-				if (&allbox[i] != mp)
+				if (this->ID!=allbox[i].ID)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
@@ -510,10 +546,25 @@ public:
 	}
 	void shoot(int kind)//发射
 	{
-		lock2.lock();
-		allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle/180.0*PI)), (my + 40 + 37.5 * sin((double)vec.angle/180.0*PI)), kind, vec));//构造子弹对象
-
-		lock2.unlock();
+		if (canshoot)
+		{
+			canshoot = false;
+			lock2.lock();
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象
+			lock2.unlock();
+		}
+	}
+	void wait(bool isgaming)
+	{
+		while (isgaming)
+		{
+			if (!canshoot)
+			{
+				for (waittime = 250; waittime > 0; waittime--)
+					Sleep(1);
+				canshoot = true;
+			}
+		}
 	}
 	void display()
 	{
@@ -528,6 +579,9 @@ public:
 			break;
 		case 3:
 			RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
+			break;
+		case 4:
+			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		}
 		double temp1, temp2;
@@ -548,32 +602,19 @@ public:
 		temp2 -= 80.0 / 2;
 
 		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
-	}
-	//检测游戏是否还在进行
-	void changepng(bool game)
-	{
-		while (game)
+		
+		if (mhealth < 100)
 		{
-			while (_kbhit())
-			{
-				int key = _getch();
-				switch (key)
-				{
-				case 'a':
-				case 'A':
-				case 'D':
-				case 'd':
-				case 'w':
-				case 'W':
-				case 's':
-				case 'S':
-					movepng++;
-				}
-				if (movepng == 4)
-					movepng = 1;
-			}
+			setfillcolor(RED);
+			fillrectangle(mx, my - 10, mx + 8 + (int)(74.0 * (double)mhealth / (double)MAXHEALTH), my - 5);
+		}
+		if (waittime != 0)
+		{
+			setfillcolor(GREEN);
+			fillrectangle(mx + 8, my - 15, mx + 8 + (int)(74.0 * (double)waittime / 250.0), my - 11);
 		}
 	}
+	
 };
 
 
@@ -590,10 +631,13 @@ typedef struct point
 class Player :public Tank
 {
 private:
+	
 	int bulkind = 1;
+	int up, down, left, right, shift, vshoot;
 public:
 	std::array<Point, 5> fpt;
-	Player() :Tank(50, 240, 2), fpt()
+	Player(int up, int down, int left, int right, int shift, int vshoot)
+	:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -617,40 +661,30 @@ public:
 
 	void control(bool& game)
 	{
-		ExMessage msg;
 		while (game)
 		{	
-			if (peekmessage(&msg, EX_KEY, true))//处理键盘信息
-			{
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'a' || msg.vkcode == 'A'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(1);
-						peekmessage(&msg, EX_KEY, true);
-					}
-						
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'd' || msg.vkcode == 'D'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(2);
-						peekmessage(&msg, EX_KEY, true);
-					}
-						
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'w' || msg.vkcode == 'W'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(3);
-						peekmessage(&msg, EX_KEY, true);
-					}
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 's' || msg.vkcode == 'S'))
-					while (msg.message == WM_KEYDOWN)
-					{
-						Move(4);
-						peekmessage(&msg, EX_KEY, true);
-					}
-				if (msg.message == WM_KEYDOWN && (msg.vkcode == 'j' || msg.vkcode == 'J'))
-					shoot(bulkind);
-			}
+			if (KeyDown(left))
+				Move(1);
+			if (KeyDown(right))
+				Move(2);
+			if (KeyDown(up))
+				Move(3);
+			if (KeyDown(down))
+				Move(4);
+			if (KeyDown(vshoot))
+				shoot(bulkind);
+			Sleep(5);
+		}
+	}
+
+	void changepng(bool game)
+	{
+		while (game)
+		{
+			if (KeyDown(left) || KeyDown(right) || KeyDown(up) || KeyDown(down))
+				movepng++;
+			if (movepng == 4)
+				movepng = 1;
 		}
 	}
 };
