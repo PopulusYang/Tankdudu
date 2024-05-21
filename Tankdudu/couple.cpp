@@ -1,8 +1,5 @@
 #include"tankclass.h"
 #include"tankhead.h"
-class bullet;
-extern std::vector<ColliderBox> allbox;
-extern std::vector<bullet> allbullet;
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void couplelegame()
 {

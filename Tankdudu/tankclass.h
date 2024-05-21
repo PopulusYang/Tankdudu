@@ -6,9 +6,12 @@
 //最长游戏时间
 #define MAXTIME 60
 #define PI 3.14159265359
+
+#define ROWS 640
+#define COLS 480
+
 #include"tankhead.h"
 #include <random>
-//666
 #include<array>
 #include <time.h>
 #include<mutex>
@@ -141,7 +144,7 @@ public:
 	virtual ~ColliderBox() {}
 	/*
 	ColliderBox fuck(double ix, double iy) {
-	 	return ColliderBox((int)ix, (int)iy, width,height);
+		return ColliderBox((int)ix, (int)iy, width,height);
 	}
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
@@ -170,7 +173,7 @@ public:
 };
 
 //调试模式，绘制碰撞箱
-void ColliderBox::drawColliderbox(ColliderBox &obj)
+void ColliderBox::drawColliderbox(ColliderBox& obj)
 {
 	setfillcolor(WHITE);
 	//+21 +20 -25 -15
@@ -190,12 +193,12 @@ public:
 	//默认构造函数
 	Entity() :mhealth(MAXHEALTH), speed(0), IsAlive(true) {};
 	//x坐标，y坐标，宽度，高度，速度，生命值
-	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w),  speed(s), IsAlive(true), vec(vec) //mybox没用
+	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true), vec(vec) //mybox没用
 	{
-		
+
 	};
-	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w),  speed(s), IsAlive(true) {};
-	
+	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true) {};
+
 	virtual ~Entity() {}
 	virtual void Dead() = 0;//死亡
 	virtual void Move(int) = 0;//移动
@@ -270,7 +273,7 @@ private:
 	double speed;
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度,种类,
-	bullet(double x, double y, int kind, Vec vec) :mx(x),my(y),vec(vec), kind(kind) ,speed(10.0){}
+	bullet(double x, double y, int kind, Vec vec) :mx(x), my(y), vec(vec), kind(kind), speed(10.0) {}
 	inline double getx() { return mx; };
 	inline double gety() { return my; }
 	static void bullMove(int isgaming)
@@ -306,14 +309,14 @@ public:
 	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int flag = 1;
-            #define MAXsize 1 //MAXsize is the number of other player
-			for (int i = 4; i <4 ; i++)//Player number define MAXsize==1
-			{	//下面的检测逻辑需要依据玩家具体参数调整
-				if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
-					flag = 0;
-					break;
-				}
+#define MAXsize 1 //MAXsize is the number of other player
+		for (int i = 4; i < 4; i++)//Player number define MAXsize==1
+		{	//下面的检测逻辑需要依据玩家具体参数调整
+			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
+				flag = 0;
+				break;
 			}
+		}
 		if (flag) {
 			return false;
 		}
@@ -329,7 +332,7 @@ public:
 				allbullet.erase(allbullet.begin() + i);//子弹消除操作
 				i--;
 			}
-		 	else if (bull_OBSdec(p))
+			else if (bull_OBSdec(p))
 			{
 				/*加入障碍物掉血操作函数*/
 				int t = bull_OBSdec(p);
@@ -536,7 +539,7 @@ public:
 		}
 		Sleep(16);
 	}
-	
+
 	void Dead() override
 	{
 		if (!IsAlive)
@@ -560,7 +563,7 @@ public:
 		{
 			if (!canshoot)
 			{
-				for (waittime = 250; waittime > 0; waittime--)
+				for (waittime = 125; waittime > 0; waittime--)
 					Sleep(1);
 				canshoot = true;
 			}
@@ -602,19 +605,19 @@ public:
 		temp2 -= 80.0 / 2;
 
 		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
-		
+
 		if (mhealth < 100)
 		{
 			setfillcolor(RED);
-			fillrectangle(mx, my - 10, mx + 8 + (int)(74.0 * (double)mhealth / (double)MAXHEALTH), my - 5);
+			fillrectangle((int)mx + 8, (int)(my - 10), (int)(mx + 8 + (int)(74.0 * (double)mhealth / (double)MAXHEALTH)), (int)(my - 5));
 		}
 		if (waittime != 0)
 		{
 			setfillcolor(GREEN);
-			fillrectangle(mx + 8, my - 15, mx + 8 + (int)(74.0 * (double)waittime / 250.0), my - 11);
+			fillrectangle((int)(mx + 8), (int)(my - 15), (int)(mx + 8 + (int)(74.0 * (double)waittime / 125.0)), (int)(my - 11));
 		}
 	}
-	
+
 };
 
 
@@ -631,13 +634,13 @@ typedef struct point
 class Player :public Tank
 {
 private:
-	
+
 	int bulkind = 1;
 	int up, down, left, right, shift, vshoot;
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-	:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -655,6 +658,7 @@ public:
 			}
 			fpt[0].x = mx;
 			fpt[0].y = my;
+
 			Sleep(250);
 		}
 	}
@@ -662,7 +666,7 @@ public:
 	void control(bool& game)
 	{
 		while (game)
-		{	
+		{
 			if (KeyDown(left))
 				Move(1);
 			if (KeyDown(right))
@@ -688,13 +692,12 @@ public:
 		}
 	}
 };
-
+#define VIEW 50;
 
 //定义敌人类，写一个敌人AI
 class Enemy : public Tank
 {
 private:
-	int view = 50;
 	// 计算两点之间的距离  
 	inline double distance(const Point& a)
 	{
@@ -713,14 +716,255 @@ private:
 
 		}
 	}
+	inline double distance(int x, int y)
+	{
+		return sqrt((x - mx) * (x - mx) + (y - my) * (y - my));
+	}
+	point* CheckPoint(Player player)//检查哪个足迹是可以跟踪的
+	{
+		double mindis = distance((int)((player.fpt.begin())->x), (int)((player.fpt.begin())->y));
+		int dis = 0;
+		int position = 0;
+		int effective = 0;
+		for (point p : player.fpt)//逐个检查
+		{
+			dis = (int)distance((int)(p.x), (int)(p.y));
+			if (dis < mindis)
+			{
+				mindis = dis;
+				effective = position;
+			}
+
+		}
+	}
+
+	enum types { m_road, m_wall };
+	enum direct { p_up, p_down, p_left, p_right, p_lup, p_ldown, p_rup, p_rdown };
+
+	class MyPoint//点坐标
+	{
+	public:
+		int row;
+		int col;
+		int f;
+		int g;
+		int h;
+		bool operator== (MyPoint p)
+		{
+			if (row == p.row && col == p.col)
+				return true;
+			else
+				return false;
+		}
+	};
+
+	struct treeNode
+	{
+		MyPoint pos;
+		std::vector<treeNode*> child;//八叉树的子数组
+		treeNode* father;//指向父节点
+	};
+
+	treeNode* createNode(MyPoint pos)
+	{
+		treeNode* pNew = new treeNode{};
+		pNew->pos = pos;
+		return pNew;
+	}
+
+
+
+	Point* Astar(MyPoint start, MyPoint end)
+	{
+		//数字描述
+		static unsigned char map[ROWS][COLS] = { 0 };
+
+		static bool isFind[ROWS][COLS] = { 0 };
+		//int pos_x = 2, pos_y = 1;
+		MyPoint begpos = start;
+		MyPoint endpos = end;
+
+		treeNode* pRoot = NULL;
+		//起点作为第一个节点
+		pRoot = createNode(begpos);
+		isFind[begpos.row][begpos.col] = 1;
+		treeNode* pCurrent = pRoot;
+		treeNode* pChild;
+
+		std::vector<treeNode*> buff;
+		std::vector<treeNode*>::iterator it;
+		std::vector<treeNode*>::iterator itmin;//找最小用的迭代器
+		bool isFindend = false;
+
+		while (1)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				pChild = createNode(pCurrent->pos);
+				switch (i)
+				{
+				case p_up:
+					pChild->pos.row--;
+					pChild->pos.g += 10;
+					break;
+				case p_down:
+					pChild->pos.row++;
+					pChild->pos.g += 10;
+					break;
+				case p_left:
+					pChild->pos.col--;
+					pChild->pos.g += 10;
+					break;
+				case p_right:
+					pChild->pos.col++;
+					pChild->pos.g += 10;
+					break;
+				case p_lup:
+					pChild->pos.row--;
+					pChild->pos.col--;
+					pChild->pos.g += 14;
+					break;
+				case p_ldown:
+					pChild->pos.row++;
+					pChild->pos.col--;
+					pChild->pos.g += 14;
+					break;
+				case p_rup:
+					pChild->pos.row--;
+					pChild->pos.col++;
+					pChild->pos.g += 14;
+					break;
+				case p_rdown:
+					pChild->pos.row++;
+					pChild->pos.col++;
+					pChild->pos.g += 14;
+				}
+				if (canWalk(pChild->pos, map, isFind))
+				{
+					//计算h
+					pChild->pos.h = getH(pChild->pos, endpos);
+					//计算f
+					pChild->pos.f = pChild->pos.g + pChild->pos.h;
+					//存入数组
+					buff.push_back(pChild);
+					//放入八叉树
+					pCurrent->child.push_back(pChild);
+					pChild->father = pCurrent;
+				}
+				else
+				{
+					delete pChild;
+				}
+			}
+			//找最小
+			itmin = buff.begin();
+			for (it = buff.begin(); it != buff.end(); it++)
+			{
+				if ((*itmin)->pos.f > (*it)->pos.f)
+					itmin = it;
+			}
+			//走
+			pCurrent = *itmin;
+
+			//把挑出来的删掉
+			buff.erase(itmin);
+			//判断是否为终点
+			if (pCurrent->pos == endpos)
+			{
+				isFindend = true;
+				break;
+			}
+			//找不到终点
+			if (buff.empty())
+				break;
+		}
+		if (isFindend)
+		{
+			std::cout << "找到终点" << std::endl;
+			std::cout << "path:";
+			Point* repoi = new Point;
+			while (pCurrent)
+			{
+				std::cout << '(' << pCurrent->pos.row << ',' << pCurrent->pos.col << ')' << std::endl;
+				pCurrent = pCurrent->father;
+				
+				if (pCurrent != NULL && pCurrent->father != NULL)
+					repoi->x = pCurrent->pos.row, repoi->y = pCurrent->pos.col;
+			}
+			return repoi;
+		}
+		return NULL;
+	}
+
+
+
+	void scan(unsigned char** map)
+	{
+		for (ColliderBox& p : allbox)
+		{
+			for (int i = (int)(p.my); i <= (int)(p.my + p.height); i++)
+			{
+				for (int j = (int)(p.mx); j <= (int)(p.my) + p.width; j++)
+				{
+					map[i][j] = 1;
+				}
+			}
+		}
+		for (int i = (int)(allbox.begin()->my); (int)(allbox.begin()->my) + (int)(allbox.begin()->height); i++)
+		{
+			for (int j = (int)allbox.begin()->mx; j <= (int)allbox.begin()->my + (int)allbox.begin()->width; j++)
+			{
+				map[i][j] = 2;
+			}
+		}
+
+	}
+
+	bool canWalk(MyPoint pos, unsigned char map[ROWS][COLS], bool isFind[ROWS][COLS])
+	{
+		if (pos.row < 0 || pos.col < 0 || pos.row >= ROWS || pos.col >= COLS)
+			return false;//越界返回false
+		if (isFind[pos.row][pos.col])
+			return false;//走过的返回false
+		if (map[pos.row][pos.col] == 1)
+			return false;//障碍物不能走
+		return true;
+	}
+
+	int getH(MyPoint pos, MyPoint end)
+	{
+		int x, y;
+		if (end.row > pos.row)
+		{
+			y = end.row - pos.row;
+		}
+		else
+		{
+			y = pos.row - end.row;
+		}
+		if (end.col > pos.col)
+		{
+			x = end.col - pos.col;
+		}
+		else
+		{
+			x = pos.col - end.col;
+		}
+		return 10 * (x + y);
+	}
+
+
+
+
 public:
 	Enemy() :Tank(400, 240, 5)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
 	}
-	void aicontrol()
+	void aicontrol(int code)
 	{
 		//寻路
 		//攻击
 	}
 };
+
