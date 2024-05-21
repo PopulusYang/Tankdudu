@@ -128,13 +128,20 @@ class ColliderBox
 public:
 	//坐标以及长宽
 
-	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum) {}
-	ColliderBox(int x, int y, int h, int w) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum)
+	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true) {}
+	ColliderBox(int x, int y,int w ,int h ,int s, int health, Vec vec) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum) , mhealth(health), speed(s), IsAlive(true), vec(vec)
 	{	
 		allbox.push_back(*this);
 		p = &allbox[allbox.size()-1];
 		IDnum++;
 	}
+	ColliderBox(int x, int y,int w, int h,  int s, int health) :mx(x + 12), my(y + 30), height(h - 12), width(w - 22), ID(IDnum), mhealth(health), speed(s), IsAlive(true)
+	{
+		allbox.push_back(*this);
+		p = &allbox[allbox.size() - 1];
+		IDnum++;
+	}
+	virtual ~ColliderBox() {}
 	/*
 	ColliderBox fuck(double ix, double iy) {
 		return ColliderBox((int)ix, (int)iy, width,height);
@@ -142,7 +149,6 @@ public:
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
-	virtual ~ColliderBox() {};
 
 	inline ColliderBox* getp() { return p; };
 	inline int getID() { return ID; };
@@ -154,6 +160,16 @@ public:
 	int height;
 	int ID;
 	ColliderBox* p;
+	int mhealth;//健康值/血量
+	//位置
+	double speed;
+	bool IsAlive;
+	Vec vec;
+public:
+	virtual void Dead()//死亡
+	{}
+	virtual void Move(int)//移动
+	{}
 };
 
 //调试模式，绘制碰撞箱
@@ -164,7 +180,7 @@ void ColliderBox::drawColliderbox(ColliderBox& obj)
 	rectangle((int)(obj.mx), (int)(obj.my), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
 }
 
-class Entity : public ColliderBox//继承了碰撞箱的属性
+/*class Entity : public ColliderBox//继承了碰撞箱的属性
 {
 protected:
 	int mhealth;//健康值/血量
@@ -186,9 +202,9 @@ public:
 	virtual ~Entity() {}
 	virtual void Dead() = 0;//死亡
 	virtual void Move(int) = 0;//移动
-};
+};*/
 
-class obstacle : public Entity//障碍物
+class obstacle : public ColliderBox//障碍物
 {
 private:
 	int kind;
@@ -198,7 +214,7 @@ private:
 public:
 	//原点指图片左上角
 	//原点的x坐标，原点的y坐标，宽度，高度,速度，血量,障碍物类型
-	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :Entity(x, y, w, h, 0, s), kind(kind)
+	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :ColliderBox(x, y, w, h, s, blood), kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
 		loadimage(&img1, "sorce/wall1.png", w, h);
@@ -211,7 +227,7 @@ public:
 		std::uniform_int_distribution<> distrib(1, 2);
 		kind = distrib(gen);*/
 	}
-	obstacle() :Entity(0, 0, 0, 0, 0, 0), kind(0) {}
+	obstacle() :ColliderBox(0, 0, 0, 0, 0, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)
@@ -224,6 +240,12 @@ public:
 		}
 	}
 	void Move(int) override {}
+	void deblood()
+	{
+		mhealth = allbox[this->ID].mhealth;
+		if (mhealth < 0)
+			IsAlive = false;
+	}
 	void display()
 	{
 		IMAGE temp;
@@ -269,21 +291,21 @@ public:
 		}
 	}
 	//检测逻辑优化,不再对子弹套用碰撞箱检测函数，简化检测逻辑，实现子弹的即时生成和销毁而不占用储存空间
-	static bool bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
-	{
-		int flag = 1;
+	//逻辑上更改一下：碰上返回allbox数，没碰上返回0。
+	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
+	{	
+		int jug = 0;
 		for (int i = 1; i < 4; i++)//OBS number define MAX==4
-		{
-			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
-				flag = 0;
+		{	
+			if (thisbull.getx() >= allbox[i].mx&& thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) 
+			{
+				jug = allbox[i].ID;
 				break;
 			}
 		}
-		if (flag) {
-			return false;
-		}
-		return true;
+		return jug;
 	}
+	//子弹检测可以改的和上面那个一样，或者直接合并
 	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int flag = 1;
@@ -313,14 +335,28 @@ public:
 			else if (bull_OBSdec(p))
 			{
 				/*加入障碍物掉血操作函数*/
-
+				int t = bull_OBSdec(p);
+				for (int i = 0; i < allbox.size(); i++)
+				{
+					if (allbox[i].ID == t)
+					{
+						allbox[i].mhealth = allbox[i].mhealth - 30;
+					}
+				}
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
 			else if (bull_PLAdec(p)) {
 
 				/*加入人物掉血操作函数*/
-
+				int t = bull_OBSdec(p);
+				for (int i = 0; i < allbox.size(); i++)
+				{
+					if (allbox[i].ID == t)
+					{
+						allbox[i].mhealth = allbox[i].mhealth - 30;
+					}
+				}
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
@@ -337,7 +373,7 @@ public:
 	}
 };
 
-class Tank : public Entity//坦克类
+class Tank : public ColliderBox//坦克类
 {
 	friend bullet;
 protected:
@@ -424,7 +460,7 @@ protected:
 	}
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :Entity(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -447,62 +483,90 @@ public:
 			break;
 		case 3:
 		{
+		
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
 			allbox[0].mx = mx;
 			allbox[0].my = my;
 
-		
+
 			for (int i = 0; i < allbox.size(); i++)//改了这
 			{
 				if (allbox[i].getID() != this->getID())
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
+					
 				}
+				
 			}
 
 			if (!jug)
 			{
+				for (int stay=1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1://左
+						mx -= vec.x * speed;//
+						my += vec.y * speed*0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					
+					case 2://下					
+						mx += vec.x * speed*0.1 ;
+						my -= vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
 
-				mx -= vec.x * speed * 2;
-				my -= vec.y * speed * 2;
-				allbox[0].mx = mx;
-				allbox[0].my = my;
+					}
+				}
 			}
-			jug = 1;
-			break;
+				jug = 1;
+				break;
+			
 		}
 		case 4:
-		{
+		{	
 			int jug = 1;
+			
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
 			allbox[0].mx = mx;
 			allbox[0].my = my;
-			ColliderBox* mp = this->getp();
-			for (int i = 1; i < allbox.size(); i++)
+			for (int i = 0; i < allbox.size(); i++)
 			{
-				if (&allbox[i] != mp)
+				if (this->ID != allbox[i].ID)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-
-				}
-				if (jug == 0) {
-
-					mx += vec.x * speed * 2;
-					my += vec.y * speed * 2;
-					allbox[0].mx = mx;
-					allbox[0].my = my;
+					
 				}
 			}
-			jug = 1;
-			break;
-		}
+			if (jug == 0) {
+				for (int stay = 1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1:
+						mx += vec.x * speed;//
+						my -= vec.y * speed * 0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					case 2:
+						mx -= vec.x * speed * 0.1;
+						my += vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					}
+				}
+				jug = 1;
+				break;
+			}
 		}
 		Sleep(16);
+		}
 	}
 
 	void Dead() override
@@ -627,7 +691,7 @@ public:
 			Sleep(250);
 		}
 	}
-
+	//mark
 	void control(bool& game)
 	{
 		while (game)

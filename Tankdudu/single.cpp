@@ -23,8 +23,8 @@ void singlegame()
 	obstacle wall3[3] =
 	{
 		obstacle(100, 100, 100, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
+		obstacle(200, 200, 100, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(300, 300,100, 100, 0, SUPER_OBSTACLE, 3),			
 	};
 
 
