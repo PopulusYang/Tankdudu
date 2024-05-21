@@ -23,6 +23,7 @@ extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
 
+
 inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);

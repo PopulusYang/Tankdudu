@@ -158,6 +158,15 @@
     <Image Include="sorce\wall2.png" />
     <Image Include="sorce\wall3.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="music\add.wav" />
+    <Media Include="music\bang.wav" />
+    <Media Include="music\blast.wav" />
+    <Media Include="music\fire.wav" />
+    <Media Include="music\Gunfire.wav" />
+    <Media Include="music\hit.wav" />
+    <Media Include="music\start.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
