@@ -166,7 +166,11 @@ int main(int argc, char* argv[])
 {
 	srand((unsigned)time(NULL));
 	starting();
-	mciSendString("music/start.wav", NULL, 0, NULL);
+	mciSendString("open music/start.wav", NULL, 0, NULL);
+	mciSendString("open music/fire.wav", NULL, 0, NULL);
+	mciSendString("open music/blast.wav", NULL, 0, NULL);
+	mciSendString("open music/bang.wav", NULL, 0, NULL);
+	mciSendString("play music/start.wav" , 0, 0, 0);
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
 	button* b2 = new button(260, 310, 120, 50, "双人游戏");
 	button* b3 = new button(260, 390, 120, 50, "退出游戏");

@@ -316,6 +316,10 @@ public:
 			this->my = -100;
 			this->height = 0;
 			this->width = 0;
+			this->mhealth = MAXHEALTH;
+			this->IsAlive = true;
+			PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			mciSendString("play music/bang.wav", 0, 0, 0);
 			for (int i = 0; i < allbox.size(); i++)
 			{
 				if(this->ID == allbox[i].ID)
@@ -324,6 +328,7 @@ public:
 					allbox[i].my = this->my;
 					allbox[i].height = this->height;
 					allbox[i].width = this->width;
+					allbox[i].mhealth = this->mhealth;
 				}
 			}
 		}
@@ -333,7 +338,11 @@ public:
 	{
 		mhealth = allbox[this->ID].mhealth;
 		if (mhealth < 0)
+		{
 			IsAlive = false;
+			//PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			//mciSendString("play music/bang.wav", 0, 0, 0);
+		}
 	}
 	void display()
 	{
@@ -570,7 +579,8 @@ public:
 		{
 			canshoot = false;
 			lock2.lock();
-			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象			
+			mciSendString("play music/fire.wav", 0, 0, 0);
 			lock2.unlock();
 		}
 	}
@@ -694,6 +704,7 @@ public:
 				Move(4);
 			if (KeyDown(vshoot))
 				shoot(bulkind);
+
 			Sleep(5);
 		}
 	}
