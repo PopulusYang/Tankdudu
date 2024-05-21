@@ -3,9 +3,10 @@
 class bullet;
 std::mutex lock;
 std::mutex lock2;
-
+int IDnum = 0;
 std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
+
 /*
 PROMISE of
 allbox distrub:
