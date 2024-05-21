@@ -15,6 +15,8 @@
 #include<array>
 #include <time.h>
 #include<mutex>
+#include<cstdlib>
+extern int IDnum;
 extern std::mutex lock;
 extern std::mutex lock2;
 extern bool isgaming;
@@ -126,11 +128,12 @@ class ColliderBox
 public:
 	//坐标以及长宽
 
-	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL) {}
-	ColliderBox(int x, int y, int h, int w) :mx(x + 12), my(y + 30), height(h - 12), width(w - 22)
-	{
+	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum) {}
+	ColliderBox(int x, int y, int h, int w) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum)
+	{	
 		allbox.push_back(*this);
-		p = &allbox[allbox.size() - 1];
+		p = &allbox[allbox.size()-1];
+		IDnum++;
 	}
 	/*
 	ColliderBox fuck(double ix, double iy) {
@@ -140,13 +143,16 @@ public:
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
 	virtual ~ColliderBox() {};
+
 	inline ColliderBox* getp() { return p; };
+	inline int getID() { return ID; };
 
 	//override the data to public
 	double mx;
 	double my;
 	int width;
 	int height;
+	int ID;
 	ColliderBox* p;
 };
 
@@ -312,6 +318,7 @@ public:
 				i--;
 			}
 			else if (bull_PLAdec(p)) {
+
 				/*加入人物掉血操作函数*/
 
 				allbullet.erase(allbullet.begin() + i);
@@ -446,10 +453,10 @@ public:
 			allbox[0].mx = mx;
 			allbox[0].my = my;
 
-			ColliderBox* mp = this->getp();
-			for (int i = 1; i < allbox.size(); i++)
+		
+			for (int i = 0; i < allbox.size(); i++)//改了这
 			{
-				if (&allbox[i] != mp)
+				if (allbox[i].getID() != this->getID())
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
@@ -483,13 +490,13 @@ public:
 						jug = 0;
 
 				}
-			}
-			if (jug == 0)
-			{
-				mx += vec.x * speed * 2;
-				my += vec.y * speed * 2;
-				allbox[0].mx = mx;
-				allbox[0].my = my;
+				if (jug == 0) {
+
+					mx += vec.x * speed * 2;
+					my += vec.y * speed * 2;
+					allbox[0].mx = mx;
+					allbox[0].my = my;
+				}
 			}
 			jug = 1;
 			break;

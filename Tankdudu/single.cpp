@@ -46,9 +46,10 @@ void singlegame()
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
 		HWND hWnd = GetHWnd();
-		if (!IsWindow(hWnd))
+		if (IsWindow(hWnd))
+	 		FlushBatchDraw();
+		else
 			exit(0);
-	 	FlushBatchDraw();
 	}
 	EndBatchDraw();
 	thread1.join();
