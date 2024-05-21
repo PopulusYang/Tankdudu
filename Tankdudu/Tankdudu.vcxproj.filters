@@ -52,5 +52,11 @@
     <Image Include="sorce\wall3.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="sorce\tank_dead.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\tankico.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

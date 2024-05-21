@@ -152,7 +152,10 @@
     <Image Include="sorce\tank1.png" />
     <Image Include="sorce\tank2.png" />
     <Image Include="sorce\tank3.png" />
+    <Image Include="sorce\tankico.ico" />
+    <Image Include="sorce\tank_dead.png" />
     <Image Include="sorce\wall1.png" />
+    <Image Include="sorce\wall2.png" />
     <Image Include="sorce\wall3.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
