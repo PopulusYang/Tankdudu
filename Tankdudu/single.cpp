@@ -17,19 +17,24 @@ void singlegame()
 	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 	Player player('W','S','A','D','R','J');
-	Enemy enemy;
-	std::random_device rd;  // 获取随机数种子
+	/*std::random_device rd;  // 获取随机数种子
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(1, 2);
-	int kind = distrib(gen);
-	obstacle wall3[3] =
+	int kind = distrib(gen);*/
+	obstacle wall_rock[4] =
 	{
-		obstacle(100, 100, 100, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
+		obstacle(80, 70, 150, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(80, 260, 150, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(360, 260,150, 100, 0, SUPER_OBSTACLE, 3),	
+		obstacle(360, 70,150, 100, 0, SUPER_OBSTACLE, 3),
 	};
-
-
+	obstacle wall_wire_mesh[4] =
+	{
+		obstacle(185, 170, 45, 90, 0, 50, 2),
+		obstacle(360, 170, 45, 90, 0, 50, 2),
+		obstacle(225, 105,147, 75, 0, 50, 1),
+		obstacle(225, 260,147, 75, 0,50, 1),
+	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
@@ -40,11 +45,20 @@ void singlegame()
 	while (isgaming)
 	{
 		cleardevice();
+		for (int i = 0; i < 4; i++)
+		{
+			wall_rock[i].deblood();
+			wall_wire_mesh[i].deblood();
+			wall_rock[i].Dead();
+			wall_wire_mesh[i].Dead();
+		}
 		player.display();
+		for (int i=0; i < 4; i++)
 		enemy.display();
 		for (int i=0; i < 3; i++)
 		{
-			wall3[i].display();
+			wall_rock[i].display();
+			wall_wire_mesh[i].display();
 		}
 		ColliderBox::drawColliderbox(player);
 		bullet::display();

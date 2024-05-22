@@ -29,6 +29,7 @@ class bullet;
 extern std::vector<bullet> allbullet;
 extern unsigned char map[ROWS][COLS];
 
+
 inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
@@ -37,6 +38,80 @@ inline bool KeyDown(int vKey)
 class Function
 {
 public:
+	static void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
+	{
+		IMAGE* pWorking = GetWorkingImage();
+		SetWorkingImage(pFrom);
+		int iWidth = getwidth();
+		int iHeight = getheight();												// 获取原图长宽
+
+		while (rad > 2 * PI)													// 化简弧度
+			rad -= 2 * PI;
+
+		double pad = rad;														// 处理弧度
+		if (pad > PI / 2 && pad <= PI)
+		{
+			pad -= PI / 2;
+			pad = PI / 2 - pad;
+		}
+		else if (pad > PI && pad <= PI / 2 * 3)
+		{
+			pad -= PI;
+		}
+		else if (pad > PI / 2 * 3 && pad <= PI * 2)
+		{
+			pad -= PI / 2 * 3;
+			pad = PI / 2 - pad;
+		}
+
+		int	tWidth = int(iWidth * cos(pad) + iHeight * sin(pad));
+		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// 计算新图大小
+
+		int iMinX = -(iWidth / 2), iMinY = -(iHeight / 2);
+		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// 计算原图最小（大）坐标
+
+		int tMinX = -(tWidth / 2), tMinY = -(tHeight / 2);
+		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// 计算新图最小（大）坐标
+
+		setorigin(-iMinX, -iMinY);												// 设置图片中心为原点
+
+		SetWorkingImage(NULL);
+		pTo->Resize(tWidth, tHeight);											// 初始化新图
+
+		DWORD* dst = GetImageBuffer(pTo);
+		DWORD* src = GetImageBuffer(pFrom);										// 获取新图、原图的缓冲区
+
+		SetWorkingImage(pTo);
+		for (int y1 = 0; y1 < tHeight; y1++)
+		{
+			for (int x1 = 0; x1 < tWidth; x1++)
+				dst[x1] = 0x00000000;
+			dst += tWidth;
+		}
+		SetWorkingImage(pWorking);
+		for (int y1 = 0; y1 < tHeight; y1++)									// 初始化新图
+			dst -= tWidth;
+
+		for (int y1 = tMinY; y1 < tMaxY; y1++)
+		{
+			for (int x1 = tMinX; x1 < tMaxX; x1++)
+			{
+				int x = int(x1 * cos(rad) - y1 * sin(rad));
+				int y = int(x1 * sin(rad) + y1 * cos(rad));						// 计算变换后坐标
+
+				int sxy = (iHeight - (y - iMinY) - 1) * iWidth + (x - iMinX);
+				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// 计算坐标在缓冲区的位置
+
+				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// 越界特判
+					dst[dxy] = src[sxy];
+			}
+		}
+
+		SetWorkingImage(pFrom);
+		setorigin(0, 0);
+		SetWorkingImage(pWorking);												// 还原原图坐标
+	}
+
 	// transparentimage 函数：
 		// 根据 png 的 alpha 信息实现半透明贴图（基于直接操作显示缓冲区）
 		//x,y图片左上角坐标
@@ -247,7 +322,21 @@ public:
 		}
 		if (!IsAlive)
 		{
-
+			int jug = 1;
+			this->mx = -100;
+			this->my = -100;
+			this->height = 0;
+			this->width = 0;
+			for (int i = 0; i < allbox.size(); i++)
+			{
+				if(this->ID == allbox[i].ID)
+				{
+					allbox[i].mx = this->mx;
+					allbox[i].my = this->my;
+					allbox[i].height = this->height;
+					allbox[i].width = this->width;
+				}
+			}
 		}
 	}
 	void Move(int) override {}
@@ -271,7 +360,7 @@ public:
 		case 3:
 			temp = img3;
 		}
-		putimage((int)mx, (int)my, &temp);
+		Function::transparentimage(NULL, mx, my, &temp);
 	}
 };
 class bullet//子弹类
@@ -306,7 +395,7 @@ public:
 	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
 	{
 		int jug = 0;
-		for (int i = 1; i < 4; i++)//OBS number define MAX==4
+		for (int i = 1; i < 9; i++)//OBS number define MAX==4
 		{
 			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
@@ -396,79 +485,7 @@ protected:
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3;
 
-	void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
-	{
-		IMAGE* pWorking = GetWorkingImage();
-		SetWorkingImage(pFrom);
-		int iWidth = getwidth();
-		int iHeight = getheight();												// 获取原图长宽
 
-		while (rad > 2 * PI)													// 化简弧度
-			rad -= 2 * PI;
-
-		double pad = rad;														// 处理弧度
-		if (pad > PI / 2 && pad <= PI)
-		{
-			pad -= PI / 2;
-			pad = PI / 2 - pad;
-		}
-		else if (pad > PI && pad <= PI / 2 * 3)
-		{
-			pad -= PI;
-		}
-		else if (pad > PI / 2 * 3 && pad <= PI * 2)
-		{
-			pad -= PI / 2 * 3;
-			pad = PI / 2 - pad;
-		}
-
-		int	tWidth = int(iWidth * cos(pad) + iHeight * sin(pad));
-		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// 计算新图大小
-
-		int iMinX = -(iWidth / 2), iMinY = -(iHeight / 2);
-		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// 计算原图最小（大）坐标
-
-		int tMinX = -(tWidth / 2), tMinY = -(tHeight / 2);
-		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// 计算新图最小（大）坐标
-
-		setorigin(-iMinX, -iMinY);												// 设置图片中心为原点
-
-		SetWorkingImage(NULL);
-		pTo->Resize(tWidth, tHeight);											// 初始化新图
-
-		DWORD* dst = GetImageBuffer(pTo);
-		DWORD* src = GetImageBuffer(pFrom);										// 获取新图、原图的缓冲区
-
-		SetWorkingImage(pTo);
-		for (int y1 = 0; y1 < tHeight; y1++)
-		{
-			for (int x1 = 0; x1 < tWidth; x1++)
-				dst[x1] = 0x00000000;
-			dst += tWidth;
-		}
-		SetWorkingImage(pWorking);
-		for (int y1 = 0; y1 < tHeight; y1++)									// 初始化新图
-			dst -= tWidth;
-
-		for (int y1 = tMinY; y1 < tMaxY; y1++)
-		{
-			for (int x1 = tMinX; x1 < tMaxX; x1++)
-			{
-				int x = int(x1 * cos(rad) - y1 * sin(rad));
-				int y = int(x1 * sin(rad) + y1 * cos(rad));						// 计算变换后坐标
-
-				int sxy = (iHeight - (y - iMinY) - 1) * iWidth + (x - iMinX);
-				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// 计算坐标在缓冲区的位置
-
-				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// 越界特判
-					dst[dxy] = src[sxy];
-			}
-		}
-
-		SetWorkingImage(pFrom);
-		setorigin(0, 0);
-		SetWorkingImage(pWorking);												// 还原原图坐标
-	}
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
 	Tank(int x, int y, int s) :ColliderBox(x + 12, y + 30, 97 - 12, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
@@ -618,16 +635,16 @@ public:
 		switch (movepng)
 		{
 		case 1:
-			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		case 2:
-			RotateImage(&temp, &img2, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img2, PI / 180.0 * (double)vec.angle);
 			break;
 		case 3:
-			RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
 			break;
 		case 4:
-			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		}
 		double temp1, temp2;
@@ -683,7 +700,7 @@ private:
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(0, 200, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
