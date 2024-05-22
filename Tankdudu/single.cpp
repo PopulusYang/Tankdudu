@@ -18,34 +18,56 @@ void singlegame()
 	_getch();
 	Player player('W','S','A','D','R','J');
 	Enemy enemy;
-	std::random_device rd;  // 获取随机数种子
+	/*std::random_device rd;  // 获取随机数种子
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(1, 2);
-	int kind = distrib(gen);
-	obstacle wall3[3] =
+	int kind = distrib(gen);*/
+	
+	obstacle wall_rock[4] =
 	{
-		obstacle(100, 100, 100, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(200, 200, 200, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(320, 260,100, 100, 0, SUPER_OBSTACLE, 3),			
+		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
+		obstacle(100, 340, 150, 70, 0, SUPER_OBSTACLE, 3),
+		obstacle(400, 340,150, 70, 0, SUPER_OBSTACLE, 3),	
+		obstacle(400, 80,150, 70, 0, SUPER_OBSTACLE, 3),
 	};
-
-
+	obstacle wall_wire_mesh[4] =
+	{
+		obstacle(180, 175, 75, 147, 0, 50, 2),
+		obstacle(390, 175, 75, 147, 0, 50, 2),
+		obstacle(250, 100,147, 75, 0, 50, 1),
+		obstacle(250, 310,147, 75, 0, 50, 1),
+	};
+	
+	
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
 	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
+	std::thread thread6(&Enemy::wait, &enemy, isgaming);
 	setbkcolor(WHITE);
 	BeginBatchDraw();
 	while (isgaming)
 	{
 		cleardevice();
+		
+		for (int i = 0; i < 4; i++)
+		{
+			wall_rock[i].deblood();
+			wall_wire_mesh[i].deblood();
+			wall_rock[i].Dead();
+			wall_wire_mesh[i].Dead();
+		}
+		for (int i=0; i < 4; i++)
+		{
+			wall_rock[i].display();
+			wall_wire_mesh[i].display();
+		}
+		
+		
 		player.display();
 		enemy.display();
-		for (int i=0; i < 3; i++)
-		{
-			wall3[i].display();
-		}
+		
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
 		HWND hWnd = GetHWnd();
@@ -60,4 +82,5 @@ void singlegame()
 	thread3.join();
 	thread4.join();
 	thread5.join();
+	thread6.join();
 }

@@ -1,12 +1,41 @@
 #include"tankclass.h"
 #include"tankhead.h"
+
 class bullet;
 std::mutex lock;
 std::mutex lock2;
 int IDnum = 0;
 std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
+//星星
+#define MAXSTAR 200	// 星星总数
+//小星星
+struct STAR
+{
+	double	x;
+	int		y;
+	double	step;
+	int		color;
+};
 
+STAR star[MAXSTAR];
+void InitStar(int i)
+{
+	star[i].x = 0;
+	star[i].y = rand() % 480;
+	star[i].step = (rand() % 5000) / 1000.0 + 1;
+	star[i].color = (int)(star[i].step * 255 / 6.0 + 0.5);
+	star[i].color = RGB(star[i].color, star[i].color, star[i].color);
+}
+
+// 移动星星
+void MoveStar(int i)
+{
+	putpixel((int)star[i].x, star[i].y, 0);
+	star[i].x += star[i].step;
+	if (star[i].x > 640)	InitStar(i);
+	putpixel((int)star[i].x, star[i].y, star[i].color);
+}
 /*
 PROMISE of
 allbox distrub:
@@ -135,7 +164,9 @@ void starting()
 
 int main(int argc, char* argv[])
 {
+	srand((unsigned)time(NULL));
 	starting();
+	mciSendString("music/start.wav", NULL, 0, NULL);
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
 	button* b2 = new button(260, 310, 120, 50, "双人游戏");
 	button* b3 = new button(260, 390, 120, 50, "退出游戏");
@@ -185,7 +216,18 @@ int main(int argc, char* argv[])
 		settextstyle(36, 0, "华文隶书");
 		settextcolor(WHITE);
 		drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		_getch();
+	}
+	//以下是星星的代码
+	for (int i = 0; i < MAXSTAR; i++)
+	{
+		InitStar(i);
+		star[i].x = rand() % 640;
+	}
+	while (!_kbhit())
+	{
+		for (int i = 0; i < MAXSTAR; i++)
+			MoveStar(i);
+		Sleep(20);
 	}
 	// 按任意键退出
 	closegraph();
