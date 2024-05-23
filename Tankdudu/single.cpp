@@ -2,6 +2,7 @@
 #include"tankhead.h"
 
 bool isgaming = 1;
+unsigned char map[ROWS][COLS];
 
 
 
@@ -36,7 +37,7 @@ void singlegame()
 	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
-	std::thread thread3(&Player::footprint, &player, isgaming);
+	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
 	setbkcolor(WHITE);
@@ -53,6 +54,8 @@ void singlegame()
 		}
 		player.display();
 		for (int i=0; i < 4; i++)
+		enemy.display();
+		for (int i=0; i < 3; i++)
 		{
 			wall_rock[i].display();
 			wall_wire_mesh[i].display();
