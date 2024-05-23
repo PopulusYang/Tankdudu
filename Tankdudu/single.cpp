@@ -2,9 +2,7 @@
 #include"tankhead.h"
 
 bool isgaming = 1;
-
-
-
+unsigned char map[ROWS][COLS];
 
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
@@ -16,6 +14,7 @@ void singlegame()
 	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 	Player player('W','S','A','D','R','J');
+	Enemy enemy;
 	/*std::random_device rd;  // 获取随机数种子
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(1, 2);
@@ -36,7 +35,7 @@ void singlegame()
 	};
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
-	std::thread thread3(&Player::footprint, &player, isgaming);
+	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
 	setbkcolor(WHITE);
@@ -52,6 +51,7 @@ void singlegame()
 			wall_wire_mesh[i].Dead();
 		}
 		player.display();
+		enemy.display();
 		for (int i=0; i < 4; i++)
 		{
 			wall_rock[i].display();
