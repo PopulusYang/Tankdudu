@@ -23,26 +23,31 @@ void singlegame()
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(1, 2);
 	int kind = distrib(gen);*/
+	
 	obstacle wall_rock[4] =
 	{
-		obstacle(80, 70, 150, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(80, 260, 150, 100, 0, SUPER_OBSTACLE, 3),
-		obstacle(360, 260,150, 100, 0, SUPER_OBSTACLE, 3),	
-		obstacle(360, 70,150, 100, 0, SUPER_OBSTACLE, 3),
+		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
+		obstacle(100, 340, 150, 70, 0, SUPER_OBSTACLE, 3),
+		obstacle(400, 340,150, 70, 0, SUPER_OBSTACLE, 3),	
+		obstacle(400, 80,150, 70, 0, SUPER_OBSTACLE, 3),
 	};
 	obstacle wall_wire_mesh[4] =
 	{
-		obstacle(185, 170, 45, 90, 0, 50, 2),
-		obstacle(360, 170, 45, 90, 0, 50, 2),
-		obstacle(225, 105,147, 75, 0, 50, 1),
-		obstacle(225, 260,147, 75, 0,50, 1),
+		obstacle(180, 175, 75, 147, 0, 50, 2),
+		obstacle(390, 175, 75, 147, 0, 50, 2),
+		obstacle(250, 100,147, 75, 0, 50, 1),
+		obstacle(250, 310,147, 75, 0, 50, 1),
 	};
+	
+	
 	std::thread thread1(&Player::changepng, &player ,isgaming);
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
-	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
+	//std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
 	//setbkcolor(WHITE);
+	std::thread thread6(&Enemy::wait, &enemy, isgaming);
+	setbkcolor(WHITE);
 	BeginBatchDraw();
 
 	while (isgaming)
@@ -56,13 +61,16 @@ void singlegame()
 			wall_rock[i].Dead();
 			wall_wire_mesh[i].Dead();
 		}
-		player.display();
-		enemy.display();
 		for (int i=0; i < 4; i++)
 		{
 			wall_rock[i].display();
 			wall_wire_mesh[i].display();
 		}
+		
+		
+		player.display();
+		enemy.display();
+		
 		ColliderBox::drawColliderbox(player);
 		bullet::display();
 		HWND hWnd = GetHWnd();
@@ -74,7 +82,8 @@ void singlegame()
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();
-	thread3.join();
+	//thread3.join();
 	thread4.join();
 	thread5.join();
+	thread6.join();
 }

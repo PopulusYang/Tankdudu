@@ -38,7 +38,8 @@ void MoveStar(int i)
 	if (star[i].x > 640)	InitStar(i);
 	putpixel((int)star[i].x, star[i].y, star[i].color);
 }
-/*int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
+/*
+int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
 	int jug = 0;//此为返回值
 	// x轴方向碰撞？
@@ -49,7 +50,94 @@ void MoveStar(int i)
 		box2.my + box2.height >= box1.my;
 	// 只有两个轴向都有碰撞时才碰撞
 	return collisionX && collisionY;
+}
+
+void starting()
+{
+	// 绘图窗口初始化
+	//为了方便调试，我把控制台打开，完成后关掉即可
+
+	initgraph(640, 480, EX_SHOWCONSOLE);
+	// 获得窗口句柄
+	HWND hWnd = GetHWnd();
+	// 使用 Windows API 修改窗口名称
+	SetWindowText(hWnd, "坦克大战");
+	//设置图标
+	HICON newIcon = (HICON)LoadImage(NULL, TEXT("sorce/tankico.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+	SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)newIcon);
+	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)newIcon);
+
+	IMAGE img;
+	loadimage(&img, "sorce/start.jpg", 640, 480, true);
+	putimage(0, 0, &img);
+	//展示标题
+	setbkmode(TRANSPARENT);
+	RECT* title = new RECT{ 180,80,455,140 };
+	settextcolor(BLACK);
+	settextstyle(44, 0, "华文隶书");
+	//输出标题
+	drawtext("坦克大战biubiu", title, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	delete(title);
+	//分割线
+	setlinecolor(BLACK);
+	line(140, 160, 500, 160);
+	//三个按钮
+	settextstyle(24, 0, "华文隶书");
+}
+
+/*
+PROMISE of
+allbox distrub:
+[0]:player
+[1]-[n]:OBS
+[n+1]:enemies
+ (ensure dynamic space for enemy generating)
+*/
+
+
+
+//检测是否碰撞,只需传入两个对象的碰撞箱对象，即可检测是否碰撞
+/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
+	if (!((box1.mx > box2.mx + box2.width) &&//右边
+		(box1.mx + box1.width < box2.mx) &&//左边
+		(box1.my > box2.my + box2.height) &&//下边
+		(box1.my + box1.height < box2.my))//上边
+		)
+	{
+		return true;
+	};
+	return false;
 }*/
+/*
+//if collider, return true
+int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+{
+	int jug = 0;
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//左下
+		jug += 1;
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//左上
+		jug += 2;
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//右下
+		jug += 4;
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//右上
+		jug += 8;
+	return jug;
+}
+*/
+
+<<<<<<<<< Temporary merge branch 1
+int dustiColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
+{
+	int jug = 0;//此为返回值
+	// x轴方向碰撞？
+	bool collisionX = box1.mx + box1.width >= box2.mx &&
+		box2.mx + box2.width >= box1.mx;
+	// y轴方向碰撞？
+	bool collisionY = box1.my + box1.height >= box2.my &&
+		box2.my + box2.height >= box1.my;
+	// 只有两个轴向都有碰撞时才碰撞
+	return collisionX && collisionY;
+}
 int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	
@@ -77,7 +165,9 @@ int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 		 }
 	
 	return 0;
-}
+}*/
+
+
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	// 检测X轴上的碰撞
@@ -100,6 +190,40 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 
 	return 0; // 没有碰撞
 }
+//near==true
+bool isPointNear(int x1, int y1, int x2, int y2, int range) {
+	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
+}
+
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
+	// 获取 box1 和 box2 的四个角的坐标
+	int box1Corners[4][2] = {
+		{box1.mx, box1.my}, // 左上角
+		{box1.mx + box1.width, box1.my}, // 右上角
+		{box1.mx, box1.my + box1.height}, // 左下角
+		{box1.mx + box1.width, box1.my + box1.height} // 右下角
+	};
+
+	int box2Corners[4][2] = {
+		{box2.mx, box2.my}, // 左上角
+		{box2.mx + box2.width, box2.my}, // 右上角
+		{box2.mx, box2.my + box2.height}, // 左下角
+		{box2.mx + box2.width, box2.my + box2.height} // 右下角
+	};
+
+	// 检查 box1 的每个角是否接近 box2 的任意一个角
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
 void starting()
 {
 	// 绘图窗口初始化
