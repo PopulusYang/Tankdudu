@@ -523,6 +523,7 @@ public:
 			break;
 		case UP:
 		{
+		
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
@@ -544,33 +545,45 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
+					
 				}
+				
 			}
 
 			if (!jug)
 			{
+				for (int stay=1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1://×ó
+						mx -= vec.x * speed;//
+						my += vec.y * speed*0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					
+					case 2://ÏÂ					
+						mx += vec.x * speed*0.1 ;
+						my -= vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
 
-				mx -= vec.x * speed * 2;
-				my -= vec.y * speed * 2;
-				if (tag == 2)
-				{
-					allbox[0].mx = mx;
-					allbox[0].my = my;
-				}
-				else
-				{
-					allbox[1].mx = mx;
-					allbox[1].my = my;
+					}
 				}
 			}
-			jug = 1;
-			break;
+				jug = 1;
+				break;
+			
 		}
 		case DOWN:
 		{
 			int jug = 1;
+			
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
+			allbox[0].mx = mx;
+			allbox[0].my = my;
+			for (int i = 0; i < allbox.size(); i++)
 			if (tag == 2)
 			{
 				allbox[0].mx = mx;
@@ -587,29 +600,32 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-
-				}
-				if (jug == 0) {
-
-					mx += vec.x * speed * 2;
-					my += vec.y * speed * 2;
-					if (tag == 2)
-					{
-						allbox[0].mx = mx;
-						allbox[0].my = my;
-					}
-					else
-					{
-						allbox[1].mx = mx;
-						allbox[1].my = my;
-					}
+					
 				}
 			}
-			jug = 1;
-			break;
-		}
+			if (jug == 0) {
+				for (int stay = 1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1:
+						mx += vec.x * speed;//
+						my -= vec.y * speed * 0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					case 2:
+						mx -= vec.x * speed * 0.1;
+						my += vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					}
+				}
+				jug = 1;
+				break;
+			}
 		}
 		Sleep(16);
+		}
 	}
 
 	void Dead() override
