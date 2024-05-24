@@ -212,25 +212,29 @@ class ColliderBox
 public:
 	//坐标以及长宽
 
-	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID(IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true), tag(0) {}
-	ColliderBox(int x, int y, int w, int h, int s, int health, int tag, Vec vec) :mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), vec(vec), tag(tag)
+	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID(IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true), tag(0), displaceX(0), displaceY(0) {}
+	ColliderBox(int x, int y, int w, int h, int s, int health, int tag, Vec vec)
+		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), vec(vec), tag(tag), displaceX(0), displaceY(0)
 	{
 		allbox.push_back(*this);
 		p = &allbox[allbox.size() - 1];
 		IDnum++;
 	}
-	ColliderBox(int x, int y, int w, int h, int s, int tag, int health) :mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag)
+	ColliderBox(int x, int y, int w, int h, int s, int tag, int health)
+		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag), displaceX(0), displaceY(0)
+	{
+		allbox.push_back(*this);
+		p = &allbox[allbox.size() - 1];
+		IDnum++;
+	}
+	ColliderBox(int x, int y, int w, int h, int s, int tag, int health, int displaceX, int displaceY) 
+		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag), displaceX(displaceX), displaceY(displaceY)
 	{
 		allbox.push_back(*this);
 		p = &allbox[allbox.size() - 1];
 		IDnum++;
 	}
 	virtual ~ColliderBox() {}
-	/*
-	ColliderBox fuck(double ix, double iy) {
-		return ColliderBox((int)ix, (int)iy, width,height);
-	}
-	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
 	inline ColliderBox* getp() { return p; };
@@ -238,6 +242,8 @@ public:
 	//override the data to public
 	double mx;
 	double my;
+	double displaceX;
+	double displaceY;
 	int width;
 	int height;
 	int ID;
@@ -260,7 +266,7 @@ void ColliderBox::drawColliderbox(ColliderBox& obj)
 {
 	setfillcolor(WHITE);
 	//+21 +20 -25 -15
-	rectangle((int)(obj.mx), (int)(obj.my), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
+	rectangle((int)(obj.mx+obj.displaceX), (int)(obj.my+obj.displaceY), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
 }
 
 /*class Entity : public ColliderBox//继承了碰撞箱的属性
@@ -400,10 +406,13 @@ public:
 	//逻辑上更改一下：碰上返回allbox数，没碰上返回0。
 	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
 	{
-		int jug = 0;
-		for (int i = 2; i < 10; i++)//OBS number define MAX==4
+		int jug = -1;
+		for (int i = 0; i < 10; i++)//OBS number define MAX==4
 		{
-			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
+			if (thisbull.getx() >= allbox[i].mx+allbox[i].displaceX &&
+				thisbull.getx() < allbox[i].mx + allbox[i].width &&
+				thisbull.gety() >= allbox[i].my+allbox[i].displaceY &&
+				thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
 				jug = allbox[i].ID;
 				break;
@@ -412,22 +421,22 @@ public:
 		return jug;
 	}
 	//子弹检测可以改的和上面那个一样，或者直接合并
-	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
+	static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
-		int flag = 1;
-#define MAXsize 1 //MAXsize is the number of other player
-		for (int i = 4; i < 4; i++)//Player number define MAXsize==1
-		{	//下面的检测逻辑需要依据玩家具体参数调整
-			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
-				flag = 0;
+		int jug = -1;
+		for (int i = 0; i <2; i++)
+		{
+			if (thisbull.getx() >= allbox[i].mx+allbox[i].displaceX &&
+				thisbull.getx() < allbox[i].mx + allbox[i].width &&
+				thisbull.gety() >= allbox[i].my+allbox[i].displaceY &&
+				thisbull.gety() < allbox[i].my + allbox[i].height)
+			{
+				jug = allbox[i].ID;
 				break;
 			}
 		}
-		if (flag) {
-			return false;
-		}
-		return true;
-	}
+		return jug;
+	} 
 	static void checkDead()
 	{
 		int i = 0;
@@ -452,7 +461,7 @@ public:
 				allbullet.erase(allbullet.begin() + i);
 				i--;
 			}
-			else if (bull_PLAdec(p)) {
+			else if (bull_PLAdec(p)>=0) {
 
 				/*加入人物掉血操作函数*/
 				int t = bull_OBSdec(p);
@@ -496,8 +505,18 @@ protected:
 
 
 public:
+	void deblood()
+	{
+		mhealth = allbox[this->ID].mhealth;
+		if (mhealth < 0)
+		{
+			IsAlive = false;
+			//PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			//mciSendString("play music/bang.wav", 0, 0, 0);
+		}
+	}
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :ColliderBox(x + 22, y + 30, 97 - 22, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x , y , 97 - 22, 80 - 22, s, 2, MAXHEALTH, 12, 30), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -691,7 +710,25 @@ public:
 	{
 		if (!IsAlive)
 		{
-			//不再成为实体，修改图像或者删除图像
+			this->mx = -100;
+			this->my = -100;
+			this->height = 0;
+			this->width = 0;
+			this->mhealth = MAXHEALTH;
+			this->IsAlive = true;
+			if (volume_jug)
+				PlaySound("music/bang.wav", NULL, SND_FILENAME | SND_ASYNC);
+			for (int i = 0; i < allbox.size(); i++)
+			{
+				if (this->ID == allbox[i].ID)
+				{
+					allbox[i].mx = this->mx;
+					allbox[i].my = this->my;
+					allbox[i].height = this->height;
+					allbox[i].width = this->width;
+					allbox[i].mhealth = this->mhealth;
+				}
+			}
 		}
 	}
 	void shoot(int kind)//发射
@@ -793,6 +830,13 @@ public:
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
+	}
+	Player(int up, int down, int left, int right, int shift, int vshoot, int t)
+		:Tank(500, 240, 2), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+	{
+		std::cout << "A player has joined in the game." << std::endl;
+		tag = t;
+		allbox[1].tag = t;
 	}
 	~Player()
 	{
@@ -1053,7 +1097,8 @@ private:
 			if (map[pos.row][pos.col + i] == 1)
 				return false;
 		}
-		/*
+		/****************************************************************************
+		乐死我了这是什么鬼
 		for (int i = 30; i > 0; i--)
 		{
 			if (map[pos.row][pos.col + i] == 1 || map[pos.row][pos.col + i] == 3)
@@ -1064,7 +1109,7 @@ private:
 			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
 				return false;
 		}
-		*/
+		****************************************************************************/
 		
 		return true;
 	}
@@ -1134,7 +1179,7 @@ private:
 
 public:
 	
-	Enemy() :Tank(500, 200, 2.3)
+	Enemy() :Tank(500, 190, 2.3)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
 		tag = 5;

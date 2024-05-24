@@ -8,11 +8,15 @@ unsigned char map[ROWS][COLS];
 void singlegame()
 {
 	cleardevice();
+	IMAGE background;
+	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
+	
 	RECT center = { 0,0,639,479 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
 	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
+
 	Player player('W','S','A','D','R','J');
 	Enemy enemy;
 	/*std::random_device rd;  // 获取随机数种子
@@ -41,12 +45,15 @@ void singlegame()
 	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
+	//setbkcolor(WHITE);
 	std::thread thread6(&Enemy::wait, &enemy, isgaming);
 	setbkcolor(WHITE);
 	BeginBatchDraw();
+
 	while (isgaming)
 	{
 		cleardevice();
+		putimage(0, 0, &background);
 		for (int i = 0; i < 4; i++)
 		{
 			wall_rock[i].deblood();
@@ -60,7 +67,10 @@ void singlegame()
 			wall_wire_mesh[i].display();
 		}
 		
-		
+		player.deblood();
+		enemy.deblood();
+		player.Dead();
+		enemy.Dead();
 		player.display();
 		enemy.display();
 		
