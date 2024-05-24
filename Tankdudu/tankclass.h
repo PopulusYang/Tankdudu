@@ -14,13 +14,15 @@
 #define RIGHT 2
 #define UP 3
 #define DOWN 4
-
+//星星
+#define MAXSTAR 200
 #include"tankhead.h"
 #include <random>
 #include<array>
 #include<mutex>
 #include<cstdlib>
 #include <time.h>  
+extern int volume_jug;
 extern int IDnum;
 extern std::mutex lock;
 extern std::mutex lock2;
@@ -34,6 +36,7 @@ inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
 }
+
 
 class Function
 {
@@ -320,15 +323,15 @@ public:
 		}
 		if (!IsAlive)
 		{
-			int jug = 1;
+			//int jug = 1;
 			this->mx = -100;
 			this->my = -100;
 			this->height = 0;
 			this->width = 0;
 			this->mhealth = MAXHEALTH;
 			this->IsAlive = true;
-			PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
-			mciSendString("play music/bang.wav", 0, 0, 0);
+			if(volume_jug)
+			    PlaySound("music/bang.wav", NULL, SND_FILENAME | SND_ASYNC);
 			for (int i = 0; i < allbox.size(); i++)
 			{
 				if(this->ID == allbox[i].ID)
@@ -702,7 +705,8 @@ public:
 			canshoot = false;
 			lock2.lock();
 			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象			
-			mciSendString("play music/fire.wav", 0, 0, 0);
+			if(volume_jug)
+				mciSendString("play music/fire.wav", 0, 0, 0);
 			lock2.unlock();
 		}
 	}
@@ -1218,4 +1222,45 @@ public:
 		}
 	}
 };
+
+//创建按钮类
+class button
+{
+private:
+	//位置信息和大小信息
+	int x;
+	int y;
+	int w;
+	int h;
+	LPCSTR str;
+private:
+	//创建并显示按钮
+	void create(int x, int y, int w, int h, LPCSTR str)
+	{
+		setbkmode(TRANSPARENT);
+		setfillcolor(0x9BB171);
+		fillroundrect(x, y, x + w, y + h, 10, 10);
+		RECT r = { x,y,x + w,y + h };
+		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	}
+public:
+	button(int x, int y, int w, int h, LPCSTR str) :x(x), y(y), w(w), h(h), str(str)
+	{
+		create(x, y, w, h, str);
+		std::cout << "A button has been created" << std::endl;
+	}
+	~button()
+	{
+		std::cout << "The button has been deleted." << std::endl;
+	}
+	//检测一次按钮是否被按下
+	inline bool test(ExMessage msg) const
+	{
+		if (msg.x >= x && msg.x <= x + w && msg.y >= y && msg.y <= y + h)
+			return true;
+		else
+			return false;
+	}
+};
+
 
