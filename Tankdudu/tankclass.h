@@ -10,18 +10,25 @@
 #define ROWS 640
 #define COLS 480
 
+#define LEFT 1
+#define RIGHT 2
+#define UP 3
+#define DOWN 4
+
 #include"tankhead.h"
 #include <random>
 #include<array>
-#include <time.h>
 #include<mutex>
 #include<cstdlib>
+#include <time.h>  
 extern int IDnum;
 extern std::mutex lock;
 extern std::mutex lock2;
 extern bool isgaming;
 class bullet;
 extern std::vector<bullet> allbullet;
+extern unsigned char map[ROWS][COLS];
+
 
 inline bool KeyDown(int vKey)
 {
@@ -31,6 +38,80 @@ inline bool KeyDown(int vKey)
 class Function
 {
 public:
+	static void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
+	{
+		IMAGE* pWorking = GetWorkingImage();
+		SetWorkingImage(pFrom);
+		int iWidth = getwidth();
+		int iHeight = getheight();												// 获取原图长宽
+
+		while (rad > 2 * PI)													// 化简弧度
+			rad -= 2 * PI;
+
+		double pad = rad;														// 处理弧度
+		if (pad > PI / 2 && pad <= PI)
+		{
+			pad -= PI / 2;
+			pad = PI / 2 - pad;
+		}
+		else if (pad > PI && pad <= PI / 2 * 3)
+		{
+			pad -= PI;
+		}
+		else if (pad > PI / 2 * 3 && pad <= PI * 2)
+		{
+			pad -= PI / 2 * 3;
+			pad = PI / 2 - pad;
+		}
+
+		int	tWidth = int(iWidth * cos(pad) + iHeight * sin(pad));
+		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// 计算新图大小
+
+		int iMinX = -(iWidth / 2), iMinY = -(iHeight / 2);
+		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// 计算原图最小（大）坐标
+
+		int tMinX = -(tWidth / 2), tMinY = -(tHeight / 2);
+		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// 计算新图最小（大）坐标
+
+		setorigin(-iMinX, -iMinY);												// 设置图片中心为原点
+
+		SetWorkingImage(NULL);
+		pTo->Resize(tWidth, tHeight);											// 初始化新图
+
+		DWORD* dst = GetImageBuffer(pTo);
+		DWORD* src = GetImageBuffer(pFrom);										// 获取新图、原图的缓冲区
+
+		SetWorkingImage(pTo);
+		for (int y1 = 0; y1 < tHeight; y1++)
+		{
+			for (int x1 = 0; x1 < tWidth; x1++)
+				dst[x1] = 0x00000000;
+			dst += tWidth;
+		}
+		SetWorkingImage(pWorking);
+		for (int y1 = 0; y1 < tHeight; y1++)									// 初始化新图
+			dst -= tWidth;
+
+		for (int y1 = tMinY; y1 < tMaxY; y1++)
+		{
+			for (int x1 = tMinX; x1 < tMaxX; x1++)
+			{
+				int x = int(x1 * cos(rad) - y1 * sin(rad));
+				int y = int(x1 * sin(rad) + y1 * cos(rad));						// 计算变换后坐标
+
+				int sxy = (iHeight - (y - iMinY) - 1) * iWidth + (x - iMinX);
+				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// 计算坐标在缓冲区的位置
+
+				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// 越界特判
+					dst[dxy] = src[sxy];
+			}
+		}
+
+		SetWorkingImage(pFrom);
+		setorigin(0, 0);
+		SetWorkingImage(pWorking);												// 还原原图坐标
+	}
+
 	// transparentimage 函数：
 		// 根据 png 的 alpha 信息实现半透明贴图（基于直接操作显示缓冲区）
 		//x,y图片左上角坐标
@@ -121,21 +202,20 @@ public:
 };
 class ColliderBox;
 extern std::vector<ColliderBox> allbox;
-class Entity;
 //碰撞箱
 class ColliderBox
 {
 public:
 	//坐标以及长宽
 
-	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID( IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true) {}
-	ColliderBox(int x, int y,int w ,int h ,int s, int health, Vec vec) :mx(x+12), my(y+30), height(h-12), width(w-22),ID(IDnum) , mhealth(health), speed(s), IsAlive(true), vec(vec)
-	{	
+	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID(IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true), tag(0) {}
+	ColliderBox(int x, int y, int w, int h, int s, int health, int tag, Vec vec) :mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), vec(vec), tag(tag)
+	{
 		allbox.push_back(*this);
-		p = &allbox[allbox.size()-1];
+		p = &allbox[allbox.size() - 1];
 		IDnum++;
 	}
-	ColliderBox(int x, int y,int w, int h,  int s, int health) :mx(x + 12), my(y + 30), height(h - 12), width(w - 22), ID(IDnum), mhealth(health), speed(s), IsAlive(true)
+	ColliderBox(int x, int y, int w, int h, int s, int tag, int health) :mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag)
 	{
 		allbox.push_back(*this);
 		p = &allbox[allbox.size() - 1];
@@ -149,10 +229,8 @@ public:
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
-
 	inline ColliderBox* getp() { return p; };
 	inline int getID() { return ID; };
-
 	//override the data to public
 	double mx;
 	double my;
@@ -170,6 +248,7 @@ public:
 	{}
 	virtual void Move(int)//移动
 	{}
+	unsigned char tag;
 };
 
 //调试模式，绘制碰撞箱
@@ -214,20 +293,25 @@ private:
 public:
 	//原点指图片左上角
 	//原点的x坐标，原点的y坐标，宽度，高度,速度，血量,障碍物类型
-	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :ColliderBox(x, y, w, h, s, blood), kind(kind)
+	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :ColliderBox(x, y, w, h, s, 1, blood), kind(kind)
 	{
 		//此处的载入图片需要改成三种障碍物
 		loadimage(&img1, "sorce/wall1.png", w, h);
 		loadimage(&img2, "sorce/wall2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
-
+		if (kind == 2)
+		{
+			tag = 3;
+			allbox.back().tag = 3;
+		}
+			
 		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
 		/*std::random_device rd;  // 获取随机数种子
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> distrib(1, 2);
 		kind = distrib(gen);*/
 	}
-	obstacle() :ColliderBox(0, 0, 0, 0, 0, 0), kind(0) {}
+	obstacle() :ColliderBox(0, 0, 0, 0, 0, 1, 0), kind(0) {}
 	void Dead() override
 	{
 		if (IsAlive)
@@ -236,7 +320,26 @@ public:
 		}
 		if (!IsAlive)
 		{
-
+			int jug = 1;
+			this->mx = -100;
+			this->my = -100;
+			this->height = 0;
+			this->width = 0;
+			this->mhealth = MAXHEALTH;
+			this->IsAlive = true;
+			PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			mciSendString("play music/bang.wav", 0, 0, 0);
+			for (int i = 0; i < allbox.size(); i++)
+			{
+				if(this->ID == allbox[i].ID)
+				{
+					allbox[i].mx = this->mx;
+					allbox[i].my = this->my;
+					allbox[i].height = this->height;
+					allbox[i].width = this->width;
+					allbox[i].mhealth = this->mhealth;
+				}
+			}
 		}
 	}
 	void Move(int) override {}
@@ -244,7 +347,11 @@ public:
 	{
 		mhealth = allbox[this->ID].mhealth;
 		if (mhealth < 0)
+		{
 			IsAlive = false;
+			//PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			//mciSendString("play music/bang.wav", 0, 0, 0);
+		}
 	}
 	void display()
 	{
@@ -260,7 +367,7 @@ public:
 		case 3:
 			temp = img3;
 		}
-		putimage((int)mx, (int)my, &temp);
+		Function::transparentimage(NULL, mx, my, &temp);
 	}
 };
 class bullet//子弹类
@@ -293,11 +400,11 @@ public:
 	//检测逻辑优化,不再对子弹套用碰撞箱检测函数，简化检测逻辑，实现子弹的即时生成和销毁而不占用储存空间
 	//逻辑上更改一下：碰上返回allbox数，没碰上返回0。
 	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
-	{	
+	{
 		int jug = 0;
-		for (int i = 1; i < 4; i++)//OBS number define MAX==4
-		{	
-			if (thisbull.getx() >= allbox[i].mx&& thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) 
+		for (int i = 2; i < 9; i++)//OBS number define MAX==4
+		{
+			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
 				jug = allbox[i].ID;
 				break;
@@ -373,6 +480,9 @@ public:
 	}
 };
 
+
+bool isPointNear(int x1, int y1, int x2, int y2, int range);
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range = 5);
 class Tank : public ColliderBox//坦克类
 {
 	friend bullet;
@@ -385,82 +495,10 @@ protected:
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3;
 
-	void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
-	{
-		IMAGE* pWorking = GetWorkingImage();
-		SetWorkingImage(pFrom);
-		int iWidth = getwidth();
-		int iHeight = getheight();												// 获取原图长宽
 
-		while (rad > 2 * PI)													// 化简弧度
-			rad -= 2 * PI;
-
-		double pad = rad;														// 处理弧度
-		if (pad > PI / 2 && pad <= PI)
-		{
-			pad -= PI / 2;
-			pad = PI / 2 - pad;
-		}
-		else if (pad > PI && pad <= PI / 2 * 3)
-		{
-			pad -= PI;
-		}
-		else if (pad > PI / 2 * 3 && pad <= PI * 2)
-		{
-			pad -= PI / 2 * 3;
-			pad = PI / 2 - pad;
-		}
-
-		int	tWidth = int(iWidth * cos(pad) + iHeight * sin(pad));
-		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// 计算新图大小
-
-		int iMinX = -(iWidth / 2), iMinY = -(iHeight / 2);
-		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// 计算原图最小（大）坐标
-
-		int tMinX = -(tWidth / 2), tMinY = -(tHeight / 2);
-		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// 计算新图最小（大）坐标
-
-		setorigin(-iMinX, -iMinY);												// 设置图片中心为原点
-
-		SetWorkingImage(NULL);
-		pTo->Resize(tWidth, tHeight);											// 初始化新图
-
-		DWORD* dst = GetImageBuffer(pTo);
-		DWORD* src = GetImageBuffer(pFrom);										// 获取新图、原图的缓冲区
-
-		SetWorkingImage(pTo);
-		for (int y1 = 0; y1 < tHeight; y1++)
-		{
-			for (int x1 = 0; x1 < tWidth; x1++)
-				dst[x1] = 0x00000000;
-			dst += tWidth;
-		}
-		SetWorkingImage(pWorking);
-		for (int y1 = 0; y1 < tHeight; y1++)									// 初始化新图
-			dst -= tWidth;
-
-		for (int y1 = tMinY; y1 < tMaxY; y1++)
-		{
-			for (int x1 = tMinX; x1 < tMaxX; x1++)
-			{
-				int x = int(x1 * cos(rad) - y1 * sin(rad));
-				int y = int(x1 * sin(rad) + y1 * cos(rad));						// 计算变换后坐标
-
-				int sxy = (iHeight - (y - iMinY) - 1) * iWidth + (x - iMinX);
-				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// 计算坐标在缓冲区的位置
-
-				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// 越界特判
-					dst[dxy] = src[sxy];
-			}
-		}
-
-		SetWorkingImage(pFrom);
-		setorigin(0, 0);
-		SetWorkingImage(pWorking);												// 还原原图坐标
-	}
 public:
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :ColliderBox(x, y, 97, 80, s, MAXHEALTH), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x + 12, y + 30, 97 - 12, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -475,20 +513,28 @@ public:
 		//检测键盘，完成动作
 		switch (input)
 		{
-		case 1:
+		case LEFT:
 			vec.roundchange(1);
 			break;
-		case 2:
+		case RIGHT:
 			vec.roundchange(2);
 			break;
-		case 3:
+		case UP:
 		{
 		
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
-			allbox[0].mx = mx;
-			allbox[0].my = my;
+			if (tag == 2)
+			{
+				allbox[0].mx = mx;
+				allbox[0].my = my;
+			}
+			else
+			{
+				allbox[1].mx = mx;
+				allbox[1].my = my;
+			}
 
 
 			for (int i = 0; i < allbox.size(); i++)//改了这
@@ -506,18 +552,48 @@ public:
 			{
 				for (int stay=1; stay < allbox.size(); stay++) {
 					switch (ColliderDectect(*this, allbox[stay])) {
-					case 1://左
-						mx -= vec.x * speed;//
-						my += vec.y * speed*0.1;
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+					case 1://左右
+						if (!angleDectect(*this, allbox[stay])) {
+							mx -= vec.x * speed ;//
+							my += vec.y * speed * 0.1;
+							
+						}
+						else {
+							mx -= vec.x * speed * 1.5;//
+							my -= vec.y * speed * 1.5;
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					
-					case 2://下					
-						mx += vec.x * speed*0.1 ;
-						my -= vec.y * speed;//
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+					case 2://上下			
+						if (!angleDectect(*this, allbox[stay])) {
+							mx += vec.x * speed * 0.1;
+							my -= vec.y * speed;//
+							
+						}
+						else {
+							mx -= vec.x * speed * 1.5;
+							my -= vec.y * speed * 1.5;//
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 
 					}
@@ -527,37 +603,80 @@ public:
 				break;
 			
 		}
-		case 4:
-		{	
+		case DOWN:
+		{
 			int jug = 1;
 			
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
-			allbox[0].mx = mx;
-			allbox[0].my = my;
-			for (int i = 0; i < allbox.size(); i++)
+			if (tag == 2)
+			{
+				allbox[0].mx = mx;
+				allbox[0].my = my;
+			}
+			else
+			{
+				allbox[1].mx = mx;
+				allbox[1].my = my;
+			}
+
+			for (int i = 1; i < allbox.size(); i++)
 			{
 				if (this->ID != allbox[i].ID)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-					
+						
 				}
 			}
-			if (jug == 0) {
+
+			if (!jug) {
 				for (int stay = 1; stay < allbox.size(); stay++) {
 					switch (ColliderDectect(*this, allbox[stay])) {
 					case 1:
-						mx += vec.x * speed;//
-						my -= vec.y * speed * 0.1;
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+
+						if (!angleDectect(*this, allbox[stay])) {
+							mx += vec.x * speed;//
+							my -= vec.y * speed * 0.1;
+							
+						}
+						else {
+							mx += vec.x * speed * 1.5;//
+							my += vec.y * speed * 1.5 ;
+						}
+
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					case 2:
-						mx -= vec.x * speed * 0.1;
-						my += vec.y * speed;//
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+						if (!angleDectect(*this, allbox[stay])) {
+							mx -= vec.x * speed * 0.1;
+							my += vec.y * speed;//
+					
+						}
+						else {
+							mx += vec.x * speed * 1.5;
+							my += vec.y * speed * 1.5;//
+						}
+						
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					}
 				}
@@ -582,7 +701,8 @@ public:
 		{
 			canshoot = false;
 			lock2.lock();
-			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象			
+			mciSendString("play music/fire.wav", 0, 0, 0);
 			lock2.unlock();
 		}
 	}
@@ -604,16 +724,16 @@ public:
 		switch (movepng)
 		{
 		case 1:
-			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		case 2:
-			RotateImage(&temp, &img2, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img2, PI / 180.0 * (double)vec.angle);
 			break;
 		case 3:
-			RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img3, PI / 180.0 * (double)vec.angle);
 			break;
 		case 4:
-			RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
+			Function::RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
 		}
 		double temp1, temp2;
@@ -669,7 +789,7 @@ private:
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(50, 240, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(0, 400, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -678,20 +798,8 @@ public:
 	{
 		std::cout << "A player has left the game." << std::endl;
 	}
-	void footprint(bool isgaming)
-	{
-		while (isgaming)
-		{
-			for (std::size_t i = 4; i > 0; --i) {
-				fpt[i] = fpt[i - 1];
-			}
-			fpt[0].x = mx;
-			fpt[0].y = my;
 
-			Sleep(250);
-		}
-	}
-	//mark
+
 	void control(bool& game)
 	{
 		while (game)
@@ -706,6 +814,7 @@ public:
 				Move(4);
 			if (KeyDown(vshoot))
 				shoot(bulkind);
+
 			Sleep(5);
 		}
 	}
@@ -727,57 +836,23 @@ public:
 class Enemy : public Tank
 {
 private:
+
 	// 计算两点之间的距离  
-	inline double distance(const Point& a)
-	{
-		return std::sqrt(std::pow(a.x - mx, 2) + std::pow(a.y - my, 2));
-	}
-
-	// 检查一个点是否在给定半径的圆内  
-	inline bool isInsideCircle(double radius, const Point& point)
-	{
-		return distance(point) <= radius;
-	}
-	inline bool check(Player& p)
-	{
-		for (Point& ptr : p.fpt)
-		{
-
-		}
-	}
-	inline double distance(int x, int y)
+	inline double distance(double x, double y)
 	{
 		return sqrt((x - mx) * (x - mx) + (y - my) * (y - my));
 	}
-	point* CheckPoint(Player player)//检查哪个足迹是可以跟踪的
-	{
-		double mindis = distance((int)((player.fpt.begin())->x), (int)((player.fpt.begin())->y));
-		int dis = 0;
-		int position = 0;
-		int effective = 0;
-		for (point p : player.fpt)//逐个检查
-		{
-			dis = (int)distance((int)(p.x), (int)(p.y));
-			if (dis < mindis)
-			{
-				mindis = dis;
-				effective = position;
-			}
-
-		}
-	}
-
 	enum types { m_road, m_wall };
 	enum direct { p_up, p_down, p_left, p_right, p_lup, p_ldown, p_rup, p_rdown };
 
 	class MyPoint//点坐标
 	{
 	public:
-		int row;
-		int col;
-		int f;
-		int g;
-		int h;
+		int row = 0;
+		int col = 0;
+		double f = 0;
+		double g = 0;
+		double h = 0;
 		bool operator== (MyPoint p)
 		{
 			if (row == p.row && col == p.col)
@@ -791,27 +866,41 @@ private:
 	{
 		MyPoint pos;
 		std::vector<treeNode*> child;//八叉树的子数组
-		treeNode* father;//指向父节点
+		treeNode* father = NULL;//指向父节点
 	};
 
 	treeNode* createNode(MyPoint pos)
 	{
 		treeNode* pNew = new treeNode{};
-		pNew->pos = pos;
+		pNew->pos.row = pos.row;
+		pNew->pos.col = pos.col;
 		return pNew;
 	}
 
+	void displaypoint(treeNode* p)//调试用，显示轨迹
+	{
+		setfillcolor(BLACK);
+		while (p)
+		{
+			fillcircle(p->pos.row, p->pos.col, 1);
+			p = p->father;
+		}
+	}
 
-
-	Point* Astar(MyPoint start, MyPoint end)
+	treeNode* Astar(int x1, int y1, int x2, int y2)
 	{
 		//数字描述
-		static unsigned char map[ROWS][COLS] = { 0 };
-
 		static bool isFind[ROWS][COLS] = { 0 };
-		//int pos_x = 2, pos_y = 1;
-		MyPoint begpos = start;
-		MyPoint endpos = end;
+		memset(isFind, 0, sizeof(isFind));
+		scan();
+		//确定起点与终点
+		MyPoint begpos;
+		begpos.row = x1;
+		begpos.col = y1;
+		MyPoint endpos;
+		endpos.row = x2;
+		endpos.col = y2;
+
 
 		treeNode* pRoot = NULL;
 		//起点作为第一个节点
@@ -824,8 +913,8 @@ private:
 		std::vector<treeNode*>::iterator it;
 		std::vector<treeNode*>::iterator itmin;//找最小用的迭代器
 		bool isFindend = false;
-
-		while (1)
+		int time = 0;
+		while (time < 700)
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -834,39 +923,39 @@ private:
 				{
 				case p_up:
 					pChild->pos.row--;
-					pChild->pos.g += 10;
+					pChild->pos.g += 10.0;
 					break;
 				case p_down:
 					pChild->pos.row++;
-					pChild->pos.g += 10;
+					pChild->pos.g += 10.0;
 					break;
 				case p_left:
 					pChild->pos.col--;
-					pChild->pos.g += 10;
+					pChild->pos.g += 10.0;
 					break;
 				case p_right:
 					pChild->pos.col++;
-					pChild->pos.g += 10;
+					pChild->pos.g += 10.0;
 					break;
 				case p_lup:
 					pChild->pos.row--;
 					pChild->pos.col--;
-					pChild->pos.g += 14;
+					pChild->pos.g += 14.0;
 					break;
 				case p_ldown:
 					pChild->pos.row++;
 					pChild->pos.col--;
-					pChild->pos.g += 14;
+					pChild->pos.g += 14.0;
 					break;
 				case p_rup:
 					pChild->pos.row--;
 					pChild->pos.col++;
-					pChild->pos.g += 14;
+					pChild->pos.g += 14.0;
 					break;
 				case p_rdown:
 					pChild->pos.row++;
 					pChild->pos.col++;
-					pChild->pos.g += 14;
+					pChild->pos.g += 14.0;
 				}
 				if (canWalk(pChild->pos, map, isFind))
 				{
@@ -885,6 +974,9 @@ private:
 					delete pChild;
 				}
 			}
+			//找不到终点
+			if (buff.empty())
+				break;
 			//找最小
 			itmin = buff.begin();
 			for (it = buff.begin(); it != buff.end(); it++)
@@ -894,59 +986,50 @@ private:
 			}
 			//走
 			pCurrent = *itmin;
-
-			//把挑出来的删掉
-			buff.erase(itmin);
+			time++;
+			//displaypoint(pCurrent);
+			//标记
+			isFind[pCurrent->pos.row][pCurrent->pos.col] = true;
+			//清空buff
+			buff.clear();
 			//判断是否为终点
-			if (pCurrent->pos == endpos)
+			if (pCurrent->pos.row>=endpos.row-3&& pCurrent->pos.row <= endpos.row + 3&& pCurrent->pos.col >= endpos.col - 3 && pCurrent->pos.col <= endpos.col + 3)
 			{
 				isFindend = true;
 				break;
 			}
-			//找不到终点
-			if (buff.empty())
-				break;
+			
 		}
 		if (isFindend)
 		{
 			std::cout << "找到终点" << std::endl;
 			std::cout << "path:";
-			Point* repoi = new Point;
-			while (pCurrent)
-			{
-				std::cout << '(' << pCurrent->pos.row << ',' << pCurrent->pos.col << ')' << std::endl;
-				pCurrent = pCurrent->father;
-				
-				if (pCurrent != NULL && pCurrent->father != NULL)
-					repoi->x = pCurrent->pos.row, repoi->y = pCurrent->pos.col;
-			}
-			return repoi;
+			treeNode* retree;
+			retree = pCurrent;
+			return retree;
 		}
+		std::cout << "寻路失败" << std::endl;
 		return NULL;
 	}
 
 
 
-	void scan(unsigned char** map)
+	void scan()
 	{
+		memset(map, 0, sizeof(map));
 		for (ColliderBox& p : allbox)
 		{
 			for (int i = (int)(p.my); i <= (int)(p.my + p.height); i++)
 			{
-				for (int j = (int)(p.mx); j <= (int)(p.my) + p.width; j++)
+				for (int j = (int)(p.mx); j <= (int)(p.mx) + p.width; j++)
 				{
-					map[i][j] = 1;
+					if (i < 0 || j < 0)
+						continue;
+					map[j][i] = p.tag;
 				}
 			}
 		}
-		for (int i = (int)(allbox.begin()->my); (int)(allbox.begin()->my) + (int)(allbox.begin()->height); i++)
-		{
-			for (int j = (int)allbox.begin()->mx; j <= (int)allbox.begin()->my + (int)allbox.begin()->width; j++)
-			{
-				map[i][j] = 2;
-			}
-		}
-
+		map[(int)mx][(int)my] = 0;
 	}
 
 	bool canWalk(MyPoint pos, unsigned char map[ROWS][COLS], bool isFind[ROWS][COLS])
@@ -957,10 +1040,30 @@ private:
 			return false;//走过的返回false
 		if (map[pos.row][pos.col] == 1)
 			return false;//障碍物不能走
+		for (int i = 12; i < 86; i++)
+		{
+			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
+				return false;
+		}
+		for (int i = 30; i < 79; i++)
+		{
+			if (map[pos.row][pos.col+i] == 1 || map[pos.row][pos.col+i] == 3)
+				return false;
+		}
+		for (int i = 30; i > -10; i--)
+		{
+			if (map[pos.row][pos.col + i] == 1 || map[pos.row][pos.col + i] == 3)
+				return false;
+		}
+		for (int i = 12; i > -10; i--)
+		{
+			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
+				return false;
+		}
 		return true;
 	}
 
-	int getH(MyPoint pos, MyPoint end)
+	double getH(MyPoint pos, MyPoint end)
 	{
 		int x, y;
 		if (end.row > pos.row)
@@ -979,21 +1082,140 @@ private:
 		{
 			x = pos.col - end.col;
 		}
-		return 10 * (x + y);
+		return sqrt(x * x + y * y);
 	}
-
-
+	//释放八叉树的内存
+	void freetree(treeNode* root)
+	{
+		treeNode* temp1;
+		temp1 = root;
+		treeNode* temp2 = NULL;
+		int i = 0;
+		while (!temp1->child.empty())
+		{
+			temp2 = temp1;
+			bool jug = true;
+			i = 0;
+			while(1)//遇到有子项的就赋值，没有子项的直接释放
+			{
+				if (temp2->child[i]->child.empty())
+				{
+					delete temp2->child[i];
+					temp2->child.erase(temp2->child.begin() + i);
+				}
+				else
+				{
+					temp1 = temp2->child[i];
+					i++;
+				}
+				if (temp1 == temp2 && temp2->child.empty())//检测是否是最后一个节点
+				{
+					jug = false;
+					break;
+				}
+				if (temp1 != temp2 && temp2->child.size() == 1)
+				{
+					jug = true;
+					break;
+				}
+			}
+			if (jug)
+				delete temp1->father;
+		}
+		delete temp1;
+	}
 
 
 public:
-	Enemy() :Tank(400, 240, 5)
+	
+	Enemy() :Tank(450, 240, 5)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
+		tag = 5;
+		allbox.back().tag = 5;
 	}
-	void aicontrol(int code)
+	void aicontrol(bool isgaimg)
 	{
 		//寻路
 		//攻击
+		typedef struct Quadrant//象限
+		{
+			int qua = 0;//象限数
+			inline void calqua(int angle)
+			{
+				qua = angle / 90 + 1;
+			}
+			int operator- (const Quadrant& p)
+			{
+				if (qua < p.qua)
+					return qua + 4 - p.qua;
+				else
+					return qua - p.qua;
+			}
+		}Quadrant;
+		while (isgaimg)
+		{
+			treeNode* road;
+			road = Astar((int)allbox[0].mx, (int)allbox[0].my, (int)mx, (int)my);
+			if (road == NULL)
+				continue;
+			Point p1{ mx,my };
+			for (int i = 0; i < 5; i++)
+			{
+				road = road->father;
+				if (road == NULL || road->father == NULL)
+					break;
+			}
+			Point p2{ (double)road->pos.row,(double)road->pos.col };
+			//释放八叉树内存
+			while (road->father != NULL)
+				road = road->father;
+			freetree(road);
+			//找出路径中的两个点，求出其向量
+			Vec temp;
+			temp.x = (double)(p2.x - p1.x) / sqrt((double)(p2.x - p1.x) * (double)(p2.x - p1.x) + (double)(p2.y - p1.y) * (double)(p2.y - p1.y));
+			temp.y = (double)(p2.y - p1.y) / sqrt((double)(p2.x - p1.x) * (double)(p2.x - p1.x) + (double)(p2.y - p1.y) * (double)(p2.y - p1.y));
+			double tempcos = temp.x / sqrt(temp.x * temp.x + temp.y * temp.y);
+			double tempsin = temp.y / sqrt(temp.x * temp.x + temp.y * temp.y);
+			temp.angle = (int)(acos((long double)tempcos) / PI * 180.0);
+			if (tempsin < 0)
+				temp.angle = 360 - temp.angle;
+			//将坦克转向方向向量
+			Quadrant q1, q2;
+			q1.calqua(temp.angle);
+			q2.calqua(vec.angle);
+			for (int i = 0; i < 20 && (temp.angle <= vec.angle - 3 || temp.angle >= vec.angle + 3); i++)
+			{
+				if (q1 - q2 > q2 - q1||temp.angle<vec.angle)
+					Move(1);
+				else
+					Move(2);
+				Sleep(25);
+			}
+			//移动
+			if (temp.angle >= vec.angle - 3 && temp.angle <= vec.angle + 3)
+			{
+				Move(3);
+				Sleep(25);
+				Move(3);
+			}
+			double dis = distance(allbox[0].mx, allbox[0].my);
+			while (dis<20.0)
+			{
+				Move(4);
+				Sleep(23);
+				dis = distance(allbox[0].mx, allbox[0].my);
+			}
+			bool canshoot = false;
+			Point checkshoot{ mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI) ,my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI) };
+			for (int i = 0; i < 50; i++)
+			{
+				if (map[(int)checkshoot.x][(int)checkshoot.y] == 2 || map[(int)checkshoot.x][(int)checkshoot.y] == 3)
+					canshoot = true;
+			}
+			if (canshoot)
+				shoot(1);
+		}
 	}
 };
 

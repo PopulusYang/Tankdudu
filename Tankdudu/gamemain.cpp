@@ -1,12 +1,41 @@
 #include"tankclass.h"
 #include"tankhead.h"
+
 class bullet;
 std::mutex lock;
 std::mutex lock2;
 int IDnum = 0;
 std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
+//星星
+#define MAXSTAR 200	// 星星总数
+//小星星
+struct STAR
+{
+	double	x;
+	int		y;
+	double	step;
+	int		color;
+};
 
+STAR star[MAXSTAR];
+void InitStar(int i)
+{
+	star[i].x = 0;
+	star[i].y = rand() % 480;
+	star[i].step = (rand() % 5000) / 1000.0 + 1;
+	star[i].color = (int)(star[i].step * 255 / 6.0 + 0.5);
+	star[i].color = RGB(star[i].color, star[i].color, star[i].color);
+}
+
+// 移动星星
+void MoveStar(int i)
+{
+	putpixel((int)star[i].x, star[i].y, 0);
+	star[i].x += star[i].step;
+	if (star[i].x > 640)	InitStar(i);
+	putpixel((int)star[i].x, star[i].y, star[i].color);
+}
 /*
 PROMISE of
 allbox distrub:
@@ -86,7 +115,6 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	return jug;
 }
 */
-
 int dustiColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
 	int jug = 0;//此为返回值
@@ -127,6 +155,8 @@ int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	
 	return 0;
 }
+
+
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	// 检测X轴上的碰撞
@@ -149,6 +179,40 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 
 	return 0; // 没有碰撞
 }
+//near==true
+bool isPointNear(int x1, int y1, int x2, int y2, int range) {
+	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
+}
+
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
+	// 获取 box1 和 box2 的四个角的坐标
+	int box1Corners[4][2] = {
+		{box1.mx, box1.my}, // 左上角
+		{box1.mx + box1.width, box1.my}, // 右上角
+		{box1.mx, box1.my + box1.height}, // 左下角
+		{box1.mx + box1.width, box1.my + box1.height} // 右下角
+	};
+
+	int box2Corners[4][2] = {
+		{box2.mx, box2.my}, // 左上角
+		{box2.mx + box2.width, box2.my}, // 右上角
+		{box2.mx, box2.my + box2.height}, // 左下角
+		{box2.mx + box2.width, box2.my + box2.height} // 右下角
+	};
+
+	// 检查 box1 的每个角是否接近 box2 的任意一个角
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
 void starting()
 {
 	// 绘图窗口初始化
@@ -184,7 +248,13 @@ void starting()
 
 int main(int argc, char* argv[])
 {
+	srand((unsigned)time(NULL));
 	starting();
+	mciSendString("open music/start.wav", NULL, 0, NULL);
+	mciSendString("open music/fire.wav", NULL, 0, NULL);
+	mciSendString("open music/blast.wav", NULL, 0, NULL);
+	mciSendString("open music/bang.wav", NULL, 0, NULL);
+	mciSendString("play music/start.wav" , 0, 0, 0);
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
 	button* b2 = new button(260, 310, 120, 50, "双人游戏");
 	button* b3 = new button(260, 390, 120, 50, "退出游戏");
@@ -234,7 +304,18 @@ int main(int argc, char* argv[])
 		settextstyle(36, 0, "华文隶书");
 		settextcolor(WHITE);
 		drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		_getch();
+	}
+	//以下是星星的代码
+	for (int i = 0; i < MAXSTAR; i++)
+	{
+		InitStar(i);
+		star[i].x = rand() % 640;
+	}
+	while (!_kbhit())
+	{
+		for (int i = 0; i < MAXSTAR; i++)
+			MoveStar(i);
+		Sleep(20);
 	}
 	// 按任意键退出
 	closegraph();
