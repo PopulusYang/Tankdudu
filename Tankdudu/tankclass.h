@@ -118,6 +118,7 @@ public:
 	// transparentimage 函数：
 		// 根据 png 的 alpha 信息实现半透明贴图（基于直接操作显示缓冲区）
 		//x,y图片左上角坐标
+
 	static void transparentimage(IMAGE* dstimg, int x, int y, IMAGE* srcimg)
 	{
 		DWORD* dst = GetImageBuffer(dstimg);
@@ -182,12 +183,12 @@ public:
 		switch (userKey)
 		{
 		case 2://沿着向量方向增加
-			angle += 4;
+			angle += 2;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
 		case 1:
-			angle -= 4;
+			angle -= 2;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
@@ -232,10 +233,8 @@ public:
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
-
 	inline ColliderBox* getp() { return p; };
 	inline int getID() { return ID; };
-
 	//override the data to public
 	double mx;
 	double my;
@@ -304,7 +303,7 @@ public:
 		loadimage(&img1, "sorce/wall1.png", w, h);
 		loadimage(&img2, "sorce/wall2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
-		if (kind == 2)
+		if (kind == 2|| kind == 1)
 		{
 			tag = 3;
 			allbox.back().tag = 3;
@@ -319,13 +318,8 @@ public:
 	obstacle() :ColliderBox(0, 0, 0, 0, 0, 1, 0), kind(0) {}
 	void Dead() override
 	{
-		if (IsAlive)
-		{
-			//不再成为实体，修改图像或者删除图像
-		}
 		if (!IsAlive)
 		{
-			//int jug = 1;
 			this->mx = -100;
 			this->my = -100;
 			this->height = 0;
@@ -418,22 +412,19 @@ public:
 		return jug;
 	}
 	//子弹检测可以改的和上面那个一样，或者直接合并
-	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
+	static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
-		int flag = 1;
-		#define MAXsize 1 //MAXsize is the number of other player
-		for (int i = 0; i <=1; i++)//Player number define MAXsize==1
-		{	//下面的检测逻辑需要依据玩家具体参数调整
-			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
-				flag = 0;
+		int jug = 0;
+		for (int i = 0; i <2; i++)
+		{
+			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
+			{
+				jug = allbox[i].ID;
 				break;
 			}
 		}
-		if (flag) {
-			return false;
-		}
-		return true;
-	}
+		return jug;
+	} 
 	static void checkDead()
 	{
 		int i = 0;
@@ -485,6 +476,9 @@ public:
 	}
 };
 
+
+bool isPointNear(int x1, int y1, int x2, int y2, int range);
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range = 5);
 class Tank : public ColliderBox//坦克类
 {
 	friend bullet;
@@ -499,8 +493,18 @@ protected:
 
 
 public:
+	void deblood()
+	{
+		mhealth = allbox[this->ID].mhealth;
+		if (mhealth < 0)
+		{
+			IsAlive = false;
+			//PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			//mciSendString("play music/bang.wav", 0, 0, 0);
+		}
+	}
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :ColliderBox(x + 12, y + 30, 97 - 12, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x + 22, y + 30, 97 - 22, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -554,18 +558,48 @@ public:
 			{
 				for (int stay=1; stay < allbox.size(); stay++) {
 					switch (ColliderDectect(*this, allbox[stay])) {
-					case 1://左
-						mx -= vec.x * speed;//
-						my += vec.y * speed*0.1;
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+					case 1://左右
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx -= vec.x * speed ;//
+							my += vec.y * speed * 0.1;
+							
+						}
+						else {
+							mx -= vec.x * speed*1.5;//
+							my -= vec.y * speed*1.1;
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					
-					case 2://下					
-						mx += vec.x * speed*0.1 ;
-						my -= vec.y * speed;//
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+					case 2://上下			
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx += vec.x * speed * 0.1;
+							my -= vec.y * speed;//
+							
+						}
+						else {
+							mx -= vec.x * speed*1.1;
+							my -= vec.y * speed*1.5;//
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 
 					}
@@ -579,11 +613,8 @@ public:
 		{
 			int jug = 1;
 			
-			mx -= vec.x * speed;
-			my -= vec.y * speed;
-			allbox[0].mx = mx;
-			allbox[0].my = my;
-			for (int i = 0; i < allbox.size(); i++)
+			mx -= vec.x * speed*1.5;
+			my -= vec.y * speed*1.5;
 			if (tag == 2)
 			{
 				allbox[0].mx = mx;
@@ -594,29 +625,64 @@ public:
 				allbox[1].mx = mx;
 				allbox[1].my = my;
 			}
+
 			for (int i = 1; i < allbox.size(); i++)
 			{
 				if (this->ID != allbox[i].ID)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-					
+						
 				}
 			}
-			if (jug == 0) {
+
+			if (!jug) {
 				for (int stay = 1; stay < allbox.size(); stay++) {
 					switch (ColliderDectect(*this, allbox[stay])) {
 					case 1:
-						mx += vec.x * speed;//
-						my -= vec.y * speed * 0.1;
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx += vec.x * speed;//
+							my -= vec.y * speed * 0.1;
+							
+						}
+						else {
+							mx += vec.x * speed*1.5;//
+							my += vec.y * speed*1.1 ;
+						}
+
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					case 2:
-						mx -= vec.x * speed * 0.1;
-						my += vec.y * speed;//
-						allbox[0].mx = mx;
-						allbox[0].my = my;
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx -= vec.x * speed * 0.1;
+							my += vec.y * speed;//
+					
+						}
+						else {
+							mx += vec.x * speed*1.1;
+							my += vec.y * speed*1.5;//
+						}
+						
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
 						break;
 					}
 				}
@@ -632,7 +698,25 @@ public:
 	{
 		if (!IsAlive)
 		{
-			//不再成为实体，修改图像或者删除图像
+			this->mx = -100;
+			this->my = -100;
+			this->height = 0;
+			this->width = 0;
+			this->mhealth = MAXHEALTH;
+			this->IsAlive = true;
+			if (volume_jug)
+				PlaySound("music/bang.wav", NULL, SND_FILENAME | SND_ASYNC);
+			for (int i = 0; i < allbox.size(); i++)
+			{
+				if (this->ID == allbox[i].ID)
+				{
+					allbox[i].mx = this->mx;
+					allbox[i].my = this->my;
+					allbox[i].height = this->height;
+					allbox[i].width = this->width;
+					allbox[i].mhealth = this->mhealth;
+				}
+			}
 		}
 	}
 	void shoot(int kind)//发射
@@ -679,6 +763,7 @@ public:
 		}
 		double temp1, temp2;
 		double co, si;
+		//通过计算排除误差
 		co = cos(PI / 180.0 * (double)vec.angle);
 		si = sin(PI / 180.0 * (double)vec.angle);
 		if (co < 0.0)
@@ -694,8 +779,7 @@ public:
 		temp1 -= 97.0 / 2;
 		temp2 -= 80.0 / 2;
 
-		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);
-
+		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);//显示坦克
 		if (mhealth < 100)
 		{
 			setfillcolor(RED);
@@ -730,7 +814,7 @@ private:
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(0, 200, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(0, 400, 1.3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -928,6 +1012,7 @@ private:
 			//走
 			pCurrent = *itmin;
 			time++;
+			//显示轨迹（调试）
 			//displaypoint(pCurrent);
 			//标记
 			isFind[pCurrent->pos.row][pCurrent->pos.col] = true;
@@ -950,6 +1035,7 @@ private:
 			return retree;
 		}
 		std::cout << "寻路失败" << std::endl;
+		freetree(pRoot);
 		return NULL;
 	}
 
@@ -981,26 +1067,30 @@ private:
 			return false;//走过的返回false
 		if (map[pos.row][pos.col] == 1)
 			return false;//障碍物不能走
+		//待定map[pos.row][pos.col+i] == 3
 		for (int i = 12; i < 86; i++)
 		{
-			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
+			if (map[pos.row + i][pos.col] == 1)
 				return false;
 		}
 		for (int i = 30; i < 79; i++)
 		{
-			if (map[pos.row][pos.col+i] == 1 || map[pos.row][pos.col+i] == 3)
+			if (map[pos.row][pos.col + i] == 1)
 				return false;
 		}
-		for (int i = 30; i > -10; i--)
+		/*
+		for (int i = 30; i > 0; i--)
 		{
 			if (map[pos.row][pos.col + i] == 1 || map[pos.row][pos.col + i] == 3)
 				return false;
 		}
-		for (int i = 12; i > -10; i--)
+		for (int i = 12; i > 0; i--)
 		{
 			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
 				return false;
 		}
+		*/
+		
 		return true;
 	}
 
@@ -1069,7 +1159,7 @@ private:
 
 public:
 	
-	Enemy() :Tank(450, 240, 5)
+	Enemy() :Tank(500, 200, 5)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
 		tag = 5;
@@ -1111,7 +1201,7 @@ public:
 			//释放八叉树内存
 			while (road->father != NULL)
 				road = road->father;
-			freetree(road);
+			freetree(road);//释放空间
 			//找出路径中的两个点，求出其向量
 			Vec temp;
 			temp.x = (double)(p2.x - p1.x) / sqrt((double)(p2.x - p1.x) * (double)(p2.x - p1.x) + (double)(p2.y - p1.y) * (double)(p2.y - p1.y));
@@ -1147,15 +1237,18 @@ public:
 				Sleep(23);
 				dis = distance(allbox[0].mx, allbox[0].my);
 			}
-			bool canshoot = false;
+			bool mcanshoot = false;
 			Point checkshoot{ mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI) ,my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI) };
-			for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 150; i++)
 			{
 				if (map[(int)checkshoot.x][(int)checkshoot.y] == 2 || map[(int)checkshoot.x][(int)checkshoot.y] == 3)
-					canshoot = true;
+					mcanshoot = true;
+				checkshoot.x += vec.x;
+				checkshoot.y += vec.y;
 			}
-			if (canshoot)
+			if (mcanshoot)
 				shoot(1);
+			Sleep(16);
 		}
 	}
 };
