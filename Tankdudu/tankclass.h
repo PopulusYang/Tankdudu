@@ -14,19 +14,15 @@
 #define RIGHT 2
 #define UP 3
 #define DOWN 4
-
-
-#define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
-
-
-
+//星星
+#define MAXSTAR 200
 #include"tankhead.h"
 #include <random>
 #include<array>
 #include<mutex>
 #include<cstdlib>
 #include <time.h>  
-
+extern int volume_jug;
 extern int IDnum;
 extern std::mutex lock;
 extern std::mutex lock2;
@@ -40,6 +36,7 @@ inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
 }
+
 
 class Function
 {
@@ -186,12 +183,12 @@ public:
 		switch (userKey)
 		{
 		case 2://沿着向量方向增加
-			angle += 4;
+			angle += 2;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
 		case 1:
-			angle -= 4;
+			angle -= 2;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
 			break;
@@ -236,10 +233,8 @@ public:
 	*/
 	friend int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2);
 	static inline void drawColliderbox(ColliderBox& obj);
-
 	inline ColliderBox* getp() { return p; };
 	inline int getID() { return ID; };
-
 	//override the data to public
 	double mx;
 	double my;
@@ -329,6 +324,10 @@ public:
 			this->my = -100;
 			this->height = 0;
 			this->width = 0;
+			this->mhealth = MAXHEALTH;
+			this->IsAlive = true;
+			if(volume_jug)
+			    PlaySound("music/bang.wav", NULL, SND_FILENAME | SND_ASYNC);
 			for (int i = 0; i < allbox.size(); i++)
 			{
 				if(this->ID == allbox[i].ID)
@@ -337,6 +336,7 @@ public:
 					allbox[i].my = this->my;
 					allbox[i].height = this->height;
 					allbox[i].width = this->width;
+					allbox[i].mhealth = this->mhealth;
 				}
 			}
 		}
@@ -346,7 +346,11 @@ public:
 	{
 		mhealth = allbox[this->ID].mhealth;
 		if (mhealth < 0)
+		{
 			IsAlive = false;
+			//PlaySound("music/blase.wav", NULL, SND_FILENAME|SND_ASYNC);
+			//mciSendString("play music/bang.wav", 0, 0, 0);
+		}
 	}
 	void display()
 	{
@@ -474,21 +478,30 @@ public:
 		}
 	}
 };
+//????????
 
+
+bool isPointNear(int x1, int y1, int x2, int y2, int range);
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range = 5);
 class Tank : public ColliderBox//坦克类
 {
 	friend bullet;
 protected:
 	bool canshoot = true;
+	bool canfly = false;
+	bool flying = false;
 	int waittime = 0;
+	int power = 0;
+	int powerlevel = 0;
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
 	int clip = 3;//弹夹中的子弹数量
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3;
-
-
+	inline double getspeed() { return this->speed; };
+	inline void changespeed(double newspeed) { this->speed = newspeed; };
 public:
+	
 	//初始x坐标，初始y坐标，宽度，高度，速度
 	Tank(int x, int y, int s) :ColliderBox(x + 22, y + 30, 97 - 22, 80 - 22, s, 2, MAXHEALTH), pierce(0), explosive(0), clip(3)
 	{
@@ -513,6 +526,7 @@ public:
 			break;
 		case UP:
 		{
+		
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
@@ -534,33 +548,72 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
+					
 				}
+				
 			}
 
 			if (!jug)
 			{
+				for (int stay=1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1://左右
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx -= vec.x * speed ;//
+							my += vec.y * speed * 0.1;
+							
+						}
+						else {
+							mx -= vec.x * speed*1.5;//
+							my -= vec.y * speed*1.1;
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
+						break;
+					
+					case 2://上下			
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx += vec.x * speed * 0.1;
+							my -= vec.y * speed;//
+							
+						}
+						else {
+							mx -= vec.x * speed*1.1;
+							my -= vec.y * speed*1.5;//
+						}
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
+						break;
 
-				mx -= vec.x * speed * 2;
-				my -= vec.y * speed * 2;
-				if (tag == 2)
-				{
-					allbox[0].mx = mx;
-					allbox[0].my = my;
-				}
-				else
-				{
-					allbox[1].mx = mx;
-					allbox[1].my = my;
+					}
 				}
 			}
-			jug = 1;
-			break;
+				jug = 1;
+				break;
+			
 		}
 		case DOWN:
 		{
 			int jug = 1;
-			mx -= vec.x * speed;
-			my -= vec.y * speed;
+			
+			mx -= vec.x * speed*1.5;
+			my -= vec.y * speed*1.5;
 			if (tag == 2)
 			{
 				allbox[0].mx = mx;
@@ -571,35 +624,73 @@ public:
 				allbox[1].mx = mx;
 				allbox[1].my = my;
 			}
+
 			for (int i = 1; i < allbox.size(); i++)
 			{
 				if (this->ID != allbox[i].ID)
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-
-				}
-				if (jug == 0) {
-
-					mx += vec.x * speed * 2;
-					my += vec.y * speed * 2;
-					if (tag == 2)
-					{
-						allbox[0].mx = mx;
-						allbox[0].my = my;
-					}
-					else
-					{
-						allbox[1].mx = mx;
-						allbox[1].my = my;
-					}
+						
 				}
 			}
-			jug = 1;
-			break;
-		}
+
+			if (!jug) {
+				for (int stay = 1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1:
+
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx += vec.x * speed*1.5;//
+							my -= vec.y * speed *1.5* 0.1;
+							
+						}
+						else {
+							mx += vec.x * speed*1.5*1.5;//
+							my += vec.y * speed*1.1*1.5 ;
+						}
+
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
+						break;
+					case 2:
+						if (!angleDectect(*this, allbox[stay],10)) {
+							mx -= vec.x * speed * 0.1*1.5;
+							my += vec.y * speed*1.5;//
+					
+						}
+						else {
+							mx += vec.x * speed*1.1*1.5;
+							my += vec.y * speed*1.5*1.5;//
+						}
+						
+						if (tag == 2)
+						{
+							allbox[0].mx = mx;
+							allbox[0].my = my;
+						}
+						else
+						{
+							allbox[1].mx = mx;
+							allbox[1].my = my;
+						}
+						break;
+					}
+				}
+				jug = 1;
+				break;
+			}
 		}
 		Sleep(16);
+		}
 	}
 
 	void Dead() override
@@ -615,7 +706,9 @@ public:
 		{
 			canshoot = false;
 			lock2.lock();
-			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//构造子弹对象			
+			if(volume_jug)
+				mciSendString("play music/fire.wav", 0, 0, 0);
 			lock2.unlock();
 		}
 	}
@@ -631,6 +724,38 @@ public:
 			}
 		}
 	}
+
+	void defpower(bool isgaming) {
+		while (isgaming)
+		{
+		 	if (!canfly)
+			{
+				while (1) {
+					power++;
+					Sleep(300);
+					if (power >= 125) {
+						canfly = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+
+	void flyyyy() {
+	 	std::cout << "F is pressd" << std::endl;
+		if (canfly)
+		{
+			changespeed(getspeed()*1.3);
+		 	powerlevel++;
+			canfly = 0;
+			power = 0;
+		}
+	}
+
+	
+
 	void display()
 	{
 		IMAGE temp;
@@ -678,6 +803,29 @@ public:
 			setfillcolor(GREEN);
 			fillrectangle((int)(mx + 8), (int)(my - 15), (int)(mx + 8 + (int)(74.0 * (double)waittime / 125.0)), (int)(my - 11));
 		}
+		if (power < 125)
+		{	
+			switch (powerlevel) {
+	 		case 0:setfillcolor(LIGHTGRAY); break;
+	 		case 1:setfillcolor(DARKGRAY); break;
+		 	case 2:setfillcolor(LIGHTCYAN); break;
+			case 3:setfillcolor(BROWN); break;
+			case 4:setfillcolor(MAGENTA); break;
+		 	case 5:setfillcolor(LIGHTRED); break;
+		 	default:setfillcolor(LIGHTMAGENTA); break;
+			}
+			solidrectangle((int)(mx + 8), (int)(my - 20), (int)(mx + 8 + (int)(74.0 * (double)power / 125.0)), (int)(my - 17));
+		}
+		else if(power>=125) {	 	
+	 		if (powerlevel >= 5) {
+	 			setfillcolor(LIGHTMAGENTA);
+			}
+			else { 
+				setfillcolor(BLUE); 
+			};
+			solidrectangle((int)(mx + 8), (int)(my - 20), (int)(mx + 8 + (int)(74.0)), (int)(my - 17));
+		}
+
 	}
 
 };
@@ -698,11 +846,11 @@ class Player :public Tank
 private:
 
 	int bulkind = 1;
-	int up, down, left, right, shift, vshoot;
+	int up, down, left, right, shift, vshoot,fly;
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(0, 200, 3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(0, 400, 1.3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -727,6 +875,9 @@ public:
 				Move(4);
 			if (KeyDown(vshoot))
 				shoot(bulkind);
+			if (KeyDown(0x46))
+			 	flyyyy();
+
 			Sleep(5);
 		}
 	}
@@ -1046,7 +1197,7 @@ private:
 
 public:
 	
-	Enemy() :Tank(500, 200, 5)
+	Enemy() :Tank(500, 200, 1)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
 		tag = 5;
@@ -1139,4 +1290,45 @@ public:
 		}
 	}
 };
+
+//创建按钮类
+class button
+{
+private:
+	//位置信息和大小信息
+	int x;
+	int y;
+	int w;
+	int h;
+	LPCSTR str;
+private:
+	//创建并显示按钮
+	void create(int x, int y, int w, int h, LPCSTR str)
+	{
+		setbkmode(TRANSPARENT);
+		setfillcolor(0x9BB171);
+		fillroundrect(x, y, x + w, y + h, 10, 10);
+		RECT r = { x,y,x + w,y + h };
+		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	}
+public:
+	button(int x, int y, int w, int h, LPCSTR str) :x(x), y(y), w(w), h(h), str(str)
+	{
+		create(x, y, w, h, str);
+		std::cout << "A button has been created" << std::endl;
+	}
+	~button()
+	{
+		std::cout << "The button has been deleted." << std::endl;
+	}
+	//检测一次按钮是否被按下
+	inline bool test(ExMessage msg) const
+	{
+		if (msg.x >= x && msg.x <= x + w && msg.y >= y && msg.y <= y + h)
+			return true;
+		else
+			return false;
+	}
+};
+
 

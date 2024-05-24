@@ -4,9 +4,6 @@
 bool isgaming = 1;
 unsigned char map[ROWS][COLS];
 
-
-
-
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
@@ -45,12 +42,15 @@ void singlegame()
 	std::thread thread4(&bullet::bullMove, isgaming);
 	std::thread thread5(&Player::wait, &player, isgaming);
 	std::thread thread6(&Enemy::wait, &enemy, isgaming);
+	std::thread thread7(&Player::defpower, &player, isgaming);
+	std::thread thread8(&Enemy::defpower, &player, isgaming);
+	
+
 	setbkcolor(WHITE);
 	BeginBatchDraw();
 	while (isgaming)
 	{
 		cleardevice();
-		
 		for (int i = 0; i < 4; i++)
 		{
 			wall_rock[i].deblood();
@@ -77,10 +77,14 @@ void singlegame()
 			exit(0);
 	}
 	EndBatchDraw();
+
 	thread1.join();
 	thread2.join();
 	thread3.join();
 	thread4.join();
 	thread5.join();
 	thread6.join();
+	thread7.join();
+	thread8.join();
+
 }

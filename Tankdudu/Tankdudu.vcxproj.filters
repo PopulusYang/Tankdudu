@@ -24,6 +24,9 @@
     <ClCompile Include="single.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="volume.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h">
@@ -58,5 +61,31 @@
     <Image Include="sorce\tankico.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="sorce\wall2.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="music\add.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\bang.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\blast.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\fire.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\Gunfire.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\hit.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+    <Media Include="music\start.wav">
+      <Filter>资源文件</Filter>
+    </Media>
   </ItemGroup>
 </Project>
