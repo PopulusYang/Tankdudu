@@ -4,9 +4,6 @@
 bool isgaming = 1;
 unsigned char map[ROWS][COLS];
 
-
-
-
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
@@ -50,7 +47,6 @@ void singlegame()
 	while (isgaming)
 	{
 		cleardevice();
-		
 		for (int i = 0; i < 4; i++)
 		{
 			wall_rock[i].deblood();
