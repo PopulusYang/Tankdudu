@@ -400,31 +400,31 @@ public:
 	//逻辑上更改一下：碰上返回allbox数，没碰上返回0。
 	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
 	{
-		int jug = 0;
+		int jug = -1;
 		for (int i = 0; i < 10; i++)//OBS number define MAX==4
 		{
 			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
-				jug = allbox[i].ID;
+				jug = allbox[i].ID+1;
 				break;
 			}
 		}
 		return jug;
 	}
 	//子弹检测可以改的和上面那个一样，或者直接合并
-	static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
+	/*static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int jug = 0;
 		for (int i = 0; i <2; i++)
 		{
 			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
-				jug = allbox[i].ID;
+				jug = allbox[i].ID+;
 				break;
 			}
 		}
 		return jug;
-	} 
+	} */
 	static void checkDead()
 	{
 		int i = 0;
@@ -435,29 +435,15 @@ public:
 				allbullet.erase(allbullet.begin() + i);//子弹消除操作
 				i--;
 			}
-			else if (bull_OBSdec(p))
+			else if (bull_OBSdec(p)>0)
 			{
 				/*加入障碍物掉血操作函数*/
-				int t = bull_OBSdec(p);
-				for (int i = 0; i < allbox.size(); i++)
+				int t = bull_OBSdec(p)-1;
+				for (int j = 0; j < allbox.size(); j++)
 				{
-					if (allbox[i].ID == t)
+					if (allbox[j].ID == t)
 					{
-						allbox[i].mhealth = allbox[i].mhealth - 30;
-					}
-				}
-				allbullet.erase(allbullet.begin() + i);
-				i--;
-			}
-			else if (bull_PLAdec(p)) {
-
-				/*加入人物掉血操作函数*/
-				int t = bull_OBSdec(p);
-				for (int i = 0; i < allbox.size(); i++)
-				{
-					if (allbox[i].ID == t)
-					{
-						allbox[i].mhealth = allbox[i].mhealth - 30;
+						allbox[j].mhealth = allbox[j].mhealth - 30;
 					}
 				}
 				allbullet.erase(allbullet.begin() + i);
@@ -717,6 +703,7 @@ public:
 					allbox[i].mhealth = this->mhealth;
 				}
 			}
+			isgaming = false;
 		}
 	}
 	void shoot(int kind)//发射
@@ -1056,6 +1043,7 @@ private:
 				}
 			}
 		}
+		if(isgaming)
 		map[(int)mx][(int)my] = 0;
 	}
 

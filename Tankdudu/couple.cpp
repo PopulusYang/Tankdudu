@@ -66,6 +66,7 @@ void couplelegame()
 		else
 			exit(0);
 	}
+	cleardevice();
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();
