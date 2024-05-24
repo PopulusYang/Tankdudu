@@ -407,7 +407,7 @@ public:
 	static int bull_OBSdec(bullet& thisbull)//子弹专属障碍物碰撞检测,Collider==ture
 	{
 		int jug = 0;
-		for (int i = 2; i < 10; i++)//OBS number define MAX==4
+		for (int i = 0; i < 10; i++)//OBS number define MAX==4
 		{
 			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
@@ -421,8 +421,8 @@ public:
 	static bool bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int flag = 1;
-#define MAXsize 1 //MAXsize is the number of other player
-		for (int i = 4; i < 4; i++)//Player number define MAXsize==1
+		#define MAXsize 1 //MAXsize is the number of other player
+		for (int i = 0; i <=1; i++)//Player number define MAXsize==1
 		{	//下面的检测逻辑需要依据玩家具体参数调整
 			if (thisbull.getx() >= allbox[i].mx && thisbull.getx() < allbox[i].mx + allbox[i].width && thisbull.gety() >= allbox[i].my && thisbull.gety() < allbox[i].my + allbox[i].height) {
 				flag = 0;
@@ -523,6 +523,7 @@ public:
 			break;
 		case UP:
 		{
+		
 			int jug = 1;
 			mx += vec.x * speed;
 			my += vec.y * speed;
@@ -544,33 +545,45 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
+					
 				}
+				
 			}
 
 			if (!jug)
 			{
+				for (int stay=1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1://左
+						mx -= vec.x * speed;//
+						my += vec.y * speed*0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					
+					case 2://下					
+						mx += vec.x * speed*0.1 ;
+						my -= vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
 
-				mx -= vec.x * speed * 2;
-				my -= vec.y * speed * 2;
-				if (tag == 2)
-				{
-					allbox[0].mx = mx;
-					allbox[0].my = my;
-				}
-				else
-				{
-					allbox[1].mx = mx;
-					allbox[1].my = my;
+					}
 				}
 			}
-			jug = 1;
-			break;
+				jug = 1;
+				break;
+			
 		}
 		case DOWN:
 		{
 			int jug = 1;
+			
 			mx -= vec.x * speed;
 			my -= vec.y * speed;
+			allbox[0].mx = mx;
+			allbox[0].my = my;
+			for (int i = 0; i < allbox.size(); i++)
 			if (tag == 2)
 			{
 				allbox[0].mx = mx;
@@ -587,29 +600,32 @@ public:
 				{
 					if (ColliderDectect(*this, allbox[i]))
 						jug = 0;
-
-				}
-				if (jug == 0) {
-
-					mx += vec.x * speed * 2;
-					my += vec.y * speed * 2;
-					if (tag == 2)
-					{
-						allbox[0].mx = mx;
-						allbox[0].my = my;
-					}
-					else
-					{
-						allbox[1].mx = mx;
-						allbox[1].my = my;
-					}
+					
 				}
 			}
-			jug = 1;
-			break;
-		}
+			if (jug == 0) {
+				for (int stay = 1; stay < allbox.size(); stay++) {
+					switch (ColliderDectect(*this, allbox[stay])) {
+					case 1:
+						mx += vec.x * speed;//
+						my -= vec.y * speed * 0.1;
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					case 2:
+						mx -= vec.x * speed * 0.1;
+						my += vec.y * speed;//
+						allbox[0].mx = mx;
+						allbox[0].my = my;
+						break;
+					}
+				}
+				jug = 1;
+				break;
+			}
 		}
 		Sleep(16);
+		}
 	}
 
 	void Dead() override

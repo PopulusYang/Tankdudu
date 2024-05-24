@@ -38,7 +38,7 @@ void MoveStar(int i)
 	if (star[i].x > 640)	InitStar(i);
 	putpixel((int)star[i].x, star[i].y, star[i].color);
 }
-int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
+/*int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
 	int jug = 0;//此为返回值
 	// x轴方向碰撞？
@@ -49,8 +49,57 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - 
 		box2.my + box2.height >= box1.my;
 	// 只有两个轴向都有碰撞时才碰撞
 	return collisionX && collisionY;
+}*/
+int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+{
+	
+		// 检测本BOX的右边是否与别的碰撞箱发生碰撞
+		if (box1.mx + box1.width > box2.mx && box1.mx < box2.mx &&
+			(box1.my > box2.my - box2.height && box1.my - box1.height < box2.my)) {
+			return 114;
+		}
+		// 检测本BOX的左边是否与别的碰撞箱发生碰撞
+		 if (box1.mx < box2.mx + box2.width && box1.mx > box2.mx &&
+			(box1.my > box2.my -box2.height &&box1.my - box1.height <box2.my)) {
+			return 514;
+		}
+		// 检测本BOX的上边是否与别的碰撞箱发生碰撞
+		 if (box1.my < box2.my + box2.height && box1.my + box1.height > box2.my&&
+			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
+		 {
+			return 191;
+		}
+		// 检测本BOX的下边是否与别的碰撞箱发生碰撞
+		 if (box1.my -box1.height< box2.my &&
+			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
+		 {
+			return 810;
+		 }
+	
+	return 0;
 }
+int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+{
+	// 检测X轴上的碰撞
+	bool xOverlap = box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx;
+	// 检测Y轴上的碰撞
+	bool yOverlap = box1.my < box2.my + box2.height && box1.my + box1.height > box2.my;
 
+	if (xOverlap && yOverlap) {
+		// 判断碰撞更多发生在X轴还是Y轴
+		float xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
+		float yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
+
+		if (xOverlapAmount < yOverlapAmount) {
+			return 1; // X轴上碰撞
+		}
+		else {
+			return 2; // Y轴上碰撞
+		}
+	}
+
+	return 0; // 没有碰撞
+}
 void starting()
 {
 	// 绘图窗口初始化
@@ -184,6 +233,7 @@ int main(int argc, char* argv[])
 				break;
 			case 2:
 				std::cout << "Button 2 has been pushed" << std::endl;
+				couplelegame();
 				break;
 			case 3:
 				std::cout << "Button 3 has been pushed" << std::endl;
@@ -246,6 +296,7 @@ int main(int argc, char* argv[])
 				break;
 			case 2:
 				std::cout << "Button 2 has been pushed" << std::endl;
+				couplelegame();
 				break;
 			case 3:
 				std::cout << "Button 3 has been pushed" << std::endl;
