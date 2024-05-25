@@ -1,0 +1,40 @@
+//gamemain.cpp
+/*
+PROMISE of
+allbox distrub:
+[0]:player
+[1]-[n]:OBS
+[n+1]:enemies
+ (ensure dynamic space for enemy generating)
+*/
+
+
+
+//检测是否碰撞,只需传入两个对象的碰撞箱对象，即可检测是否碰撞
+/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
+	if (!((box1.mx > box2.mx + box2.width) &&//右边
+		(box1.mx + box1.width < box2.mx) &&//左边
+		(box1.my > box2.my + box2.height) &&//下边
+		(box1.my + box1.height < box2.my))//上边
+		)
+	{
+		return true;
+	};
+	return false;
+}*/
+/*
+//if collider, return true
+int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+{
+	int jug = 0;
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//左下
+		jug += 1;
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//左上
+		jug += 2;
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//右下
+		jug += 4;
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//右上
+		jug += 8;
+	return jug;
+}
+*/

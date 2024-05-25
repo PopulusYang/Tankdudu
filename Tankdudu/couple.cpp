@@ -32,13 +32,13 @@ void couplelegame()
 		obstacle(250, 310,147, 75, 0, 50, 1),
 	};
 
-	std::thread thread1(&Player::changepng, &player1, isgaming);
+	std::thread thread1(&Player::changepng, &player1, std::ref(isgaming));
 	std::thread thread2(&Player::control, &player1, std::ref(isgaming));
-	std::thread thread4(&bullet::bullMove, isgaming);
-	std::thread thread5(&Player::wait, &player1, isgaming);
-	std::thread thread3(&Player::changepng, &player2, isgaming);
+	std::thread thread4(&bullet::bullMove, std::ref(isgaming));
+	std::thread thread5(&Player::wait, &player1, std::ref(isgaming));
+	std::thread thread3(&Player::changepng, &player2, std::ref(isgaming));
 	std::thread thread6(&Player::control, &player2, std::ref(isgaming));
-	std::thread thread7(&Player::wait, &player2, isgaming);
+	std::thread thread7(&Player::wait, &player2, std::ref(isgaming));
 	setbkcolor(WHITE);
 	BeginBatchDraw();
 	while (isgaming)
@@ -67,6 +67,7 @@ void couplelegame()
 		else
 			exit(0);
 	}
+	cleardevice();
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();

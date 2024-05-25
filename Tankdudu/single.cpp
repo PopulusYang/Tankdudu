@@ -40,14 +40,12 @@ void singlegame()
 	};
 	
 	
-	std::thread thread1(&Player::changepng, &player ,isgaming);
+	std::thread thread1(&Player::changepng, &player ,std::ref(isgaming));
 	std::thread thread2(&Player::control,&player,std::ref(isgaming));
-	std::thread thread3(&Enemy::aicontrol, &enemy, isgaming);
-	std::thread thread4(&bullet::bullMove, isgaming);
-	std::thread thread5(&Player::wait, &player, isgaming);
-	//setbkcolor(WHITE);
-	std::thread thread6(&Enemy::wait, &enemy, isgaming);
-	setbkcolor(WHITE);
+	std::thread thread3(&Enemy::aicontrol, &enemy, std::ref(isgaming));
+	std::thread thread4(&bullet::bullMove, std::ref(isgaming));
+	std::thread thread5(&Player::wait, &player, std::ref(isgaming));
+	std::thread thread6(&Enemy::wait, &enemy, std::ref(isgaming));
 	BeginBatchDraw();
 
 	while (isgaming)
@@ -82,6 +80,7 @@ void singlegame()
 		else
 			exit(0);
 	}
+	cleardevice();
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();

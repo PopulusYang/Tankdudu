@@ -388,7 +388,7 @@ public:
 	bullet(double x, double y, int kind, Vec vec) :mx(x), my(y), vec(vec), kind(kind), speed(10.0) {}
 	inline double getx() { return mx; };
 	inline double gety() { return my; }
-	static void bullMove(int isgaming)
+	static void bullMove(bool& isgaming)
 	{
 		while (isgaming)
 		{
@@ -414,14 +414,14 @@ public:
 				thisbull.gety() >= allbox[i].my+allbox[i].displaceY &&
 				thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
-				jug = allbox[i].ID;
+				jug = allbox[i].ID+1;
 				break;
 			}
 		}
 		return jug;
 	}
 	//子弹检测可以改的和上面那个一样，或者直接合并
-	static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
+	/*static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
 	{
 		int jug = -1;
 		for (int i = 0; i <2; i++)
@@ -431,12 +431,12 @@ public:
 				thisbull.gety() >= allbox[i].my+allbox[i].displaceY &&
 				thisbull.gety() < allbox[i].my + allbox[i].height)
 			{
-				jug = allbox[i].ID;
+				jug = allbox[i].ID+;
 				break;
 			}
 		}
 		return jug;
-	} 
+	} */
 	static void checkDead()
 	{
 		int i = 0;
@@ -447,29 +447,15 @@ public:
 				allbullet.erase(allbullet.begin() + i);//子弹消除操作
 				i--;
 			}
-			else if (bull_OBSdec(p))
+			else if (bull_OBSdec(p)>0)
 			{
 				/*加入障碍物掉血操作函数*/
-				int t = bull_OBSdec(p);
-				for (int i = 0; i < allbox.size(); i++)
+				int t = bull_OBSdec(p)-1;
+				for (int j = 0; j < allbox.size(); j++)
 				{
-					if (allbox[i].ID == t)
+					if (allbox[j].ID == t)
 					{
-						allbox[i].mhealth = allbox[i].mhealth - 30;
-					}
-				}
-				allbullet.erase(allbullet.begin() + i);
-				i--;
-			}
-			else if (bull_PLAdec(p)>=0) {
-
-				/*加入人物掉血操作函数*/
-				int t = bull_OBSdec(p);
-				for (int i = 0; i < allbox.size(); i++)
-				{
-					if (allbox[i].ID == t)
-					{
-						allbox[i].mhealth = allbox[i].mhealth - 30;
+						allbox[j].mhealth = allbox[j].mhealth - 30;
 					}
 				}
 				allbullet.erase(allbullet.begin() + i);
@@ -516,7 +502,7 @@ public:
 		}
 	}
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :ColliderBox(x , y , 97 - 22, 80 - 22, s, 2, MAXHEALTH, 12, 30), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, int s) :ColliderBox(x , y , 97 - 22, 80 - 12, s, 2, MAXHEALTH, 12, 20), pierce(0), explosive(0), clip(3)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -729,6 +715,7 @@ public:
 					allbox[i].mhealth = this->mhealth;
 				}
 			}
+			isgaming = false;
 		}
 	}
 	void shoot(int kind)//发射
@@ -743,7 +730,7 @@ public:
 			lock2.unlock();
 		}
 	}
-	void wait(bool isgaming)
+	void wait(bool& isgaming)
 	{
 		while (isgaming)
 		{
@@ -863,7 +850,7 @@ public:
 		}
 	}
 
-	void changepng(bool game)
+	void changepng(bool& game)
 	{
 		while (game)
 		{
@@ -1075,6 +1062,7 @@ private:
 				}
 			}
 		}
+		if(isgaming)
 		map[(int)mx][(int)my] = 0;
 	}
 
@@ -1185,7 +1173,7 @@ public:
 		tag = 5;
 		allbox.back().tag = 5;
 	}
-	void aicontrol(bool isgaimg)
+	void aicontrol(bool& isgaimg)
 	{
 		//寻路
 		//攻击
@@ -1207,7 +1195,7 @@ public:
 		while (isgaimg)
 		{
 			treeNode* road;
-			road = Astar((int)allbox[0].mx, (int)allbox[0].my, (int)mx, (int)my);
+			road = Astar((int)allbox[0].mx + allbox[0].displaceX, (int)allbox[0].my + allbox[0].displaceY, (int)mx, (int)my);
 			if (road == NULL)
 				continue;
 			Point p1{ mx,my };
@@ -1251,7 +1239,7 @@ public:
 				Move(3);
 			}
 			double dis = distance(allbox[0].mx, allbox[0].my);
-			while (dis<20.0)
+			while (dis<40.0)
 			{
 				Move(4);
 				Sleep(23);
@@ -1268,7 +1256,7 @@ public:
 			}
 			if (mcanshoot)
 				shoot(1);
-			Sleep(16);
+			Sleep(10);
 		}
 	}
 };
@@ -1283,21 +1271,20 @@ private:
 	int w;
 	int h;
 	LPCSTR str;
-private:
+public:
+	button(int x, int y, int w, int h, LPCSTR str) :x(x), y(y), w(w), h(h), str(str)
+	{
+		create();
+		std::cout << "A button has been created" << std::endl;
+	}
 	//创建并显示按钮
-	void create(int x, int y, int w, int h, LPCSTR str)
+	void create()
 	{
 		setbkmode(TRANSPARENT);
 		setfillcolor(0x9BB171);
 		fillroundrect(x, y, x + w, y + h, 10, 10);
 		RECT r = { x,y,x + w,y + h };
 		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	}
-public:
-	button(int x, int y, int w, int h, LPCSTR str) :x(x), y(y), w(w), h(h), str(str)
-	{
-		create(x, y, w, h, str);
-		std::cout << "A button has been created" << std::endl;
 	}
 	~button()
 	{
@@ -1310,6 +1297,10 @@ public:
 			return true;
 		else
 			return false;
+	}
+	inline void changetext(LPCSTR new_str)
+	{
+		str = new_str;
 	}
 };
 

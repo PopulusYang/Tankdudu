@@ -171,6 +171,9 @@
     <Media Include="music\hit.wav" />
     <Media Include="music\start.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="backup.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
