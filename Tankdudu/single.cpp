@@ -47,7 +47,6 @@ void singlegame()
 	std::thread thread5(&Player::wait, &player, isgaming);
 	//setbkcolor(WHITE);
 	std::thread thread6(&Enemy::wait, &enemy, isgaming);
-	setbkcolor(WHITE);
 	BeginBatchDraw();
 
 	while (isgaming)
@@ -82,6 +81,7 @@ void singlegame()
 		else
 			exit(0);
 	}
+	cleardevice();
 	EndBatchDraw();
 	thread1.join();
 	thread2.join();
