@@ -801,7 +801,7 @@ private:
 public:
 	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(0, 400, 1.3), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+		:Tank(10, 240, 2), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
@@ -1147,7 +1147,7 @@ private:
 
 public:
 	
-	Enemy() :Tank(500, 200, 5)
+	Enemy() :Tank(500, 200, 2.3)
 	{
 		std::cout << "An AI has joined the game." << std::endl;
 		tag = 5;
@@ -1209,7 +1209,7 @@ public:
 					Move(1);
 				else
 					Move(2);
-				Sleep(25);
+				Sleep(10);
 			}
 			//ÒÆ¶¯
 			if (temp.angle >= vec.angle - 3 && temp.angle <= vec.angle + 3)
