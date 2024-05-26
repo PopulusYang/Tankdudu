@@ -32,11 +32,7 @@ void singlegame()
 
 	Player player('W','S','A','D','R','J');
 	Enemy enemy;
-	/*std::random_device rd;  // 获取随机数种子
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> distrib(1, 2);
-	int kind = distrib(gen);*/
-	
+	//准备地图
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
@@ -79,7 +75,7 @@ void singlegame()
 		putimage(0, 0, &background);
 		
 		TimeFun::showTime(time, 540, 0);
-
+		//显示分数
 		s[6] = score1 / 10 + '0';
 		s[7] = score1 % 10 + '0';
 		s[8] = ':';
@@ -114,12 +110,16 @@ void singlegame()
 		if (player.IsAlive && enemy.IsAlive)
 			wait = true;
 	}
+	cleardevice();
+	EndBatchDraw();
+
+	settextcolor(WHITE);
+	settextstyle(36, 0, "华文隶书");
 	if (time != 0)
 		std::cout << "游戏未结束" << std::endl;
 	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	time = 0;
-	cleardevice();
-	EndBatchDraw();
+
 	//等待线程结束
 	scores.push_back(allscore{ 0,0 });
 	for (int i = 4; i >=0; i--)
@@ -140,5 +140,15 @@ void singlegame()
 	allbox.clear();
 	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
+	//清除缓冲区
+	cleardevice();
+	std::cin.sync();
+	if (score1 > score2)
+		drawtext("YOU WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 < score2)
+		drawtext("YOU LOSE...", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 == score2)
+		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	Sleep(3000);
 	std::cin.sync();
 }

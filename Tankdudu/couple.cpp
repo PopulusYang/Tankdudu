@@ -19,7 +19,7 @@ void couplelegame()
 
 	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);
 	Player player2(VK_UP,VK_DOWN,VK_LEFT,VK_RIGHT,VK_SHIFT,VK_RETURN,5);
-
+	//准备地图
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
@@ -97,12 +97,16 @@ void couplelegame()
 		if (player1.IsAlive && player2.IsAlive)
 			wait = true;
 	}
+	cleardevice();
+	EndBatchDraw();
+
+	settextcolor(WHITE);
+	settextstyle(36, 0, "华文隶书");
 	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	if (time != 0)
 		std::cout << "游戏未结束" << std::endl;
 	time = 0;
-	cleardevice();
-	EndBatchDraw();
+
 	//等待线程结束
 	thread1.join();
 	thread2.join();
@@ -118,5 +122,15 @@ void couplelegame()
 	allbox.clear();
 	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
+	//清除缓冲区
+	cleardevice();
+	std::cin.sync();
+	if (score1 > score2)
+		drawtext("P1 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 < score2)
+		drawtext("P2 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 == score2)
+		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	Sleep(3000);
 	std::cin.sync();
 }
