@@ -20,6 +20,8 @@ struct STAR
 	int		color;
 };
 
+
+
 STAR star[MAXSTAR];
 void InitStar(int i)
 {
@@ -38,48 +40,7 @@ void MoveStar(int i)
 	if (star[i].x > 640)	InitStar(i);
 	putpixel((int)star[i].x, star[i].y, star[i].color);
 }
-/*
-int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
-{
-	int jug = 0;//此为返回值
-	// x轴方向碰撞？
-	bool collisionX = box1.mx + box1.width >= box2.mx &&
-		box2.mx + box2.width >= box1.mx;
-	// y轴方向碰撞？
-	bool collisionY = box1.my + box1.height >= box2.my &&
-		box2.my + box2.height >= box1.my;
-	// 只有两个轴向都有碰撞时才碰撞
-	return collisionX && collisionY;
-}
 
-int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
-{
-	
-		// 检测本BOX的右边是否与别的碰撞箱发生碰撞
-		if (box1.mx + box1.width > box2.mx && box1.mx < box2.mx &&
-			(box1.my > box2.my - box2.height && box1.my - box1.height < box2.my)) {
-			return 114;
-		}
-		// 检测本BOX的左边是否与别的碰撞箱发生碰撞
-		 if (box1.mx < box2.mx + box2.width && box1.mx > box2.mx &&
-			(box1.my > box2.my -box2.height &&box1.my - box1.height <box2.my)) {
-			return 514;
-		}
-		// 检测本BOX的上边是否与别的碰撞箱发生碰撞
-		 if (box1.my < box2.my + box2.height && box1.my + box1.height > box2.my&&
-			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
-		 {
-			return 191;
-		}
-		// 检测本BOX的下边是否与别的碰撞箱发生碰撞
-		 if (box1.my -box1.height< box2.my &&
-			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
-		 {
-			return 810;
-		 }
-	
-	return 0;
-}*/
 
 
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
@@ -143,7 +104,7 @@ void starting()
 	// 绘图窗口初始化
 	//为了方便调试，我把控制台打开，完成后关掉即可
 
-	initgraph(640, 480, EX_SHOWCONSOLE);
+	
 	// 获得窗口句柄
 	HWND hWnd = GetHWnd();
 	// 使用 Windows API 修改窗口名称
@@ -171,185 +132,96 @@ void starting()
 	settextstyle(24, 0, "华文隶书");
 }
 
-/*
-PROMISE of
-allbox distrub:
-[0]:player
-[1]-[n]:OBS
-[n+1]:enemies
- (ensure dynamic space for enemy generating)
-*/
 
 
 
-//检测是否碰撞,只需传入两个对象的碰撞箱对象，即可检测是否碰撞
-/*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
-	if (!((box1.mx > box2.mx + box2.width) &&//右边
-		(box1.mx + box1.width < box2.mx) &&//左边
-		(box1.my > box2.my + box2.height) &&//下边
-		(box1.my + box1.height < box2.my))//上边
-		)
-	{
-		return true;
-	};
-	return false;
-}*/
-/*
-//if collider, return true
-int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
-{
-	int jug = 0;
-	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//左下
-		jug += 1;
-	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//左上
-		jug += 2;
-	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//右下
-		jug += 4;
-	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//右上
-		jug += 8;
-	return jug;
-}
-*/
-
-
-
-int main(int argc, char* argv[])
+int main()
 {
 	srand((unsigned)time(NULL));
-	starting();
+	initgraph(640, 480, EX_SHOWCONSOLE);
 	mciSendString("open music/start.wav alias start", NULL, 0, NULL);
 	mciSendString("open music/fire.wav alias fire", NULL, 0, NULL);
 	mciSendString("open music/blast.wav alias blast", NULL, 0, NULL);
 	mciSendString("open music/bang.wav alias bang", NULL, 0, NULL);
-	mciSendString("play music/start.wav" , 0, 0, 0);
+	button* b1 = new button(260, 230, 120, 50, "单人游戏");
+	button* b2 = new button(260, 310, 120, 50, "双人游戏");
+	button* b3 = new button(460, 390, 120, 50, "静 音");
+	button* b4 = new button(260, 390, 120, 50, "退出游戏");
 	while (play_game)
 	{
-		if (volume_jug)
+		starting();
+		b1->create();
+		b2->create();
+		b3->create();
+		b4->create();
+		int choose = 0;
+		ExMessage msg;
+		bool jug = true;
+		while (jug)
 		{
-			button* b1 = new button(260, 230, 120, 50, "单人游戏");
-			button* b2 = new button(260, 310, 120, 50, "双人游戏");
-			button* b3 = new button(460, 390, 120, 50, "静 音");
-			button* b4 = new button(260, 390, 120, 50, "退出游戏");
-			int choose = 0;
-			ExMessage msg;
-			bool jug = true;
-			while (jug)
+			HWND hWnd = GetHWnd();
+			if (!IsWindow(hWnd))
+				exit(0);
+			if (peekmessage(&msg, EX_MOUSE))
 			{
-				HWND hWnd = GetHWnd();
-				if (!IsWindow(hWnd))
-					exit(0);
-				if (peekmessage(&msg, EX_MOUSE))
+				switch (msg.message)
 				{
-					switch (msg.message)
-					{
-					case WM_LBUTTONDOWN:
-						if (b1->test(msg))
-							choose = 1;
-						if (b2->test(msg))
-							choose = 2;
-						if (b3->test(msg))
-							choose = 3;
-						if (b4->test(msg))
-							choose = 4;
-						if (choose)
-							jug = false;
-						break;
-					default:
-						break;
-					}
+				case WM_LBUTTONDOWN:
+					if (b1->test(msg))
+						choose = 1;
+					if (b2->test(msg))
+						choose = 2;
+					if (b3->test(msg))
+						choose = 3;
+					if (b4->test(msg))
+						choose = 4;
+					if (choose)
+						jug = false;
+					break;
+				default:
+					break;
 				}
-			}
-			delete(b1);
-			delete(b2);
-			delete(b3);
-			delete(b4);
-			switch (choose)
-			{
-			case 1:
-				std::cout << "Button 1 has been pushed" << std::endl;
-				singlegame();
-				break;
-			case 2:
-				std::cout << "Button 2 has been pushed" << std::endl;
-				break;
-			case 3:
-				std::cout << "Button 3 has been pushed" << std::endl;
-				volume_jug = (volume_jug + 1) % 2;
-				break;
-			case 4:
-				std::cout << "Button 4 has been pushed" << std::endl;
-				play_game = 0;
-				cleardevice();
-				RECT center = { 0,0,639,479 };
-				settextstyle(36, 0, "华文隶书");
-				settextcolor(WHITE);
-				drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 			}
 		}
-		if (!volume_jug)
+		switch (choose)
 		{
-			button* b1 = new button(260, 230, 120, 50, "单人游戏");
-			button* b2 = new button(260, 310, 120, 50, "双人游戏");
-			button* b3 = new button(460, 390, 120, 50, "解除静音");
-			button* b4 = new button(260, 390, 120, 50, "退出游戏");
-			int choose = 0;
-			ExMessage msg;
-			bool jug = true;
-			while (jug)
-			{
-				HWND hWnd = GetHWnd();
-				if (!IsWindow(hWnd))
-					exit(0);
-				if (peekmessage(&msg, EX_MOUSE))
-				{
-					switch (msg.message)
-					{
-					case WM_LBUTTONDOWN:
-						if (b1->test(msg))
-							choose = 1;
-						if (b2->test(msg))
-							choose = 2;
-						if (b3->test(msg))
-							choose = 3;
-						if (b4->test(msg))
-							choose = 4;
-						if (choose)
-							jug = false;
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			delete(b1);
-			delete(b2);
-			delete(b3);
-			delete(b4);
-			switch (choose)
-			{
-			case 1:
-				std::cout << "Button 1 has been pushed" << std::endl;
-				singlegame();
-				break;
-			case 2:
-				std::cout << "Button 2 has been pushed" << std::endl;
-				break;
-			case 3:
-				std::cout << "Button 3 has been pushed" << std::endl;
-				volume_jug = (volume_jug + 1) % 2;
-				break;
-			case 4:
-				std::cout << "Button 4 has been pushed" << std::endl;
-				play_game = 0;
-				cleardevice();
-				RECT center = { 0,0,639,479 };
-				settextstyle(36, 0, "华文隶书");
-				settextcolor(WHITE);
-				drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-			}
-
+		case 1:
+			std::cout << "Button 1 has been pushed" << std::endl;
+			if (volume_jug)
+				mciSendString("play music/start.wav", 0, 0, 0);
+			singlegame();
+			break;
+		case 2:
+			std::cout << "Button 2 has been pushed" << std::endl;
+			if (volume_jug)
+				mciSendString("play music/start.wav", 0, 0, 0);
+			couplelegame();
+			break;
+		case 3:
+			std::cout << "Button 3 has been pushed" << std::endl;
+			volume_jug = (volume_jug + 1) % 2;
+			if (volume_jug)
+				b3->changetext("静音");
+			else
+				b3->changetext("解除静音");
+			b3->create();
+			break;
+		case 4:
+			std::cout << "Button 4 has been pushed" << std::endl;
+			play_game = 0;
+			cleardevice();
+			RECT center = { 0,0,639,479 };
+			settextstyle(36, 0, "华文隶书");
+			settextcolor(WHITE);
+			drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		}
 	}
+	//释放空间
+	delete(b1);
+	delete(b2);
+	delete(b3);
+	delete(b4);
+
 	//以下是星星的代码
 	for (int i = 0; i < MAXSTAR; i++)
 	{
@@ -366,7 +238,3 @@ int main(int argc, char* argv[])
 	closegraph();
 	return 0;
 }
-
-
-
-

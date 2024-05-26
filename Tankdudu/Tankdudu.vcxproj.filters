@@ -64,6 +64,15 @@
     <Image Include="sorce\wall2.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="sorce\bk2.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\bg.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\bk3.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="music\add.wav">
@@ -87,5 +96,8 @@
     <Media Include="music\start.wav">
       <Filter>资源文件</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="backup.txt" />
   </ItemGroup>
 </Project>
