@@ -269,29 +269,7 @@ void ColliderBox::drawColliderbox(ColliderBox& obj)
 	rectangle((int)(obj.mx+obj.displaceX), (int)(obj.my+obj.displaceY), (int)(obj.mx + obj.width), (int)(obj.my + obj.height));
 }
 
-/*class Entity : public ColliderBox//继承了碰撞箱的属性
-{
-protected:
-	int mhealth;//健康值/血量
-	//位置
-	double speed;
-	bool IsAlive;
-	ColliderBox mybox;
-	Vec vec;
-public:
-	//默认构造函数
-	Entity() :mhealth(MAXHEALTH), speed(0), IsAlive(true) {};
-	//x坐标，y坐标，宽度，高度，速度，生命值
-	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true), vec(vec) //mybox没用
-	{
 
-	};
-	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true) {};
-
-	virtual ~Entity() {}
-	virtual void Dead() = 0;//死亡
-	virtual void Move(int) = 0;//移动
-};*/
 
 class obstacle : public ColliderBox//障碍物
 {
@@ -420,23 +398,7 @@ public:
 		}
 		return jug;
 	}
-	//子弹检测可以改的和上面那个一样，或者直接合并
-	/*static int bull_PLAdec(bullet& thisbull) //子弹专属人物碰撞检测,写这个主要是保险，后续可以合并简化，Collider==ture
-	{
-		int jug = -1;
-		for (int i = 0; i <2; i++)
-		{
-			if (thisbull.getx() >= allbox[i].mx+allbox[i].displaceX &&
-				thisbull.getx() < allbox[i].mx + allbox[i].width &&
-				thisbull.gety() >= allbox[i].my+allbox[i].displaceY &&
-				thisbull.gety() < allbox[i].my + allbox[i].height)
-			{
-				jug = allbox[i].ID+;
-				break;
-			}
-		}
-		return jug;
-	} */
+
 	static void checkDead()
 	{
 		int i = 0;

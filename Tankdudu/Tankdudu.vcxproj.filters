@@ -24,6 +24,9 @@
     <ClCompile Include="single.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="filerw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h">
@@ -96,5 +99,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="backup.txt" />
+    <Text Include="scores.txt">
+      <Filter>资源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>
