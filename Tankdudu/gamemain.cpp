@@ -9,6 +9,7 @@ std::vector<ColliderBox> allbox;
 std::vector<bullet> allbullet;
 int volume_jug = 1;
 int play_game = 1;
+
 //星星
 #define MAXSTAR 200	// 星星总数
 //小星星
@@ -19,8 +20,13 @@ struct STAR
 	double	step;
 	int		color;
 };
+typedef struct allscore
+{
+	int score1;
+	int score2;
+};
 
-
+std::vector<allscore> scores;
 
 STAR star[MAXSTAR];
 void InitStar(int i)
@@ -99,7 +105,7 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
 }
 
 
-void starting()
+static void starting()
 {
 	// 绘图窗口初始化
 	//为了方便调试，我把控制台打开，完成后关掉即可
@@ -164,6 +170,7 @@ int main()
 			HWND hWnd = GetHWnd();
 			if (!IsWindow(hWnd))
 				exit(0);
+			//获取鼠标消息，检测是否按在了按钮上
 			if (peekmessage(&msg, EX_MOUSE))
 			{
 				switch (msg.message)
