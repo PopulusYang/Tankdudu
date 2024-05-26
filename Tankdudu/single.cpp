@@ -4,28 +4,15 @@
 bool isgaming = 1;
 unsigned char map[ROWS][COLS];
 
-static void checkdead(obstacle* wall_rock, obstacle* wall_wire_mesh, Player& player, Enemy& enemy)
-{
-	while (isgaming)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			wall_rock[i].deblood();
-			wall_wire_mesh[i].deblood();
-			wall_rock[i].Dead();
-			wall_wire_mesh[i].Dead();
-		}
-		player.deblood();
-		enemy.deblood();
-		player.Dead();
-		enemy.Dead();
-	}
-}
+
 
 
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
+	int score1 = 0;
+	int score2 = 0;
+	bool wait = true;
 	cleardevice();
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
@@ -74,16 +61,24 @@ void singlegame()
 	//计时
 	std::thread thread7(&TimeFun::setTime, std::ref(time), std::ref(isgaming));
 	//检测扣血
-	std::thread thread8(&checkdead, wall_rock, wall_wire_mesh, std::ref(player), std::ref(enemy));
+	std::thread thread8(&otherFun::checkdead, wall_rock, wall_wire_mesh, std::ref(player), std::ref(enemy));
+	//能量
+	std::thread thread9(&Player::defpower, &player, std::ref(isgaming));
 	BeginBatchDraw();
-
+	char s[12] = "score ";
 	while (isgaming)
 	{
 		cleardevice();
 		putimage(0, 0, &background);
 		
 		TimeFun::showTime(time, 540, 0);
-		
+
+		s[6] = score1 / 10 + '0';
+		s[7] = score1 % 10 + '0';
+		s[8] = ':';
+		s[9] = score2 / 10 + '0';
+		s[10] = score2 % 10 + '0';
+		outtextxy(490, 15, _T(s));
 		for (int i = 0; i < 4; i++)
 		{
 			wall_rock[i].display();
@@ -99,6 +94,18 @@ void singlegame()
 	 		FlushBatchDraw();
 		else
 			exit(0);
+		//计成绩
+		if (wait)
+		{
+			if (!player.IsAlive)
+				score2++;
+			if (!enemy.IsAlive)
+				score1++;
+			wait = false;
+		}
+		//全部复活，恢复
+		if (player.IsAlive && enemy.IsAlive)
+			wait = true;
 	}
 	time = 0;
 	cleardevice();
@@ -112,5 +119,7 @@ void singlegame()
 	thread6.join();
 	thread7.join();
 	thread8.join();
+	thread9.join();
 	std::cout << "All threads have been over." << std::endl;
+	std::cin.sync();
 }
