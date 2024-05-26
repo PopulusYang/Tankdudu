@@ -26,6 +26,9 @@ static void checkdead(obstacle* wall_rock, obstacle* wall_wire_mesh, Player& pla
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
+	int score1 = 0;
+	int score2 = 0;
+	bool wait = true;
 	cleardevice();
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
@@ -78,14 +81,20 @@ void singlegame()
 	//能量
 	std::thread thread9(&Player::defpower, &player, std::ref(isgaming));
 	BeginBatchDraw();
-
+	char s[12] = "score ";
 	while (isgaming)
 	{
 		cleardevice();
 		putimage(0, 0, &background);
 		
 		TimeFun::showTime(time, 540, 0);
-		
+
+		s[6] = score1 / 10 + '0';
+		s[7] = score1 % 10 + '0';
+		s[8] = ':';
+		s[9] = score2 / 10 + '0';
+		s[10] = score2 % 10 + '0';
+		outtextxy(540, 10, _T(s));
 		for (int i = 0; i < 4; i++)
 		{
 			wall_rock[i].display();
@@ -101,6 +110,18 @@ void singlegame()
 	 		FlushBatchDraw();
 		else
 			exit(0);
+		//计成绩
+		if (wait)
+		{
+			if (!player.IsAlive)
+				score2++;
+			if (!enemy.IsAlive)
+				score1++;
+			wait = false;
+		}
+		//全部复活，恢复
+		if (player.IsAlive && enemy.IsAlive)
+			wait = true;
 	}
 	time = 0;
 	cleardevice();
@@ -116,4 +137,5 @@ void singlegame()
 	thread8.join();
 	thread9.join();
 	std::cout << "All threads have been over." << std::endl;
+	std::cin.sync();
 }

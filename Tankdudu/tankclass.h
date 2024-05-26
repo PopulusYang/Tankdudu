@@ -1330,7 +1330,7 @@ public:
 				changepng();
 			}
 			double dis = distance(allbox[0].mx, allbox[0].my);
-			while (dis<80.0)
+			while (dis<100.0)
 			{
 				Move(4);
 				changepng();
@@ -1339,7 +1339,7 @@ public:
 			}
 			bool mcanshoot = false;
 			Point checkshoot{ mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI) ,my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI) };
-			for (int i = 0; i < 150; i++)
+			for (int i = 0; i < 180; i++)
 			{
 				if (map[(int)checkshoot.x][(int)checkshoot.y] == 2 || map[(int)checkshoot.x][(int)checkshoot.y] == 3)
 					mcanshoot = true;
