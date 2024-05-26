@@ -152,7 +152,8 @@ int main()
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
 	button* b2 = new button(260, 310, 120, 50, "双人游戏");
 	button* b3 = new button(460, 390, 120, 50, "静 音");
-	button* b4 = new button(260, 390, 120, 50, "退出游戏");
+	button* b5 = new button(260, 390, 120, 50, "退出游戏");
+	button* b4 = new button(60, 390, 120, 50, "操作指南");
 	while (play_game)
 	{
 		starting();
@@ -160,6 +161,7 @@ int main()
 		b2->create();
 		b3->create();
 		b4->create();
+		b5->create();
 		int choose = 0;
 		ExMessage msg;
 		bool jug = true;
@@ -182,6 +184,8 @@ int main()
 						choose = 3;
 					if (b4->test(msg))
 						choose = 4;
+					if (b5->test(msg))
+						choose = 5;
 					if (choose)
 						jug = false;
 					break;
@@ -214,6 +218,10 @@ int main()
 			b3->create();
 			break;
 		case 4:
+			operate();
+			cleardevice();
+			break;
+		case 5:
 			std::cout << "Button 4 has been pushed" << std::endl;
 			play_game = 0;
 			cleardevice();
