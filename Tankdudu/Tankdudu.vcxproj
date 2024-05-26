@@ -142,7 +142,6 @@
     <ClCompile Include="couple.cpp" />
     <ClCompile Include="gamemain.cpp" />
     <ClCompile Include="single.cpp" />
-    <ClCompile Include="volume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h" />
