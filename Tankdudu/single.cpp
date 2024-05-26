@@ -78,6 +78,8 @@ void singlegame()
 	std::thread thread7(&TimeFun::setTime, std::ref(time), std::ref(isgaming));
 	//¼ì²â¿ÛÑª
 	std::thread thread8(&checkdead, wall_rock, wall_wire_mesh, std::ref(player), std::ref(enemy));
+	//ÄÜÁ¿
+	std::thread thread9(&Player::defpower, &player, std::ref(isgaming));
 	BeginBatchDraw();
 	char s[12] = "score ";
 	while (isgaming)
@@ -133,6 +135,7 @@ void singlegame()
 	thread6.join();
 	thread7.join();
 	thread8.join();
+	thread9.join();
 	std::cout << "All threads have been over." << std::endl;
 	std::cin.sync();
 }
