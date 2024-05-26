@@ -12,6 +12,10 @@ void singlegame();//单人游戏函数入口
 
 void couplelegame();//双人游戏函数入口
 
+//操作指南进入这个函数
+
+void operate();
+
 class TimeFun
 {
 public:
