@@ -4,12 +4,19 @@
 bool isgaming = 1;
 unsigned char map[ROWS][COLS];
 
+typedef struct allscore
+{
+	int score1;
+	int score2;
+}allscore;
 
+extern std::vector<allscore> scores;
 
 
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
+	isgaming = true;
 	int score1 = 0;
 	int score2 = 0;
 	bool wait = true;
@@ -107,10 +114,20 @@ void singlegame()
 		if (player.IsAlive && enemy.IsAlive)
 			wait = true;
 	}
+	if (time != 0)
+		std::cout << "游戏未结束" << std::endl;
+	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	time = 0;
 	cleardevice();
 	EndBatchDraw();
 	//等待线程结束
+	scores.push_back(allscore{ 0,0 });
+	for (int i = 4; i >=0; i--)
+	{
+		scores[i + 1] = scores[i];
+	}
+	scores[0].score1 = score1;
+	scores[0].score2 = score2;
 	thread1.join();
 	thread2.join();
 	thread3.join();
@@ -120,6 +137,8 @@ void singlegame()
 	thread7.join();
 	thread8.join();
 	thread9.join();
+	allbox.clear();
+	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
 	std::cin.sync();
 }

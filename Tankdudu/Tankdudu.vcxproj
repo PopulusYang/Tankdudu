@@ -140,9 +140,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="couple.cpp" />
-    <ClCompile Include="filerw.cpp" />
     <ClCompile Include="gamemain.cpp" />
     <ClCompile Include="single.cpp" />
+    <ClCompile Include="operate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h" />
@@ -152,6 +152,8 @@
     <Image Include="sorce\bg.jpg" />
     <Image Include="sorce\bk2.jpg" />
     <Image Include="sorce\bk3.jpg" />
+    <Image Include="sorce\operate.png" />
+    <Image Include="sorce\operate2.png" />
     <Image Include="sorce\start.jpg" />
     <Image Include="sorce\tank1.png" />
     <Image Include="sorce\tank2.png" />
@@ -161,6 +163,7 @@
     <Image Include="sorce\wall1.png" />
     <Image Include="sorce\wall2.png" />
     <Image Include="sorce\wall3.png" />
+    <Image Include="sorce\white.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="music\add.wav" />
@@ -173,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="backup.txt" />
-    <Text Include="scores.txt" />
+    <Text Include="scores.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

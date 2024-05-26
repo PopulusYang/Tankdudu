@@ -3,6 +3,7 @@
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void couplelegame()
 {
+	isgaming = true;
 	int score1 = 0;
 	int score2 = 0;
 	bool wait = true;
@@ -96,6 +97,7 @@ void couplelegame()
 		if (player1.IsAlive && player2.IsAlive)
 			wait = true;
 	}
+	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	if (time != 0)
 		std::cout << "游戏未结束" << std::endl;
 	time = 0;
@@ -113,6 +115,8 @@ void couplelegame()
 	thread9.join();
 	thread10.join();
 	thread11.join();
+	allbox.clear();
+	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
 	std::cin.sync();
 }
