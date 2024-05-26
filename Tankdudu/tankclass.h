@@ -843,18 +843,16 @@ public:
 		if (power < 125)
 		{	
 			switch (powerlevel) {
-	 		case 0:setfillcolor(LIGHTGRAY); break;
-	 		case 1:setfillcolor(DARKGRAY); break;
-		 	case 2:setfillcolor(LIGHTCYAN); break;
-			case 3:setfillcolor(BROWN); break;
-			case 4:setfillcolor(MAGENTA); break;
-		 	case 5:setfillcolor(LIGHTRED); break;
+		 	case 0:setfillcolor(YELLOW); break;
+			case 1:setfillcolor(BROWN); break;
+			case 2:setfillcolor(MAGENTA); break;
+		 	case 3:setfillcolor(LIGHTRED); break;
 		 	default:setfillcolor(LIGHTMAGENTA); break;
 			}
 			solidrectangle((int)(mx + 8), (int)(my - 20), (int)(mx + 8 + (int)(74.0 * (double)power / 125.0)), (int)(my - 17));
 		}
 		else if(power>=125) {	 	
-	 		if (powerlevel >= 5) {
+	 		if (powerlevel >= 4) {
 	 			setfillcolor(LIGHTMAGENTA);
 			}
 			else { 
