@@ -2,11 +2,11 @@
 //最大生命值
 #define MAXHEALTH 100
 //障碍物的超级血量
-#define SUPER_OBSTACLE 9999
+#define SUPER_OBSTACLE 99999
 //最长游戏时间
 #define MAXTIME 60
 #define PI 3.14159265359
-
+//地图大小
 #define ROWS 640
 #define COLS 480
 
@@ -473,6 +473,7 @@ public:
 		}
 	}
 };
+//????????
 
 
 bool isPointNear(int x1, int y1, int x2, int y2, int range);
@@ -482,7 +483,11 @@ class Tank : public ColliderBox//坦克类
 	friend bullet;
 protected:
 	bool canshoot = true;
+	bool canfly = false;
+	bool flying = false;
 	int waittime = 0;
+	int power = 0;
+	int powerlevel = 0;
 	int pierce;//穿甲弹数量
 	int explosive;//高爆弹数量
 	int clip = 3;//弹夹中的子弹数量
@@ -501,6 +506,11 @@ public:
 			//mciSendString("play music/bang.wav", 0, 0, 0);
 		}
 	}
+	
+	inline double getspeed() { return this->speed; };
+	inline void changespeed(double newspeed) { this->speed = newspeed; };
+public:
+	
 	//初始x坐标，初始y坐标，宽度，高度，速度
 	Tank(int x, int y, int s) :ColliderBox(x , y , 97 - 22, 80 - 12, s, 2, MAXHEALTH, 12, 20), pierce(0), explosive(0), clip(3)
 	{
@@ -641,13 +651,13 @@ public:
 					case 1:
 
 						if (!angleDectect(*this, allbox[stay],10)) {
-							mx += vec.x * speed;//
-							my -= vec.y * speed * 0.1;
+							mx += vec.x * speed*1.5;//
+							my -= vec.y * speed *1.5* 0.1;
 							
 						}
 						else {
-							mx += vec.x * speed*1.5;//
-							my += vec.y * speed*1.1 ;
+							mx += vec.x * speed*1.5*1.5;//
+							my += vec.y * speed*1.1*1.5 ;
 						}
 
 						if (tag == 2)
@@ -663,13 +673,13 @@ public:
 						break;
 					case 2:
 						if (!angleDectect(*this, allbox[stay],10)) {
-							mx -= vec.x * speed * 0.1;
-							my += vec.y * speed;//
+							mx -= vec.x * speed * 0.1*1.5;
+							my += vec.y * speed*1.5;//
 					
 						}
 						else {
-							mx += vec.x * speed*1.1;
-							my += vec.y * speed*1.5;//
+							mx += vec.x * speed*1.1*1.5;
+							my += vec.y * speed*1.5*1.5;//
 						}
 						
 						if (tag == 2)
@@ -749,6 +759,38 @@ public:
 			}
 		}
 	}
+
+	void defpower(bool& isgaming) {
+		while (isgaming)
+		{
+		 	if (!canfly)
+			{
+				while (1) {
+					power++;
+					Sleep(120);
+					if (power >= 125) {
+						canfly = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+
+	void flyyyy() {
+	 	std::cout << "F is pressd" << std::endl;
+		if (canfly)
+		{
+			changespeed(getspeed()*1.3);
+		  	powerlevel++;
+			canfly = 0;
+			power = 0;
+		}
+	}
+
+	
+
 	void display()
 	{
 		IMAGE temp;
@@ -798,6 +840,27 @@ public:
 			setfillcolor(GREEN);
 			fillrectangle((int)(mx + 8), (int)(my - 15), (int)(mx + 8 + (int)(74.0 * (double)waittime / 125.0)), (int)(my - 11));
 		}
+		if (power < 125)
+		{	
+			switch (powerlevel) {
+		 	case 0:setfillcolor(YELLOW); break;
+			case 1:setfillcolor(BROWN); break;
+			case 2:setfillcolor(MAGENTA); break;
+		 	case 3:setfillcolor(LIGHTRED); break;
+		 	default:setfillcolor(LIGHTMAGENTA); break;
+			}
+			solidrectangle((int)(mx + 8), (int)(my - 20), (int)(mx + 8 + (int)(74.0 * (double)power / 125.0)), (int)(my - 17));
+		}
+		else if(power>=125) {	 	
+	 		if (powerlevel >= 4) {
+	 			setfillcolor(LIGHTMAGENTA);
+			}
+			else { 
+				setfillcolor(BLUE); 
+			};
+			solidrectangle((int)(mx + 8), (int)(my - 20), (int)(mx + 8 + (int)(74.0)), (int)(my - 17));
+		}
+
 	}
 
 };
@@ -818,17 +881,17 @@ class Player :public Tank
 private:
 
 	int bulkind = 1;
-	int up, down, left, right, shift, vshoot;
+	int up, down, left, right, vshoot,fly;
 public:
 	std::array<Point, 5> fpt;
-	Player(int up, int down, int left, int right, int shift, int vshoot)
-		:Tank(10, 240, 2), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+	Player(int up, int down, int left, int right, int fly, int vshoot)
+		:Tank(10, 240, 2), fpt(), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
 	}
-	Player(int up, int down, int left, int right, int shift, int vshoot, int t)
-		:Tank(500, 240, 2), fpt(), up(up), down(down), left(left), right(right), shift(shift), vshoot(vshoot)
+	Player(int up, int down, int left, int right, int fly, int vshoot, int t)
+		:Tank(500, 240, 2), fpt(), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 		tag = t;
@@ -855,7 +918,10 @@ public:
 				Move(4);
 			if (KeyDown(vshoot))
 				shoot(bulkind);
-
+			if (KeyDown(fly))
+			 	flyyyy();
+			if (KeyDown(VK_ESCAPE))
+				game = false;
 			Sleep(5);
 		}
 	}
@@ -1265,7 +1331,7 @@ public:
 				changepng();
 			}
 			double dis = distance(allbox[0].mx, allbox[0].my);
-			while (dis<80.0)
+			while (dis<100.0)
 			{
 				Move(4);
 				changepng();
@@ -1274,7 +1340,7 @@ public:
 			}
 			bool mcanshoot = false;
 			Point checkshoot{ mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI) ,my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI) };
-			for (int i = 0; i < 150; i++)
+			for (int i = 0; i < 180; i++)
 			{
 				if (map[(int)checkshoot.x][(int)checkshoot.y] == 2 || map[(int)checkshoot.x][(int)checkshoot.y] == 3)
 					mcanshoot = true;
@@ -1331,3 +1397,24 @@ public:
 };
 
 
+class otherFun
+{
+public:
+	static void checkdead(obstacle* wall_rock, obstacle* wall_wire_mesh, Tank& player, Tank& enemy)
+	{
+		while (isgaming)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				wall_rock[i].deblood();
+				wall_wire_mesh[i].deblood();
+				wall_rock[i].Dead();
+				wall_wire_mesh[i].Dead();
+			}
+			player.deblood();
+			enemy.deblood();
+			player.Dead();
+			enemy.Dead();
+		}
+	}
+};

@@ -24,9 +24,6 @@
     <ClCompile Include="single.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="volume.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h">
