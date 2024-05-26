@@ -109,6 +109,7 @@ void singlegame()
 	}
 	time = 0;
 	cleardevice();
+
 	EndBatchDraw();
 	//等待线程结束
 	thread1.join();

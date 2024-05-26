@@ -16,7 +16,7 @@ void couplelegame()
 	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 
-	Player player1('W', 'S', 'A', 'D', 'R', ' ');
+	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);
 	Player player2(VK_UP,VK_DOWN,VK_LEFT,VK_RIGHT,VK_SHIFT,VK_RETURN,5);
 
 	obstacle wall_rock[4] =

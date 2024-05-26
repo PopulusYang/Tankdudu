@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="couple.cpp" />
+    <ClCompile Include="filerw.cpp" />
     <ClCompile Include="gamemain.cpp" />
     <ClCompile Include="single.cpp" />
     <ClCompile Include="operate.cpp" />
@@ -152,6 +153,7 @@
     <Image Include="sorce\bg.jpg" />
     <Image Include="sorce\bk2.jpg" />
     <Image Include="sorce\bk3.jpg" />
+    <Image Include="sorce\lose.png" />
     <Image Include="sorce\operate.png" />
     <Image Include="sorce\operate2.png" />
     <Image Include="sorce\operate3.png" />
@@ -165,6 +167,7 @@
     <Image Include="sorce\wall2.png" />
     <Image Include="sorce\wall3.png" />
     <Image Include="sorce\white.png" />
+    <Image Include="sorce\win.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="music\add.wav" />
@@ -177,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="backup.txt" />
+    <Text Include="scores.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
