@@ -730,10 +730,13 @@ public:
 				while (1) {
 					power++;
 					Sleep(120);
-					if (power >= 125) {
+					if (power >= 125)
+					{
 						canfly = 1;
 						break;
 					}
+					if (!isgaming)
+						break;
 				}
 			}
 		}
