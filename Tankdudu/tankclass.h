@@ -487,7 +487,7 @@ protected:
 	int explosive;//高爆弹数量
 	int clip = 3;//弹夹中的子弹数量
 	int movepng = 1;//显示哪张图片
-	IMAGE img1, img2, img3;
+	IMAGE img1, img2, img3, img4;
 
 
 public:
@@ -507,6 +507,7 @@ public:
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
 		loadimage(&img3, "sorce/tank3.png", 97, 80);
+		loadimage(&img4, "sorce/tank_dead.png", 97, 80);
 	}
 	/*********************************************
 	杨武显的设计思路：
@@ -696,12 +697,7 @@ public:
 	{
 		if (!IsAlive)
 		{
-			this->mx = -100;
-			this->my = -100;
-			this->height = 0;
-			this->width = 0;
 			this->mhealth = MAXHEALTH;
-			this->IsAlive = true;
 			if (volume_jug)
 				PlaySound("music/bang.wav", NULL, SND_FILENAME | SND_ASYNC);
 			for (int i = 0; i < allbox.size(); i++)
@@ -715,7 +711,18 @@ public:
 					allbox[i].mhealth = this->mhealth;
 				}
 			}
-			isgaming = false;
+			movepng = 5;
+			Sleep(2500);
+			movepng = 1;
+			//归位
+			if (tag == 5)
+				mx = 500;
+			else
+				mx = 10;
+			my = 190;
+			allbox[this->ID].mx = mx;
+			allbox[this->ID].my = my;
+			IsAlive = true;
 		}
 	}
 	void shoot(int kind)//发射
@@ -759,6 +766,8 @@ public:
 		case 4:
 			Function::RotateImage(&temp, &img1, PI / 180.0 * (double)vec.angle);
 			break;
+		case 5:
+			Function::RotateImage(&temp, &img4, PI / 180.0 * (double)vec.angle);
 		}
 		double temp1, temp2;
 		double co, si;
@@ -835,6 +844,7 @@ public:
 	{
 		while (game)
 		{
+			while (!IsAlive);
 			if (KeyDown(left))
 				Move(1);
 			if (KeyDown(right))
@@ -854,10 +864,13 @@ public:
 	{
 		while (game)
 		{
-			if (KeyDown(left) || KeyDown(right) || KeyDown(up) || KeyDown(down))
-				movepng++;
-			if (movepng == 4)
-				movepng = 1;
+			if (IsAlive)
+			{
+				if (KeyDown(left) || KeyDown(right) || KeyDown(up) || KeyDown(down))
+					movepng++;
+				if (movepng == 4)
+					movepng = 1;
+			}
 		}
 	}
 };
@@ -1173,6 +1186,15 @@ public:
 		tag = 5;
 		allbox.back().tag = 5;
 	}
+	void changepng()
+	{
+		if (IsAlive)
+		{
+				movepng++;
+			if (movepng == 4)
+				movepng = 1;
+		}
+	}
 	void aicontrol(bool& isgaimg)
 	{
 		//寻路
@@ -1194,6 +1216,7 @@ public:
 		}Quadrant;
 		while (isgaimg)
 		{
+			while (!IsAlive);
 			treeNode* road;
 			road = Astar((int)allbox[0].mx + allbox[0].displaceX, (int)allbox[0].my + allbox[0].displaceY, (int)mx, (int)my);
 			if (road == NULL)
@@ -1229,19 +1252,23 @@ public:
 					Move(1);
 				else
 					Move(2);
+				changepng();
 				Sleep(10);
 			}
 			//移动
 			if (temp.angle >= vec.angle - 3 && temp.angle <= vec.angle + 3)
 			{
 				Move(3);
+				changepng();
 				Sleep(25);
 				Move(3);
+				changepng();
 			}
 			double dis = distance(allbox[0].mx, allbox[0].my);
-			while (dis<40.0)
+			while (dis<80.0)
 			{
 				Move(4);
+				changepng();
 				Sleep(23);
 				dis = distance(allbox[0].mx, allbox[0].my);
 			}
@@ -1274,7 +1301,6 @@ private:
 public:
 	button(int x, int y, int w, int h, LPCSTR str) :x(x), y(y), w(w), h(h), str(str)
 	{
-		create();
 		std::cout << "A button has been created" << std::endl;
 	}
 	//创建并显示按钮
