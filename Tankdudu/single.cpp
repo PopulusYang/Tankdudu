@@ -166,7 +166,7 @@ void singlegame()
 		for (int i = 0; i < 20; i++)
 		{
 			IMAGE img1;
-			loadimage(&img1, "sorce/win.png", 12.5*(i+1), 12.5 * (i + 1));
+			loadimage(&img1, "sorce/win.png", (int)(12.5*(i+1)), (int)(12.5 * (i + 1)));
 			Function::transparentimage(NULL, 319-(25*(i+1)/4), 219 - (25 * (i + 1) / 4), &img1);
 			settextcolor(RGB(255, 0, 0));
 			drawtext("YOU WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
