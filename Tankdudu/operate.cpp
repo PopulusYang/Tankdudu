@@ -1,3 +1,7 @@
+//文件名：operate.cpp
+//作者：朱佳悦
+//功能：展示操作指南
+
 #include"tankclass.h"
 #include"tankhead.h"
 //操作指南进入这个函数

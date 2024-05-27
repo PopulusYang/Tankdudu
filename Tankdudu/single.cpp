@@ -1,3 +1,7 @@
+//文件名：single.cpp
+//作者：杨武显，朱佳悦,任宇轩
+//功能：为单人游戏提供入口
+
 #include"tankclass.h"
 #include"tankhead.h"
 
@@ -28,7 +32,7 @@ void singlegame()
 	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 
 	Player player('W','S','A','D','R','J');
@@ -163,7 +167,7 @@ void singlegame()
 		for (int i = 0; i < 20; i++)
 		{
 			IMAGE img1;
-			loadimage(&img1, "sorce/win.png", 12.5*(i+1), 12.5 * (i + 1));
+			loadimage(&img1, "sorce/win.png", (int)(12.5*(i+1)), (int)(12.5 * (i + 1)));
 			Function::transparentimage(NULL, 319-(25*(i+1)/4), 219 - (25 * (i + 1) / 4), &img1);
 			settextcolor(RGB(255, 255, 255));
 			drawtext("YOU WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
