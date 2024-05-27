@@ -121,7 +121,7 @@ void operate()
 		if (player == 3)
 		{
 			Function::transparentimage(NULL, 0, 0, &img2);
-			Function::transparentimage(NULL, 60, 70, &img4);
+			Function::transparentimage(NULL, 100, 60, &img4);
 			b1->create();
 			b5->create();
 			int jug = 1;
