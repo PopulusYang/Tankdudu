@@ -24,10 +24,68 @@ typedef struct allscore
 {
 	int score1;
 	int score2;
-};
+}allscore;
 
 std::vector<allscore> scores;
 
+
+void fileread()
+{
+	std::ifstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
+
+	if (!file) 
+	{ // 检查文件是否成功打开  
+		std::cerr << "Unable to open file";
+		exit(-1);
+	}
+	//临时储存分数
+	int score1 = 0;
+	int score2 = 0;
+
+	while (file) 
+	{ 
+		//读取
+		file.read(reinterpret_cast<char*>(&score1), sizeof(score1));
+		file.read(reinterpret_cast<char*>(&score2), sizeof(score2));
+		//存入内存
+		scores.push_back(allscore{ score1, score2 });
+		if (file.gcount() == 0)
+		{
+			if (file.eof())
+			{
+				// 确实是EOF，文件读取完毕  
+				std::cout << "End of file reached." << std::endl;
+				scores.pop_back();
+				break;
+			}
+			else
+			{
+				// 出现了其他错误  
+				std::cerr << "Error reading file." << std::endl;
+				break;
+			}
+		}
+		
+	}
+}
+
+
+void filewrite()
+{
+	std::ofstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
+
+	if (!file) 
+	{ // 检查文件是否成功打开  
+		std::cerr << "Unable to open file";
+		exit(-1);
+	}
+
+	for (allscore p : scores)
+	{
+		file.write(reinterpret_cast<char*>(&p.score1), sizeof(p.score1));
+		file.write(reinterpret_cast<char*>(&p.score2), sizeof(p.score2));
+	}
+}
 STAR star[MAXSTAR];
 void InitStar(int i)
 {
@@ -56,15 +114,18 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	// 检测Y轴上的碰撞
 	bool yOverlap = box1.my < box2.my + box2.height && box1.my + box1.height > box2.my;
 
-	if (xOverlap && yOverlap) {
+	if (xOverlap && yOverlap)
+	{
 		// 判断碰撞更多发生在X轴还是Y轴
 		float xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
 		float yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
 
-		if (xOverlapAmount < yOverlapAmount) {
+		if (xOverlapAmount < yOverlapAmount) 
+		{
 			return 1; // X轴上碰撞
 		}
-		else {
+		else
+		{
 			return 2; // Y轴上碰撞
 		}
 	}
@@ -72,20 +133,24 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	return 0; // 没有碰撞
 }
 //near==true
-bool isPointNear(int x1, int y1, int x2, int y2, int range) {
+bool isPointNear(int x1, int y1, int x2, int y2, int range) 
+{
 	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
 }
 
-bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) 
+{
 	// 获取 box1 和 box2 的四个角的坐标
-	int box1Corners[4][2] = {
+	int box1Corners[4][2] = 
+	{
 		{box1.mx, box1.my}, // 左上角
 		{box1.mx + box1.width, box1.my}, // 右上角
 		{box1.mx, box1.my + box1.height}, // 左下角
 		{box1.mx + box1.width, box1.my + box1.height} // 右下角
 	};
 
-	int box2Corners[4][2] = {
+	int box2Corners[4][2] = 
+	{
 		{box2.mx, box2.my}, // 左上角
 		{box2.mx + box2.width, box2.my}, // 右上角
 		{box2.mx, box2.my + box2.height}, // 左下角
@@ -93,9 +158,12 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
 	};
 
 	// 检查 box1 的每个角是否接近 box2 的任意一个角
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) {
+	for (int i = 0; i < 4; ++i) 
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) 
+			{
 				return true;
 			}
 		}
@@ -143,6 +211,7 @@ static void starting()
 
 int main()
 {
+	fileread();
 	srand((unsigned)time(NULL));
 	initgraph(640, 480, EX_SHOWCONSOLE);
 	mciSendString("open music/start.wav alias start", NULL, 0, NULL);
@@ -162,6 +231,27 @@ int main()
 		b3->create();
 		b4->create();
 		b5->create();
+		setfillcolor(0x9BB171);
+		fillrectangle(70, 220, 180, 370);
+		RECT position{ 70,220,180,240 };
+		settextstyle(18, 0, "华文隶书");
+		int i = 0;
+		drawtext("单人成绩", &position, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		for (allscore p : scores)
+		{
+			if (i > 5)
+				break;
+			i++;
+			RECT pos{ 70,220 + 20 * i,180,240 + 20 * i };
+			char s[6] = { '\0'};
+			s[0] = p.score1 / 10 + '0';
+			s[1] = p.score1 % 10 + '0';
+			s[2] = ':';
+			s[3] = p.score2 / 10 + '0';
+			s[4] = p.score2 % 10 + '0';
+			drawtext(_T(s), &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		}
+		
 		int choose = 0;
 		ExMessage msg;
 		bool jug = true;
@@ -251,5 +341,6 @@ int main()
 	}
 	// 按任意键退出
 	closegraph();
+	filewrite();
 	return 0;
 }

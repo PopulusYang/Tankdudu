@@ -6,6 +6,7 @@
 #include<thread>
 #include<cmath>
 #include<mmsystem.h>
+#include<fstream>
 #pragma comment(lib,"winmm.lib")
 
 void singlegame();//单人游戏函数入口

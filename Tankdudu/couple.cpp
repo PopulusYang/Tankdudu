@@ -3,6 +3,7 @@
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void couplelegame()
 {
+	isgaming = true;
 	int score1 = 0;
 	int score2 = 0;
 	bool wait = true;
@@ -18,7 +19,7 @@ void couplelegame()
 
 	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);
 	Player player2(VK_UP,VK_DOWN,VK_LEFT,VK_RIGHT,VK_SHIFT,VK_RETURN,5);
-
+	//准备地图
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
@@ -96,23 +97,63 @@ void couplelegame()
 		if (player1.IsAlive && player2.IsAlive)
 			wait = true;
 	}
-	if (time != 0)
-		std::cout << "游戏未结束" << std::endl;
-	time = 0;
-	cleardevice();
 	EndBatchDraw();
+	setfillcolor(0x9BB171);
+	fillrectangle(160, 120, 480, 360);
+
+	settextcolor(WHITE);
+	settextstyle(36, 0, "华文隶书");
+	drawtext("游戏结束，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (time != 0)
+		std::cout << "游戏未完成" << std::endl;
+	time = 0;
+
 	//等待线程结束
 	thread1.join();
+	std::cout << "thread1 have been over." << std::endl;
 	thread2.join();
+	std::cout << "thread2 have been over." << std::endl;
 	thread3.join();
+	std::cout << "thread3 have been over." << std::endl;
 	thread4.join();
+	std::cout << "thread4 have been over." << std::endl;
 	thread5.join();
+	std::cout << "thread5 have been over." << std::endl;
 	thread6.join();
+	std::cout << "thread6 have been over." << std::endl;
 	thread7.join();
+	std::cout << "thread7 have been over." << std::endl;
 	thread8.join();
+	std::cout << "thread8 have been over." << std::endl;
 	thread9.join();
+	std::cout << "thread9 have been over." << std::endl;
 	thread10.join();
+	std::cout << "thread10 have been over." << std::endl;
 	thread11.join();
+	std::cout << "thread11 have been over." << std::endl;
+	allbox.clear();
+	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
+
+	cleardevice();
+	std::cin.sync();
+	if (score1 > score2)
+		drawtext("P1 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 < score2)
+		drawtext("P2 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 == score2)
+		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	button over(260, 390, 120, 40, "继续");
+	over.create();
+	bool jug = true;
+	ExMessage msg;
+	while (jug)
+	{
+		if(peekmessage(&msg,EX_MOUSE))
+			if(msg.message == WM_LBUTTONDOWN)
+				if (over.test(msg))
+					jug = false;
+	}
+	//清除缓冲区
 	std::cin.sync();
 }
