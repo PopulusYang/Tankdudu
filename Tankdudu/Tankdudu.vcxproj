@@ -145,6 +145,7 @@
     <ClCompile Include="operate.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="tankclass.h" />
     <ClInclude Include="tankhead.h" />
   </ItemGroup>
@@ -182,6 +183,9 @@
   <ItemGroup>
     <Text Include="backup.txt" />
     <Text Include="scores.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Tankdudu.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

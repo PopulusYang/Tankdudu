@@ -1,3 +1,6 @@
+此文档用于储存各种被弃用的函数和类
+
+
 /*
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
