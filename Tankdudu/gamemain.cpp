@@ -1,5 +1,11 @@
+//文件名：gamemain.cpp
+//作者：杨武显，朱佳悦，任宇轩
+//该文件为程序的入口，部分函数的实现以及文件的读写等
+
+
 #include"tankclass.h"
 #include"tankhead.h"
+
 
 class bullet;
 std::mutex lock;
@@ -33,7 +39,7 @@ void fileread()
 {
 	std::ifstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) 
+	if (!file)
 	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
@@ -42,8 +48,8 @@ void fileread()
 	int score1 = 0;
 	int score2 = 0;
 
-	while (file) 
-	{ 
+	while (file)
+	{
 		//读取
 		file.read(reinterpret_cast<char*>(&score1), sizeof(score1));
 		file.read(reinterpret_cast<char*>(&score2), sizeof(score2));
@@ -65,7 +71,6 @@ void fileread()
 				break;
 			}
 		}
-		
 	}
 }
 
@@ -74,7 +79,7 @@ void filewrite()
 {
 	std::ofstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) 
+	if (!file)
 	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
@@ -110,17 +115,17 @@ void MoveStar(int i)
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	// 检测X轴上的碰撞
-	bool xOverlap = box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx;
+	bool xOverlap = box1.mx + box1.displaceX < box2.mx + box2.width && box1.mx + box1.width > box2.mx + box2.displaceX;
 	// 检测Y轴上的碰撞
-	bool yOverlap = box1.my < box2.my + box2.height && box1.my + box1.height > box2.my;
+	bool yOverlap = box1.my + box1.displaceY < box2.my + box2.height && box1.my + box1.height > box2.my + box2.displaceY;
 
 	if (xOverlap && yOverlap)
 	{
 		// 判断碰撞更多发生在X轴还是Y轴
-		float xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
-		float yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
+		double xOverlapAmount = min(box1.mx + box1.width - box2.mx - box2.displaceX, box2.mx + box2.width - box1.mx - box1.displaceX);
+		double yOverlapAmount = min(box1.my + box1.height - box2.my - box2.displaceY, box2.my + box2.height - box1.my - box1.displaceY);
 
-		if (xOverlapAmount < yOverlapAmount) 
+		if (xOverlapAmount < yOverlapAmount)
 		{
 			return 1; // X轴上碰撞
 		}
@@ -133,36 +138,34 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	return 0; // 没有碰撞
 }
 //near==true
-bool isPointNear(int x1, int y1, int x2, int y2, int range) 
+bool isPointNear(int x1, int y1, int x2, int y2, int range)
 {
 	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
 }
 
-bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) 
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range)
 {
 	// 获取 box1 和 box2 的四个角的坐标
-	int box1Corners[4][2] = 
-	{
-		{box1.mx, box1.my}, // 左上角
-		{box1.mx + box1.width, box1.my}, // 右上角
-		{box1.mx, box1.my + box1.height}, // 左下角
-		{box1.mx + box1.width, box1.my + box1.height} // 右下角
+	int box1Corners[4][2] = {
+		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.displaceY)}, // 左上角
+		{(int)(box1.mx + box1.width), (int)(box1.my + box1.displaceY)}, // 右上角
+		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.height)}, // 左下角
+		{(int)(box1.mx + box1.width),(int)(box1.my + box1.height)} // 右下角
 	};
 
-	int box2Corners[4][2] = 
-	{
-		{box2.mx, box2.my}, // 左上角
-		{box2.mx + box2.width, box2.my}, // 右上角
-		{box2.mx, box2.my + box2.height}, // 左下角
-		{box2.mx + box2.width, box2.my + box2.height} // 右下角
+	int box2Corners[4][2] = {
+		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.displaceY)}, // 左上角
+		{(int)(box2.mx + box2.width), (int)(box2.my + box2.displaceY)}, // 右上角
+		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.height)}, // 左下角
+		{(int)(box2.mx + box2.width), (int)(box2.my + box2.height)} // 右下角
 	};
 
 	// 检查 box1 的每个角是否接近 box2 的任意一个角
-	for (int i = 0; i < 4; ++i) 
+	for (int i = 0; i < 4; ++i)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
-			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) 
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range))
 			{
 				return true;
 			}
@@ -175,10 +178,6 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range)
 
 static void starting()
 {
-	// 绘图窗口初始化
-	//为了方便调试，我把控制台打开，完成后关掉即可
-
-	
 	// 获得窗口句柄
 	HWND hWnd = GetHWnd();
 	// 使用 Windows API 修改窗口名称
@@ -213,7 +212,9 @@ int main()
 {
 	fileread();
 	srand((unsigned)time(NULL));
-	initgraph(640, 480, EX_SHOWCONSOLE);
+	// 绘图窗口初始化
+	//为了方便调试，我把控制台打开，完成后关掉即可
+	initgraph(640, 480);
 	mciSendString("open music/start.wav alias start", NULL, 0, NULL);
 	mciSendString("open music/fire.wav alias fire", NULL, 0, NULL);
 	mciSendString("open music/blast.wav alias blast", NULL, 0, NULL);
@@ -243,7 +244,7 @@ int main()
 				break;
 			i++;
 			RECT pos{ 70,220 + 20 * i,180,240 + 20 * i };
-			char s[6] = { '\0'};
+			char s[6] = { '\0' };
 			s[0] = p.score1 / 10 + '0';
 			s[1] = p.score1 % 10 + '0';
 			s[2] = ':';
@@ -251,7 +252,7 @@ int main()
 			s[4] = p.score2 % 10 + '0';
 			drawtext(_T(s), &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		}
-		
+
 		int choose = 0;
 		ExMessage msg;
 		bool jug = true;

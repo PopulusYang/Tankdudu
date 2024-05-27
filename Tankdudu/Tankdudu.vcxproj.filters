@@ -24,9 +24,6 @@
     <ClCompile Include="single.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="filerw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="operate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -36,6 +33,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="tankhead.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -94,6 +94,15 @@
     <Image Include="sorce\win.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="sorce\awards.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\awardsP1.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\other.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="music\add.wav">
@@ -120,8 +129,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="backup.txt" />
-    <Text Include="scores.txt">
+    <Text Include="scores.bin">
       <Filter>资源文件</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Tankdudu.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

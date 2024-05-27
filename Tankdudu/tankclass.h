@@ -1,3 +1,8 @@
+//文件名：tankclass.h
+//作者：杨武显，朱佳悦，任宇轩
+//功能：封装了坦克大战游戏的各种类，定义一些必要的宏，提供了部分比较有用的函数
+
+
 #pragma once
 //最大生命值
 #define MAXHEALTH 100
@@ -17,11 +22,8 @@
 //星星
 #define MAXSTAR 200
 #include"tankhead.h"
-#include <random>
-#include<array>
-#include<mutex>
-#include<cstdlib>
-#include <time.h>  
+
+//一堆外部变量
 extern int volume_jug;
 extern int IDnum;
 extern std::mutex lock;
@@ -31,7 +33,7 @@ class bullet;
 extern std::vector<bullet> allbullet;
 extern unsigned char map[ROWS][COLS];
 
-
+//检测某个按键是否被按下
 inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
@@ -41,6 +43,7 @@ inline bool KeyDown(int vKey)
 class Function
 {
 public:
+	//重写图片旋转函数
 	static void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
 	{
 		IMAGE* pWorking = GetWorkingImage();
@@ -213,21 +216,21 @@ public:
 	//坐标以及长宽
 
 	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID(IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true), tag(0), displaceX(0), displaceY(0) {}
-	ColliderBox(int x, int y, int w, int h, int s, int health, int tag, Vec vec)
+	ColliderBox(int x, int y, int w, int h, double s, int health, int tag, Vec vec)
 		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), vec(vec), tag(tag), displaceX(0), displaceY(0)
 	{
 		allbox.push_back(*this);
 		p = &allbox[allbox.size() - 1];
 		IDnum++;
 	}
-	ColliderBox(int x, int y, int w, int h, int s, int tag, int health)
+	ColliderBox(int x, int y, int w, int h, double s, int tag, int health)
 		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag), displaceX(0), displaceY(0)
 	{
 		allbox.push_back(*this);
 		p = &allbox[allbox.size() - 1];
 		IDnum++;
 	}
-	ColliderBox(int x, int y, int w, int h, int s, int tag, int health, int displaceX, int displaceY) 
+	ColliderBox(int x, int y, int w, int h, double s, int tag, int health, int displaceX, int displaceY) 
 		:mx(x), my(y), height(h), width(w), ID(IDnum), mhealth(health), speed(s), IsAlive(true), tag(tag), displaceX(displaceX), displaceY(displaceY)
 	{
 		allbox.push_back(*this);
@@ -292,12 +295,6 @@ public:
 			tag = 3;
 			allbox.back().tag = 3;
 		}
-			
-		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
-		/*std::random_device rd;  // 获取随机数种子
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> distrib(1, 2);
-		kind = distrib(gen);*/
 	}
 	obstacle() :ColliderBox(0, 0, 0, 0, 0, 1, 0), kind(0) {}
 	void Dead() override
@@ -350,7 +347,7 @@ public:
 		case 3:
 			temp = img3;
 		}
-		Function::transparentimage(NULL, mx, my, &temp);
+		Function::transparentimage(NULL, (int)mx, (int)my, &temp);
 	}
 };
 class bullet//子弹类
@@ -435,7 +432,6 @@ public:
 		}
 	}
 };
-//????????
 
 
 bool isPointNear(int x1, int y1, int x2, int y2, int range);
@@ -450,9 +446,6 @@ protected:
 	int waittime = 0;
 	int power = 0;
 	int powerlevel = 0;
-	int pierce;//穿甲弹数量
-	int explosive;//高爆弹数量
-	int clip = 3;//弹夹中的子弹数量
 	int movepng = 1;//显示哪张图片
 	IMAGE img1, img2, img3, img4;
 
@@ -474,7 +467,7 @@ public:
 public:
 	
 	//初始x坐标，初始y坐标，宽度，高度，速度
-	Tank(int x, int y, int s) :ColliderBox(x , y , 97 - 22, 80 - 12, s, 2, MAXHEALTH, 12, 20), pierce(0), explosive(0), clip(3)
+	Tank(int x, int y, double s) :ColliderBox(x , y , 97 - 22, 80 - 12, s, 2, MAXHEALTH, 12, 20)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
 		loadimage(&img2, "sorce/tank2.png", 97, 80);
@@ -744,7 +737,7 @@ public:
 
 
 	void flyyyy() {
-	 	std::cout << "F is pressd" << std::endl;
+	 	std::cout << "Flyyyy has been activated" << std::endl;
 		if (canfly)
 		{
 			changespeed(getspeed()*1.3);
@@ -848,15 +841,14 @@ private:
 	int bulkind = 1;
 	int up, down, left, right, vshoot,fly;
 public:
-	std::array<Point, 5> fpt;
 	Player(int up, int down, int left, int right, int fly, int vshoot)
-		:Tank(10, 240, 2), fpt(), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
+		:Tank(10, 240, 2), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 
 	}
 	Player(int up, int down, int left, int right, int fly, int vshoot, int t)
-		:Tank(500, 240, 2), fpt(), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
+		:Tank(500, 240, 2), up(up), down(down), left(left), right(right), vshoot(vshoot),fly(fly)
 	{
 		std::cout << "A player has joined in the game." << std::endl;
 		tag = t;
@@ -872,7 +864,10 @@ public:
 	{
 		while (game)
 		{
-			while (!IsAlive);
+			while (!IsAlive)
+			{
+				std::cout << "dead" << std::endl;
+			}
 			if (KeyDown(left))
 				Move(1);
 			if (KeyDown(right))
@@ -1129,20 +1124,6 @@ private:
 			if (map[pos.row][pos.col + i] == 1)
 				return false;
 		}
-		/****************************************************************************
-		乐死我了这是什么鬼
-		for (int i = 30; i > 0; i--)
-		{
-			if (map[pos.row][pos.col + i] == 1 || map[pos.row][pos.col + i] == 3)
-				return false;
-		}
-		for (int i = 12; i > 0; i--)
-		{
-			if (map[pos.row + i][pos.col] == 1 || map[pos.row + i][pos.col] == 3)
-				return false;
-		}
-		****************************************************************************/
-		
 		return true;
 	}
 
@@ -1247,9 +1228,12 @@ public:
 		}Quadrant;
 		while (isgaimg)
 		{
-			while (!IsAlive);
+			while (!IsAlive)
+			{
+				std::cout << "dead" << std::endl;
+			}
 			treeNode* road;
-			road = Astar((int)allbox[0].mx + allbox[0].displaceX, (int)allbox[0].my + allbox[0].displaceY, (int)mx, (int)my);
+			road = Astar((int)(allbox[0].mx + allbox[0].displaceX), (int)(allbox[0].my + allbox[0].displaceY), (int)mx, (int)my);
 			if (road == NULL)
 				continue;
 			Point p1{ mx,my };
