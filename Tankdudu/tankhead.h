@@ -7,6 +7,11 @@
 #include<cmath>
 #include<mmsystem.h>
 #include<fstream>
+#include <random>
+#include<mutex>
+#include<cstdlib>
+#include <time.h>  
+
 #pragma comment(lib,"winmm.lib")
 
 void singlegame();//单人游戏函数入口

@@ -64,7 +64,6 @@ void fileread()
 				break;
 			}
 		}
-		
 	}
 }
 
@@ -114,8 +113,8 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 
 	if (xOverlap && yOverlap) {
 		// 判断碰撞更多发生在X轴还是Y轴
-		float xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
-		float yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
+		double xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
+		double yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
 
 		if (xOverlapAmount < yOverlapAmount) {
 			return 1; // X轴上碰撞
@@ -135,17 +134,17 @@ bool isPointNear(int x1, int y1, int x2, int y2, int range) {
 bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
 	// 获取 box1 和 box2 的四个角的坐标
 	int box1Corners[4][2] = {
-		{box1.mx, box1.my}, // 左上角
-		{box1.mx + box1.width, box1.my}, // 右上角
-		{box1.mx, box1.my + box1.height}, // 左下角
-		{box1.mx + box1.width, box1.my + box1.height} // 右下角
+		{(int)box1.mx, (int)box1.my}, // 左上角
+		{(int)box1.mx + box1.width, (int)box1.my}, // 右上角
+		{(int)box1.mx, (int)box1.my + box1.height}, // 左下角
+		{(int)box1.mx + box1.width,(int)box1.my + box1.height} // 右下角
 	};
 
 	int box2Corners[4][2] = {
-		{box2.mx, box2.my}, // 左上角
-		{box2.mx + box2.width, box2.my}, // 右上角
-		{box2.mx, box2.my + box2.height}, // 左下角
-		{box2.mx + box2.width, box2.my + box2.height} // 右下角
+		{(int)box2.mx, (int)box2.my}, // 左上角
+		{(int)box2.mx + box2.width, (int)box2.my}, // 右上角
+		{(int)box2.mx, (int)box2.my + box2.height}, // 左下角
+		{(int)box2.mx + box2.width, (int)box2.my + box2.height} // 右下角
 	};
 
 	// 检查 box1 的每个角是否接近 box2 的任意一个角
@@ -163,10 +162,6 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
 
 static void starting()
 {
-	// 绘图窗口初始化
-	//为了方便调试，我把控制台打开，完成后关掉即可
-
-	
 	// 获得窗口句柄
 	HWND hWnd = GetHWnd();
 	// 使用 Windows API 修改窗口名称
@@ -201,6 +196,8 @@ int main()
 {
 	fileread();
 	srand((unsigned)time(NULL));
+	// 绘图窗口初始化
+	//为了方便调试，我把控制台打开，完成后关掉即可
 	initgraph(640, 480, EX_SHOWCONSOLE);
 	mciSendString("open music/start.wav alias start", NULL, 0, NULL);
 	mciSendString("open music/fire.wav alias fire", NULL, 0, NULL);
