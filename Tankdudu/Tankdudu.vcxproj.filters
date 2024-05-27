@@ -27,6 +27,9 @@
     <ClCompile Include="filerw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="operate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h">
@@ -71,6 +74,24 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="sorce\bk3.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\operate.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\operate2.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\operate3.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\white.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\lose.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="sorce\win.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

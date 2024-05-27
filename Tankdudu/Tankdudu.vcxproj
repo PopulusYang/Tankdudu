@@ -145,6 +145,7 @@
     <ClCompile Include="operate.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="tankclass.h" />
     <ClInclude Include="tankhead.h" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <Image Include="sorce\bg.jpg" />
     <Image Include="sorce\bk2.jpg" />
     <Image Include="sorce\bk3.jpg" />
+    <Image Include="sorce\lose.png" />
     <Image Include="sorce\operate.png" />
     <Image Include="sorce\operate2.png" />
     <Image Include="sorce\operate3.png" />
@@ -165,6 +167,7 @@
     <Image Include="sorce\wall2.png" />
     <Image Include="sorce\wall3.png" />
     <Image Include="sorce\white.png" />
+    <Image Include="sorce\win.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="music\add.wav" />
@@ -178,6 +181,9 @@
   <ItemGroup>
     <Text Include="backup.txt" />
     <Text Include="scores.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Tankdudu.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

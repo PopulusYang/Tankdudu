@@ -1,5 +1,11 @@
+//文件名：gamemain.cpp
+//作者：杨武显，朱佳悦，任宇轩
+//该文件为程序的入口，部分函数的实现以及文件的读写等
+
+
 #include"tankclass.h"
 #include"tankhead.h"
+
 
 class bullet;
 std::mutex lock;
@@ -33,7 +39,8 @@ void fileread()
 {
 	std::ifstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) { // 检查文件是否成功打开  
+	if (!file) 
+	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
@@ -72,7 +79,8 @@ void filewrite()
 {
 	std::ofstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) { // 检查文件是否成功打开  
+	if (!file) 
+	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
@@ -107,19 +115,22 @@ void MoveStar(int i)
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	// 检测X轴上的碰撞
-	bool xOverlap = box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx;
+	bool xOverlap = box1.mx+box1.displaceX < box2.mx + box2.width && box1.mx + box1.width > box2.mx+box2.displaceX;
 	// 检测Y轴上的碰撞
-	bool yOverlap = box1.my < box2.my + box2.height && box1.my + box1.height > box2.my;
+	bool yOverlap = box1.my+box1.displaceY < box2.my + box2.height && box1.my + box1.height > box2.my+box2.displaceY;
 
-	if (xOverlap && yOverlap) {
+	if (xOverlap && yOverlap)
+	{
 		// 判断碰撞更多发生在X轴还是Y轴
-		double xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
-		double yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
+		double xOverlapAmount = min(box1.mx + box1.width - box2.mx-box2.displaceX, box2.mx + box2.width - box1.mx-box1.displaceX);
+		double yOverlapAmount = min(box1.my + box1.height - box2.my-box2.displaceY, box2.my + box2.height - box1.my-box1.displaceY);
 
-		if (xOverlapAmount < yOverlapAmount) {
+		if (xOverlapAmount < yOverlapAmount) 
+		{
 			return 1; // X轴上碰撞
 		}
-		else {
+		else
+		{
 			return 2; // Y轴上碰撞
 		}
 	}
@@ -127,30 +138,35 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	return 0; // 没有碰撞
 }
 //near==true
-bool isPointNear(int x1, int y1, int x2, int y2, int range) {
+bool isPointNear(int x1, int y1, int x2, int y2, int range) 
+{
 	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
 }
 
-bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) 
+{
 	// 获取 box1 和 box2 的四个角的坐标
 	int box1Corners[4][2] = {
-		{(int)box1.mx, (int)box1.my}, // 左上角
-		{(int)box1.mx + box1.width, (int)box1.my}, // 右上角
-		{(int)box1.mx, (int)box1.my + box1.height}, // 左下角
+		{(int)box1.mx+box1.displaceX, (int)box1.my+box1.displaceY}, // 左上角
+		{(int)box1.mx + box1.width, (int)box1.my + box1.displaceY}, // 右上角
+		{(int)box1.mx + box1.displaceX, (int)box1.my + box1.height}, // 左下角
 		{(int)box1.mx + box1.width,(int)box1.my + box1.height} // 右下角
 	};
 
 	int box2Corners[4][2] = {
-		{(int)box2.mx, (int)box2.my}, // 左上角
-		{(int)box2.mx + box2.width, (int)box2.my}, // 右上角
-		{(int)box2.mx, (int)box2.my + box2.height}, // 左下角
+		{(int)box2.mx + box2.displaceX, (int)box2.my + box2.displaceY}, // 左上角
+		{(int)box2.mx + box2.width, (int)box2.my + box2.displaceY}, // 右上角
+		{(int)box2.mx + box2.displaceX, (int)box2.my + box2.height}, // 左下角
 		{(int)box2.mx + box2.width, (int)box2.my + box2.height} // 右下角
 	};
 
 	// 检查 box1 的每个角是否接近 box2 的任意一个角
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) {
+	for (int i = 0; i < 4; ++i) 
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) 
+			{
 				return true;
 			}
 		}

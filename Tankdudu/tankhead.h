@@ -1,3 +1,8 @@
+//文件名：tankhead.h
+//作者：杨武显
+//功能：提供函数入口，打包各种头文件
+
+
 #pragma once
 #pragma warning(disable:6031)
 #include<iostream>

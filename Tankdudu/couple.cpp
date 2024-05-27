@@ -1,3 +1,7 @@
+//文件名：couple.cpp
+//作者：杨武显，朱佳悦, 任宇轩
+//功能：为双人游戏提供入口
+
 #include"tankclass.h"
 #include"tankhead.h"
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
@@ -14,7 +18,7 @@ void couplelegame()
 	RECT center = { 0,0,639,479 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 
 	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);

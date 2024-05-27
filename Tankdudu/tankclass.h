@@ -1,3 +1,8 @@
+//文件名：tankclass.h
+//作者：杨武显，朱佳悦，任宇轩
+//功能：封装了坦克大战游戏的各种类，定义一些必要的宏，提供了部分比较有用的函数
+
+
 #pragma once
 //最大生命值
 #define MAXHEALTH 100
@@ -18,7 +23,7 @@
 #define MAXSTAR 200
 #include"tankhead.h"
 
-
+//一堆外部变量
 extern int volume_jug;
 extern int IDnum;
 extern std::mutex lock;
@@ -28,7 +33,7 @@ class bullet;
 extern std::vector<bullet> allbullet;
 extern unsigned char map[ROWS][COLS];
 
-
+//检测某个按键是否被按下
 inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
@@ -38,6 +43,7 @@ inline bool KeyDown(int vKey)
 class Function
 {
 public:
+	//重写图片旋转函数
 	static void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
 	{
 		IMAGE* pWorking = GetWorkingImage();
@@ -289,12 +295,6 @@ public:
 			tag = 3;
 			allbox.back().tag = 3;
 		}
-			
-		//此处被注释掉的代码应该在调用函数时确定kind类型时候使用
-		/*std::random_device rd;  // 获取随机数种子
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> distrib(1, 2);
-		kind = distrib(gen);*/
 	}
 	obstacle() :ColliderBox(0, 0, 0, 0, 0, 1, 0), kind(0) {}
 	void Dead() override
@@ -864,7 +864,10 @@ public:
 	{
 		while (game)
 		{
-			while (!IsAlive);
+			while (!IsAlive)
+			{
+				std::cout << "dead" << std::endl;
+			}
 			if (KeyDown(left))
 				Move(1);
 			if (KeyDown(right))
@@ -1225,7 +1228,10 @@ public:
 		}Quadrant;
 		while (isgaimg)
 		{
-			while (!IsAlive);
+			while (!IsAlive)
+			{
+				std::cout << "dead" << std::endl;
+			}
 			treeNode* road;
 			road = Astar((int)(allbox[0].mx + allbox[0].displaceX), (int)(allbox[0].my + allbox[0].displaceY), (int)mx, (int)my);
 			if (road == NULL)
@@ -1316,9 +1322,12 @@ public:
 	void create()
 	{
 		setbkmode(TRANSPARENT);
+		setfillcolor(0x809060);
+		fillroundrect(x-5, y-3, x + w+5, y + h+5,10,10);
 		setfillcolor(0x9BB171);
 		fillroundrect(x, y, x + w, y + h, 10, 10);
 		RECT r = { x,y,x + w,y + h };
+		settextstyle(24, 0, "华文隶书");
 		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	~button()

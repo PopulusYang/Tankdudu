@@ -1,3 +1,7 @@
+//文件名：single.cpp
+//作者：杨武显，朱佳悦,任宇轩
+//功能：为单人游戏提供入口
+
 #include"tankclass.h"
 #include"tankhead.h"
 
@@ -27,7 +31,7 @@ void singlegame()
 	RECT center = { 0,0,639,479 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 
 	Player player('W','S','A','D','R','J');
@@ -121,7 +125,7 @@ void singlegame()
 	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	time = 0;
 
-	if (score1 != 0 && score2 != 0)
+	if (score1 != 0 || score2 != 0)
 	{
 		scores.push_back(allscore{ 0,0 });
 		for (int i = 4; i >= 0; i--)
@@ -158,7 +162,18 @@ void singlegame()
 	cleardevice();
 	std::cin.sync();
 	if (score1 > score2)
-		drawtext("YOU WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	{
+		for (int i = 0; i < 20; i++)
+		{
+			IMAGE img1;
+			loadimage(&img1, "sorce/win.png", 12.5*(i+1), 12.5 * (i + 1));
+			Function::transparentimage(NULL, 319-(25*(i+1)/4), 219 - (25 * (i + 1) / 4), &img1);
+			settextcolor(RGB(255, 0, 0));
+			drawtext("YOU WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			settextcolor(RGB(0, 0, 0));
+			Sleep(50);
+		}
+	}
 	if (score1 < score2)
 		drawtext("YOU LOSE...", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	if (score1 == score2)
