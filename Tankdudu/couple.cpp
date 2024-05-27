@@ -1,12 +1,13 @@
 //文件名：couple.cpp
 //作者：杨武显，朱佳悦, 任宇轩
 //功能：为双人游戏提供入口
-
 #include"tankclass.h"
 #include"tankhead.h"
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void couplelegame()
 {
+	bool jug = true;
+	ExMessage msg;
 	isgaming = true;
 	int score1 = 0;
 	int score2 = 0;
@@ -19,10 +20,14 @@ void couplelegame()
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
 	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	_getch();
+	while (jug)
+	{
+		if (peekmessage(&msg, EX_KEY))
+			jug = false;
+	}
 
 	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);
-	Player player2(VK_UP,VK_DOWN,VK_LEFT,VK_RIGHT,VK_SHIFT,VK_RETURN,5);
+	Player player2(VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SHIFT, VK_RETURN, 5);
 	//准备地图
 	obstacle wall_rock[4] =
 	{
@@ -141,14 +146,14 @@ void couplelegame()
 
 	cleardevice();
 	std::cin.sync();
-	if (score1 >score2)
+	if (score1 > score2)
 	{
 		drawtext("P1 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		IMAGE img1;
 		loadimage(&img1, "sorce/awardsP1.png", 400, 300);
 		Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
 	}
-	if (score1 <score2)
+	if (score1 < score2)
 	{
 		drawtext("P2 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		IMAGE img1;
@@ -159,12 +164,11 @@ void couplelegame()
 		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	button over(260, 390, 120, 40, "继续");
 	over.create();
-	bool jug = true;
-	ExMessage msg;
+	jug = true;
 	while (jug)
 	{
-		if(peekmessage(&msg,EX_MOUSE))
-			if(msg.message == WM_LBUTTONDOWN)
+		if (peekmessage(&msg, EX_MOUSE))
+			if (msg.message == WM_LBUTTONDOWN)
 				if (over.test(msg))
 					jug = false;
 	}
