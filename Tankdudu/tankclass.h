@@ -722,7 +722,7 @@ public:
 			{
 				while (1) {
 					power++;
-					Sleep(120);
+					Sleep(70);
 					if (power >= 125)
 					{
 						canfly = 1;
