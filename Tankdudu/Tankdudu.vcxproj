@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="couple.cpp" />
-    <ClCompile Include="filerw.cpp" />
     <ClCompile Include="gamemain.cpp" />
     <ClCompile Include="single.cpp" />
     <ClCompile Include="operate.cpp" />
@@ -180,7 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="backup.txt" />
-    <Text Include="scores.txt" />
+    <Text Include="scores.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
