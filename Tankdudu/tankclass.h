@@ -1316,9 +1316,12 @@ public:
 	void create()
 	{
 		setbkmode(TRANSPARENT);
+		setfillcolor(0x809060);
+		fillroundrect(x-5, y-3, x + w+5, y + h+5,10,10);
 		setfillcolor(0x9BB171);
 		fillroundrect(x, y, x + w, y + h, 10, 10);
 		RECT r = { x,y,x + w,y + h };
+		settextstyle(24, 0, "»ªÎÄÁ¥Êé");
 		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	~button()

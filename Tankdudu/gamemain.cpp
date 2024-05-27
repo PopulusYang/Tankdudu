@@ -33,7 +33,8 @@ void fileread()
 {
 	std::ifstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) { // 检查文件是否成功打开  
+	if (!file) 
+	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
@@ -72,7 +73,8 @@ void filewrite()
 {
 	std::ofstream file("scores.bin", std::ios::binary); // 打开文件以进行读取  
 
-	if (!file) { // 检查文件是否成功打开  
+	if (!file) 
+	{ // 检查文件是否成功打开  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
@@ -111,15 +113,18 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	// 检测Y轴上的碰撞
 	bool yOverlap = box1.my < box2.my + box2.height && box1.my + box1.height > box2.my;
 
-	if (xOverlap && yOverlap) {
+	if (xOverlap && yOverlap)
+	{
 		// 判断碰撞更多发生在X轴还是Y轴
 		double xOverlapAmount = min(box1.mx + box1.width - box2.mx, box2.mx + box2.width - box1.mx);
 		double yOverlapAmount = min(box1.my + box1.height - box2.my, box2.my + box2.height - box1.my);
 
-		if (xOverlapAmount < yOverlapAmount) {
+		if (xOverlapAmount < yOverlapAmount) 
+		{
 			return 1; // X轴上碰撞
 		}
-		else {
+		else
+		{
 			return 2; // Y轴上碰撞
 		}
 	}
@@ -127,11 +132,13 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 	return 0; // 没有碰撞
 }
 //near==true
-bool isPointNear(int x1, int y1, int x2, int y2, int range) {
+bool isPointNear(int x1, int y1, int x2, int y2, int range) 
+{
 	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
 }
 
-bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
+bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) 
+{
 	// 获取 box1 和 box2 的四个角的坐标
 	int box1Corners[4][2] = {
 		{(int)box1.mx, (int)box1.my}, // 左上角
@@ -148,9 +155,12 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range) {
 	};
 
 	// 检查 box1 的每个角是否接近 box2 的任意一个角
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) {
+	for (int i = 0; i < 4; ++i) 
+	{
+		for (int j = 0; j < 4; ++j)
+		{
+			if (isPointNear(box1Corners[i][0], box1Corners[i][1], box2Corners[j][0], box2Corners[j][1], range)) 
+			{
 				return true;
 			}
 		}
