@@ -25,6 +25,7 @@ void singlegame()
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
 	
 	RECT center = { 0,0,639,479 };
+	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
 	drawtext("开发中，按任意键开始测试。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -44,8 +45,8 @@ void singlegame()
 	{
 		obstacle(180, 175, 75, 147, 0, 50, 2),
 		obstacle(390, 175, 75, 147, 0, 50, 2),
-		obstacle(250, 100,147, 75, 0, 50, 1),
-		obstacle(250, 310,147, 75, 0, 50, 1),
+		obstacle(250, 80,147, 75, 0, 50, 1),
+		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
 	int time = MAXTIME;
 	//多线程
@@ -164,14 +165,22 @@ void singlegame()
 			IMAGE img1;
 			loadimage(&img1, "sorce/win.png", 12.5*(i+1), 12.5 * (i + 1));
 			Function::transparentimage(NULL, 319-(25*(i+1)/4), 219 - (25 * (i + 1) / 4), &img1);
-			settextcolor(RGB(255, 0, 0));
-			drawtext("YOU WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			settextcolor(RGB(255, 255, 255));
+			drawtext("YOU WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 			settextcolor(RGB(0, 0, 0));
 			Sleep(50);
 		}
 	}
 	if (score1 < score2)
-		drawtext("YOU LOSE...", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	{			
+			settextcolor(RGB(255, 255, 255));
+			drawtext("YOU LOSE...", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				IMAGE img1;
+				loadimage(&img1, "sorce/lose.png", 250, 250);
+				Function::transparentimage(NULL, 319-125, 219-125, &img1);
+				settextcolor(RGB(0, 0, 0));
+	}
+
 	if (score1 == score2)
 		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	button over(260, 390, 120, 40, "继续");

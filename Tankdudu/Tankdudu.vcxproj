@@ -149,6 +149,8 @@
     <ClInclude Include="tankhead.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="sorce\awards.png" />
+    <Image Include="sorce\awardsP1.png" />
     <Image Include="sorce\bg.jpg" />
     <Image Include="sorce\bk2.jpg" />
     <Image Include="sorce\bk3.jpg" />

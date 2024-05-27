@@ -10,7 +10,7 @@ void couplelegame()
 	cleardevice();
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
-
+	RECT settlement = { 0,0,639,96 };
 	RECT center = { 0,0,639,479 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
@@ -31,8 +31,8 @@ void couplelegame()
 	{
 		obstacle(180, 175, 75, 147, 0, 50, 2),
 		obstacle(390, 175, 75, 147, 0, 50, 2),
-		obstacle(250, 100,147, 75, 0, 50, 1),
-		obstacle(250, 310,147, 75, 0, 50, 1),
+		obstacle(250, 80,147, 75, 0, 50, 1),
+		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
 	int time = MAXTIME;
 	//多线程
@@ -137,10 +137,20 @@ void couplelegame()
 
 	cleardevice();
 	std::cin.sync();
-	if (score1 > score2)
-		drawtext("P1 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	if (score1 < score2)
-		drawtext("P2 WIN!!!", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	if (score1 >score2)
+	{
+		drawtext("P1 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		IMAGE img1;
+		loadimage(&img1, "sorce/awardsP1.png", 400, 300);
+		Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
+	}
+	if (score1 <score2)
+	{
+		drawtext("P2 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		IMAGE img1;
+		loadimage(&img1, "sorce/awardsP2.png", 400, 300);
+		Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
+	}
 	if (score1 == score2)
 		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	button over(260, 390, 120, 40, "继续");
