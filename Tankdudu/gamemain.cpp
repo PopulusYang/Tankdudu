@@ -16,6 +16,21 @@ std::vector<bullet> allbullet;
 int volume_jug = 1;
 int play_game = 1;
 
+//储存是否达成成就的结构体
+typedef struct Achievement
+{
+	bool a1 = false, a2 = false, a3 = false, a4 = false;
+} Achieve;
+
+typedef struct Setting
+{
+	bool sound = true;
+	int background = 3;
+	int gametime = 2;
+} Setting;
+
+Achieve achieve;
+Setting set;
 //星星
 #define MAXSTAR 200	// 星星总数
 //小星星
@@ -72,6 +87,7 @@ void fileread()
 			}
 		}
 	}
+	file.close();
 }
 
 
@@ -84,12 +100,15 @@ void filewrite()
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-
-	for (allscore p : scores)
+	if (scores.size() != 0)
 	{
-		file.write(reinterpret_cast<char*>(&p.score1), sizeof(p.score1));
-		file.write(reinterpret_cast<char*>(&p.score2), sizeof(p.score2));
+		for (allscore p : scores)
+		{
+			file.write(reinterpret_cast<char*>(&p.score1), sizeof(p.score1));
+			file.write(reinterpret_cast<char*>(&p.score2), sizeof(p.score2));
+		}
 	}
+	file.close();
 }
 STAR star[MAXSTAR];
 void InitStar(int i)
@@ -210,6 +229,9 @@ static void starting()
 
 int main()
 {
+	RECT center = { 0,0,639,479 };
+	Acfileread();
+	sefileread();
 	fileread();
 	srand((unsigned)time(NULL));
 	// 绘图窗口初始化
@@ -221,9 +243,10 @@ int main()
 	mciSendString("open music/bang.wav alias bang", NULL, 0, NULL);
 	button* b1 = new button(260, 230, 120, 50, "单人游戏");
 	button* b2 = new button(260, 310, 120, 50, "双人游戏");
-	button* b3 = new button(460, 390, 120, 50, "静 音");
+	button* b3 = new button(460, 390, 120, 50, "设 置");
 	button* b5 = new button(260, 390, 120, 50, "退出游戏");
 	button* b4 = new button(60, 390, 120, 50, "操作指南");
+	button* b6 = new button(460, 310, 120, 50, "成就");
 	while (play_game)
 	{
 		starting();
@@ -232,6 +255,7 @@ int main()
 		b3->create();
 		b4->create();
 		b5->create();
+		b6->create();
 		setfillcolor(0x9BB171);
 		fillrectangle(70, 220, 180, 370);
 		RECT position{ 70,220,180,240 };
@@ -277,6 +301,8 @@ int main()
 						choose = 4;
 					if (b5->test(msg))
 						choose = 5;
+					if (b6->test(msg))
+						choose = 6;
 					if (choose)
 						jug = false;
 					break;
@@ -300,26 +326,24 @@ int main()
 			couplelegame();
 			break;
 		case 3:
-			std::cout << "Button 3 has been pushed" << std::endl;
-			volume_jug = (volume_jug + 1) % 2;
-			if (volume_jug)
-				b3->changetext("静音");
-			else
-				b3->changetext("解除静音");
-			b3->create();
+			setting();
 			break;
 		case 4:
+			std::cout << "Button 4 has been pushed" << std::endl;
 			operate();
 			cleardevice();
 			break;
 		case 5:
-			std::cout << "Button 4 has been pushed" << std::endl;
+			std::cout << "Button 5 has been pushed" << std::endl;
 			play_game = 0;
 			cleardevice();
-			RECT center = { 0,0,639,479 };
 			settextstyle(36, 0, "华文隶书");
 			settextcolor(WHITE);
 			drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			break;
+		case 6:
+			std::cout << "Button 6 has been pushed" << std::endl;
+			checkachieve();
 		}
 	}
 	//释放空间
@@ -327,6 +351,8 @@ int main()
 	delete(b2);
 	delete(b3);
 	delete(b4);
+	delete(b5);
+	delete(b6);
 
 	//以下是星星的代码
 	for (int i = 0; i < MAXSTAR; i++)
@@ -341,7 +367,9 @@ int main()
 		Sleep(20);
 	}
 	// 按任意键退出
-	closegraph();
 	filewrite();
+	Acfilewrite();
+	sefilewrite();
+	closegraph();
 	return 0;
 }

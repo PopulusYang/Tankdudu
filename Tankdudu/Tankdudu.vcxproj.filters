@@ -27,6 +27,12 @@
     <ClCompile Include="operate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="achievement.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="setting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tankclass.h">
@@ -68,9 +74,6 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="sorce\bk2.jpg">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="sorce\bg.jpg">
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="sorce\bk3.jpg">
@@ -130,6 +133,12 @@
   <ItemGroup>
     <Text Include="backup.txt" />
     <Text Include="scores.bin">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="achievement.bin">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="setting.bin">
       <Filter>资源文件</Filter>
     </Text>
   </ItemGroup>
