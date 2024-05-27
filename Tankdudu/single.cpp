@@ -128,7 +128,6 @@ void singlegame()
 
 	if (score1 != 0 || score2 != 0)
 	{
-		scores.push_back(allscore{ 0,0 });
 		for (int i = 4; i >= 0; i--)
 		{
 			scores[i + 1] = scores[i];

@@ -708,7 +708,7 @@ public:
 		{
 			if (!canshoot)
 			{
-				for (waittime = 125; waittime > 0; waittime--)
+				for (waittime = 750; waittime > 0; waittime--)
 					Sleep(1);
 				canshoot = true;
 			}
@@ -722,7 +722,7 @@ public:
 			{
 				while (1) {
 					power++;
-					Sleep(120);
+					Sleep(70);
 					if (power >= 125)
 					{
 						canfly = 1;
@@ -796,7 +796,7 @@ public:
 		if (waittime != 0)
 		{
 			setfillcolor(GREEN);
-			fillrectangle((int)(mx + 8), (int)(my - 15), (int)(mx + 8 + (int)(74.0 * (double)waittime / 125.0)), (int)(my - 11));
+			fillrectangle((int)(mx + 8), (int)(my - 15), (int)(mx + 8 + (int)(74.0 * (double)waittime / 750.0)), (int)(my - 11));
 		}
 		if (power < 125)
 		{	
@@ -882,7 +882,7 @@ public:
 			 	flyyyy();
 			if (KeyDown(VK_ESCAPE))
 				game = false;
-			Sleep(5);
+			Sleep(15);
 		}
 	}
 
