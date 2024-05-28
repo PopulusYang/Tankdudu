@@ -33,11 +33,16 @@ void couplelegame()
 	case 3:
 		loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
 	}
-	RECT settlement = { 0,0,639,96 };
 	RECT center = { 0,0,639,479 };
+	RECT say1 = { 0,100,639,479 };
+	RECT say2 = { 0,0,639,379 };
+	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("请在一分钟内尽自己所能炸毁对方！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("准备开战！", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("按任意键开始游戏.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	_getch();
 	while (jug)
 	{
 		if (peekmessage(&msg, EX_KEY))
