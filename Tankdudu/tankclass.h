@@ -1328,6 +1328,7 @@ public:
 		fillroundrect(x, y, x + w, y + h, 10, 10);
 		RECT r = { x,y,x + w,y + h };
 		settextstyle(24, 0, "»ªÎÄÁ¥Êé");
+		settextcolor(BLACK);
 		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	~button()

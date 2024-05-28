@@ -70,11 +70,6 @@ void checkachieve()
 	loadimage(&a3, "sorce/achievement/loser.png", 80, 80, 1);
 	loadimage(&a4, "sorce/achievement/winner.png", 80, 80, 1);
 
-	//画框框
-	rectangle(105, 85, 300, 165);
-	rectangle(105, 200, 300, 280);
-	rectangle(330, 85, 525, 165);
-	rectangle(330, 200, 525, 280);
 
 	settextcolor(BLACK);
 	//成就1
@@ -91,6 +86,8 @@ void checkachieve()
 	else
 	{
 		RECT center{ 105,85,300,165 };
+		settextstyle(40, 0, "华文隶书");
+		settextcolor(BLACK);
 		drawtext("未解锁", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	//成就2
@@ -107,6 +104,8 @@ void checkachieve()
 	else
 	{
 		RECT center{ 330,85,525,165 };
+		settextstyle(40, 0, "华文隶书");
+		settextcolor(BLACK);
 		drawtext("未解锁", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	//成就3
@@ -123,6 +122,8 @@ void checkachieve()
 	else
 	{
 		RECT center{ 105,200,300,280 };
+		settextstyle(40, 0, "华文隶书");
+		settextcolor(BLACK);
 		drawtext("未解锁", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 	//成就4
@@ -138,8 +139,15 @@ void checkachieve()
 	else
 	{
 		RECT center{ 330,200,525,280 };
+		settextstyle(40, 0, "华文隶书");
+		settextcolor(BLACK);
 		drawtext("未解锁", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
+	//画框框
+	rectangle(105, 85, 300, 165);
+	rectangle(105, 200, 300, 280);
+	rectangle(330, 85, 525, 165);
+	rectangle(330, 200, 525, 280);
 	//按钮退出
 	bool jug = true;
 	ExMessage msg;
