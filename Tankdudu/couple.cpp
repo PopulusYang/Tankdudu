@@ -3,6 +3,14 @@
 //功能：为双人游戏提供入口
 #include"tankclass.h"
 #include"tankhead.h"
+typedef struct Setting
+{
+	bool sound = true;
+	int background = 3;
+	int gametime = 2;
+} Setting;
+
+extern Setting set;
 //双人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void couplelegame()
 {
@@ -14,11 +22,19 @@ void couplelegame()
 	bool wait = true;
 	cleardevice();
 	IMAGE background;
-	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
-	RECT center = { 0,0,639,479 };
-	RECT say1 = { 0,100,639,479 };
-	RECT say2 = { 0,0,639,379 };
+	switch (set.background)
+	{
+	case 1:
+		loadimage(&background, "sorce/bk1.jpg", 640, 480, 1);
+		break;
+	case 2:
+		loadimage(&background, "sorce/bk2.jpg", 640, 480, 1);
+		break;
+	case 3:
+		loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
+	}
 	RECT settlement = { 0,0,639,96 };
+	RECT center = { 0,0,639,479 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
 	drawtext("请在一分钟内尽自己所能炸毁对方！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -48,7 +64,7 @@ void couplelegame()
 		obstacle(250, 80,147, 75, 0, 50, 1),
 		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
-	int time = MAXTIME;
+	int time = MAXTIME / set.gametime;
 	//多线程
 	//动图
 	std::thread thread1(&Player::changepng, &player1, std::ref(isgaming));

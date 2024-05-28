@@ -15,15 +15,15 @@ void operate()
 	button* b3 = new button(460, 390, 120, 50, "双人操作");
 	button* b4 = new button(460, 390, 120, 50, "其  他");
 	button* b5 = new button(260, 390, 120, 50, "双人操作");
-	IMAGE img1,img2,img3,img4;
+	IMAGE img1, img2, img3, img4;
 	IMAGE img[3];
 	loadimage(&img1, "sorce/operate.png", 550, 320);
 	loadimage(&img2, "sorce/white.png", 640, 480);
 	loadimage(&img3, "sorce/operate3.png", 480, 360);
 	loadimage(&img4, "sorce/other.png", 480, 320);
-	loadimage(&img[0], "sorce/tank4.png", 160,194);
-	loadimage(&img[1], "sorce/tank5.png",160, 194);
-	loadimage(&img[2], "sorce/tank6.png",160, 194);
+	loadimage(&img[0], "sorce/tank4.png", 160, 194);
+	loadimage(&img[1], "sorce/tank5.png", 160, 194);
+	loadimage(&img[2], "sorce/tank6.png", 160, 194);
 	while (operate_jug)
 	{
 		if (player == 1)
@@ -37,11 +37,11 @@ void operate()
 			ExMessage msg;
 			int choose = 0;
 			while (jug)
-			{			
-				for (int i = 0; i < 3; i++)
 			{
-				Function::transparentimage(NULL, 340, 150, &img[i]);
-			}
+				for (int i = 0; i < 3; i++)
+				{
+					Function::transparentimage(NULL, 340, 150, &img[i]);
+				}
 				HWND hWnd = GetHWnd();
 				if (!IsWindow(hWnd))
 					exit(0);
@@ -66,7 +66,7 @@ void operate()
 			{
 				player = 2;
 			}
-			if (choose==1)
+			if (choose == 1)
 			{
 				operate_jug = 0;
 			}
@@ -113,7 +113,7 @@ void operate()
 			{
 				player = 3;
 			}
-			if (choose==1)
+			if (choose == 1)
 			{
 				operate_jug = 0;
 			}

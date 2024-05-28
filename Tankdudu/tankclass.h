@@ -9,7 +9,7 @@
 //障碍物的超级血量
 #define SUPER_OBSTACLE 99999
 //最长游戏时间
-#define MAXTIME 60
+#define MAXTIME 120
 #define PI 3.14159265359
 //地图大小
 #define ROWS 640

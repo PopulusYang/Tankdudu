@@ -139,8 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="achievement.cpp" />
     <ClCompile Include="couple.cpp" />
     <ClCompile Include="gamemain.cpp" />
+    <ClCompile Include="setting.cpp" />
     <ClCompile Include="single.cpp" />
     <ClCompile Include="operate.cpp" />
   </ItemGroup>
@@ -152,7 +154,6 @@
   <ItemGroup>
     <Image Include="sorce\awards.png" />
     <Image Include="sorce\awardsP1.png" />
-    <Image Include="sorce\bg.jpg" />
     <Image Include="sorce\bk2.jpg" />
     <Image Include="sorce\bk3.jpg" />
     <Image Include="sorce\lose.png" />
@@ -182,8 +183,10 @@
     <Media Include="music\start.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="achievement.bin" />
     <Text Include="backup.txt" />
     <Text Include="scores.bin" />
+    <Text Include="setting.bin" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tankdudu.rc" />

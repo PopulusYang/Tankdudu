@@ -16,6 +16,14 @@ typedef struct allscore
 
 extern std::vector<allscore> scores;
 
+typedef struct Setting
+{
+	bool sound = true;
+	int background = 3;
+	int gametime = 2;
+} Setting;
+
+extern Setting set;
 
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
@@ -28,8 +36,19 @@ void singlegame()
 	bool wait = true;
 	cleardevice();
 	IMAGE background;
-	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
+	switch (set.background)
+	{
+	case 1:
+		loadimage(&background, "sorce/bk1.jpg", 640, 480, 1);
+		break;
+	case 2:
+		loadimage(&background, "sorce/bk2.jpg", 640, 480, 1);
+		break;
+	case 3:
+		loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
+	}
 	
+
 	RECT center = { 0,0,639,479 };
 	RECT say1 = { 0,100,639,479 };
 	RECT say2 = { 0,0,639,379 };
@@ -46,14 +65,14 @@ void singlegame()
 			jug = false;
 	}
 
-	Player player('W','S','A','D','R','J');
+	Player player('W', 'S', 'A', 'D', 'R', 'J');
 	Enemy enemy;
 	//准备地图
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
 		obstacle(100, 340, 150, 70, 0, SUPER_OBSTACLE, 3),
-		obstacle(400, 340,150, 70, 0, SUPER_OBSTACLE, 3),	
+		obstacle(400, 340,150, 70, 0, SUPER_OBSTACLE, 3),
 		obstacle(400, 80,150, 70, 0, SUPER_OBSTACLE, 3),
 	};
 	obstacle wall_wire_mesh[4] =
@@ -63,12 +82,13 @@ void singlegame()
 		obstacle(250, 80,147, 75, 0, 50, 1),
 		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
-	int time = MAXTIME;
-	//多线程
+	//初始化时间
+	int time = MAXTIME / set.gametime;
+	//启动游戏需要的线程
 	//动图
-	std::thread thread1(&Player::changepng, &player ,std::ref(isgaming));
+	std::thread thread1(&Player::changepng, &player, std::ref(isgaming));
 	//玩家控制
-	std::thread thread2(&Player::control,&player,std::ref(isgaming));
+	std::thread thread2(&Player::control, &player, std::ref(isgaming));
 	//AI控制
 	std::thread thread3(&Enemy::aicontrol, &enemy, std::ref(isgaming));
 	//子弹控制
@@ -89,7 +109,7 @@ void singlegame()
 	{
 		cleardevice();
 		putimage(0, 0, &background);
-		
+
 		TimeFun::showTime(time, 540, 0);
 		//显示分数
 		s[6] = score1 / 10 + '0';
@@ -110,7 +130,7 @@ void singlegame()
 		bullet::display();
 		HWND hWnd = GetHWnd();
 		if (IsWindow(hWnd))
-	 		FlushBatchDraw();
+			FlushBatchDraw();
 		else
 			exit(0);
 		//计成绩
@@ -136,17 +156,22 @@ void singlegame()
 		std::cout << "游戏未结束" << std::endl;
 	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	time = 0;
-
-	if (score1 != 0 || score2 != 0)
+	if (scores.size() < 6 && (score1 != 0 || score2 != 0))
 	{
-		for (int i = 4; i >= 0; i--)
-		{
-			scores[i + 1] = scores[i];
-		}
-		scores[0].score1 = score1;
-		scores[0].score2 = score2;
+		scores.push_back(allscore{ score1,score2 });
 	}
-	
+	else
+	{
+		if (score1 != 0 || score2 != 0)
+		{
+			for (int i = 4; i >= 0; i--)
+			{
+				scores[i + 1] = scores[i];
+			}
+			scores[0].score1 = score1;
+			scores[0].score2 = score2;
+		}
+	}
 	//等待线程结束
 	thread1.join();
 	std::cout << "thread1 have been over." << std::endl;
@@ -177,8 +202,8 @@ void singlegame()
 		for (int i = 0; i < 20; i++)
 		{
 			IMAGE img1;
-			loadimage(&img1, "sorce/win.png", (int)(12.5*(i+1)), (int)(12.5 * (i + 1)));
-			Function::transparentimage(NULL, 319-(25*(i+1)/4), 219 - (25 * (i + 1) / 4), &img1);
+			loadimage(&img1, "sorce/win.png", (int)(12.5 * (i + 1)), (int)(12.5 * (i + 1)));
+			Function::transparentimage(NULL, 319 - (25 * (i + 1) / 4), 219 - (25 * (i + 1) / 4), &img1);
 			settextcolor(RGB(255, 255, 255));
 			drawtext("YOU WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 			settextcolor(RGB(0, 0, 0));
@@ -186,13 +211,13 @@ void singlegame()
 		}
 	}
 	if (score1 < score2)
-	{			
-			settextcolor(RGB(255, 255, 255));
-			drawtext("YOU LOSE...", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-				IMAGE img1;
-				loadimage(&img1, "sorce/lose.png", 250, 250);
-				Function::transparentimage(NULL, 319-125, 219-125, &img1);
-				settextcolor(RGB(0, 0, 0));
+	{
+		settextcolor(RGB(255, 255, 255));
+		drawtext("YOU LOSE...", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		IMAGE img1;
+		loadimage(&img1, "sorce/lose.png", 250, 250);
+		Function::transparentimage(NULL, 319 - 125, 219 - 125, &img1);
+		settextcolor(RGB(0, 0, 0));
 	}
 
 	if (score1 == score2)
@@ -206,6 +231,24 @@ void singlegame()
 			if (msg.message == WM_LBUTTONDOWN)
 				if (over.test(msg))
 					jug = false;
+	}
+	std::cin.sync();
+	//检测是否解锁了新成就
+	jug = unlockachieve(wall_wire_mesh, score1, score2);
+	if (jug)
+	{
+		cleardevice();
+		settextstyle(36, 0, "华文隶书");
+		settextcolor(WHITE);
+		drawtext("您解锁了新成就，快去看看吧！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		over.create();
+		while (jug)
+		{
+			if (peekmessage(&msg, EX_MOUSE))
+				if (msg.message == WM_LBUTTONDOWN)
+					if (over.test(msg))
+						jug = false;
+		}
 	}
 	std::cin.sync();
 }
