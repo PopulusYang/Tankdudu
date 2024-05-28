@@ -55,7 +55,7 @@ void checkachieve()
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
 	cleardevice();
 	putimage(0, 0, &background);
-	RECT upcenter{ 0,0,640,30 };
+	RECT upcenter{ 0,0,639,50 };
 	settextstyle(40, 0, "华文隶书");
 	settextcolor(RED);
 	drawtext("成   就", &upcenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);

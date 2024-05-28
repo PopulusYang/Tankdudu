@@ -29,7 +29,7 @@ void setting()
 	//准备页面
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
-	RECT upcenter{ 0,0,640,30 };
+	RECT upcenter{ 0,0,639,50 };
 	ExMessage msg;
 	//创建一堆按钮
 	button s1(140, 90, 120, 50, "静音");

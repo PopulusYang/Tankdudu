@@ -336,6 +336,9 @@ int main()
 		case 5:
 			std::cout << "Button 5 has been pushed" << std::endl;
 			play_game = 0;
+			filewrite();
+			Acfilewrite();
+			sefilewrite();
 			cleardevice();
 			settextstyle(36, 0, "华文隶书");
 			settextcolor(WHITE);
@@ -353,7 +356,7 @@ int main()
 	delete(b4);
 	delete(b5);
 	delete(b6);
-
+	
 	//以下是星星的代码
 	for (int i = 0; i < MAXSTAR; i++)
 	{
@@ -368,9 +371,6 @@ int main()
 		Sleep(20);
 	}
 	// 按任意键退出
-	filewrite();
-	Acfilewrite();
-	sefilewrite();
 	closegraph();
 	return 0;
 }
