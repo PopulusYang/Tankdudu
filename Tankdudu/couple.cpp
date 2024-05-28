@@ -39,7 +39,7 @@ void couplelegame()
 	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("请在一分钟内尽自己所能炸毁对方！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("请在规定时间内尽自己所能炸毁对方！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	drawtext("准备开战！", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	drawtext("按任意键开始游戏.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
@@ -109,7 +109,8 @@ void couplelegame()
 		player1.display();
 		player2.display();
 		//调试模式：显示碰撞箱
-		//ColliderBox::drawColliderbox(player);
+		//ColliderBox::drawColliderbox(player1);
+		//ColliderBox::drawColliderbox(player2);
 		bullet::display();
 		HWND hWnd = GetHWnd();
 		if (IsWindow(hWnd))
