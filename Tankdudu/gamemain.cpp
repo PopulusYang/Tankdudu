@@ -5,7 +5,7 @@
 
 #include"tankclass.h"
 #include"tankhead.h"
-
+#define MAXSTAR 200	// 星星总数
 
 class bullet;
 std::mutex lock;
@@ -31,8 +31,7 @@ typedef struct Setting
 
 Achieve achieve;
 Setting set;
-//星星
-#define MAXSTAR 200	// 星星总数
+
 //小星星
 struct STAR
 {
@@ -87,7 +86,6 @@ void fileread()
 			}
 		}
 	}
-	file.close();
 }
 
 
