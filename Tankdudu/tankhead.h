@@ -16,6 +16,7 @@
 #include<mutex>
 #include<cstdlib>
 #include <time.h>  
+#include<limits>
 
 #pragma comment(lib,"winmm.lib")
 
