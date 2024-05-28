@@ -20,6 +20,8 @@ extern std::vector<allscore> scores;
 //单人游戏进入这个函数，避免main函数过长（C语言课设因为这个问题我要死了）
 void singlegame()
 {
+	bool jug = true;
+	ExMessage msg;
 	isgaming = true;
 	int score1 = 0;
 	int score2 = 0;
@@ -34,10 +36,12 @@ void singlegame()
 	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "华文隶书");
 	settextcolor(WHITE);
-	drawtext("请在一分钟内尽自己所能炸毁对方！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("准备开战！", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("按任意键开始游戏.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	_getch();
+	drawtext("准备开战！按任意键开始游戏。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	while (jug)
+	{
+		if (peekmessage(&msg, EX_KEY))
+			jug = false;
+	}
 
 	Player player('W','S','A','D','R','J');
 	Enemy enemy;
@@ -192,8 +196,7 @@ void singlegame()
 		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	button over(260, 390, 120, 40, "继续");
 	over.create();
-	bool jug = true;
-	ExMessage msg;
+	jug = true;
 	while (jug)
 	{
 		if (peekmessage(&msg, EX_MOUSE))
