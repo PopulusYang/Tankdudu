@@ -360,7 +360,8 @@ int main()
 		InitStar(i);
 		star[i].x = rand() % 640;
 	}
-	while (!_kbhit())
+	ExMessage msg;
+	while (!peekmessage(&msg, EX_KEY))
 	{
 		for (int i = 0; i < MAXSTAR; i++)
 			MoveStar(i);
