@@ -368,6 +368,7 @@ int main()
 	{
 		for (int i = 0; i < MAXSTAR; i++)
 			MoveStar(i);
+		drawtext("游戏结束,任意键退出。感谢游玩", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		Sleep(20);
 	}
 	// 按任意键退出
