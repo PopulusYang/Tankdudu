@@ -5,6 +5,7 @@
 #include"tankclass.h"
 #include"tankhead.h"
 
+extern bool pause;
 bool isgaming = 1;
 unsigned char map[ROWS][COLS];
 
@@ -129,6 +130,13 @@ void singlegame()
 		//ColliderBox::drawColliderbox(player);
 		//ColliderBox::drawColliderbox(enemy);
 		bullet::display();
+		//调用暂停模块
+		if (pause)
+		{
+			EndBatchDraw();
+			Pause(&isgaming);
+			BeginBatchDraw();
+		}
 		HWND hWnd = GetHWnd();
 		if (IsWindow(hWnd))
 			FlushBatchDraw();
@@ -153,27 +161,12 @@ void singlegame()
 
 	settextcolor(WHITE);
 	settextstyle(36, 0, "华文隶书");
+	bool notover = false;
 	if (time != 0)
-		std::cout << "游戏未结束" << std::endl;
+		notover = true;
 	drawtext("统计中，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	time = 0;
-	if (scores.size() < 6 && (score1 != 0 || score2 != 0))
-	{
-		scores.push_back(allscore{ score1,score2 });
-	}
-	else
-	{
-		if (score1 != 0 || score2 != 0)
-		{
-			for (int i = 4; i >= 0; i--)
-			{
-				scores[i + 1] = scores[i];
-			}
-			scores[0].score1 = score1;
-			scores[0].score2 = score2;
-		}
-	}
 	//等待线程结束
+	time = 0;
 	thread1.join();
 	std::cout << "thread1 have been over." << std::endl;
 	thread2.join();
@@ -197,58 +190,76 @@ void singlegame()
 	std::cout << "All threads have been over." << std::endl;
 	//清除缓冲区
 	cleardevice();
-	std::cin.sync();
-	if (score1 > score2)
+	if (!notover)
 	{
-		for (int i = 0; i < 20; i++)
+		std::cin.sync();
+		if (scores.size() < 6 && (score1 != 0 || score2 != 0))
 		{
-			IMAGE img1;
-			loadimage(&img1, "sorce/win.png", (int)(12.5 * (i + 1)), (int)(12.5 * (i + 1)));
-			Function::transparentimage(NULL, 319 - (25 * (i + 1) / 4), 219 - (25 * (i + 1) / 4), &img1);
-			settextcolor(RGB(255, 255, 255));
-			drawtext("YOU WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-			settextcolor(RGB(0, 0, 0));
-			Sleep(50);
+			scores.push_back(allscore{ score1,score2 });
 		}
-	}
-	if (score1 < score2)
-	{
-		settextcolor(RGB(255, 255, 255));
-		drawtext("YOU LOSE...", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		IMAGE img1;
-		loadimage(&img1, "sorce/lose.png", 250, 250);
-		Function::transparentimage(NULL, 319 - 125, 219 - 125, &img1);
-		settextcolor(RGB(0, 0, 0));
-	}
+		else
+		{
+			if (score1 != 0 || score2 != 0)
+			{
+				for (int i = 4; i >= 0; i--)
+				{
+					scores[i + 1] = scores[i];
+				}
+				scores[0].score1 = score1;
+				scores[0].score2 = score2;
+			}
+		}
+		if (score1 > score2)
+		{
+			for (int i = 0; i < 20; i++)
+			{
+				IMAGE img1;
+				loadimage(&img1, "sorce/win.png", (int)(12.5 * (i + 1)), (int)(12.5 * (i + 1)));
+				Function::transparentimage(NULL, 319 - (25 * (i + 1) / 4), 219 - (25 * (i + 1) / 4), &img1);
+				settextcolor(RGB(255, 255, 255));
+				drawtext("YOU WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				settextcolor(RGB(0, 0, 0));
+				Sleep(50);
+			}
+		}
+		if (score1 < score2)
+		{
+			settextcolor(RGB(255, 255, 255));
+			drawtext("YOU LOSE...", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			IMAGE img1;
+			loadimage(&img1, "sorce/lose.png", 250, 250);
+			Function::transparentimage(NULL, 319 - 125, 219 - 125, &img1);
+			settextcolor(RGB(0, 0, 0));
+		}
 
-	if (score1 == score2)
-		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	button over(260, 390, 120, 40, "继续");
-	over.create();
-	jug = true;
-	while (jug)
-	{
-		if (peekmessage(&msg, EX_MOUSE))
-			if (msg.message == WM_LBUTTONDOWN)
-				if (over.test(msg))
-					jug = false;
-	}
-	std::cin.sync();
-	//检测是否解锁了新成就
-	jug = unlockachieve(wall_wire_mesh, score1, score2);
-	if (jug)
-	{
-		cleardevice();
-		settextstyle(36, 0, "华文隶书");
-		settextcolor(WHITE);
-		drawtext("您解锁了新成就，快去看看吧！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		if (score1 == score2)
+			drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		button over(260, 390, 120, 40, "继续");
 		over.create();
+		jug = true;
 		while (jug)
 		{
 			if (peekmessage(&msg, EX_MOUSE))
 				if (msg.message == WM_LBUTTONDOWN)
 					if (over.test(msg))
 						jug = false;
+		}
+		//检测是否解锁了新成就
+		jug = unlockachieve(wall_wire_mesh, score1, score2);
+		if (jug)
+		{
+			cleardevice();
+			settextstyle(36, 0, "华文隶书");
+			settextcolor(WHITE);
+			drawtext("您解锁了新成就，快去看看吧！", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			over.create();
+			while (jug)
+			{
+				if (peekmessage(&msg, EX_MOUSE))
+					if (msg.message == WM_LBUTTONDOWN)
+						if (over.test(msg))
+							jug = false;
+			}
 		}
 	}
 	std::cin.sync();

@@ -23,6 +23,7 @@
 #include"tankhead.h"
 
 //一堆外部变量
+extern bool pause;
 extern int volume_jug;
 extern int IDnum;
 extern std::mutex lock;
@@ -366,6 +367,7 @@ public:
 	{
 		while (isgaming)
 		{
+			while (pause) {}
 			for (bullet& p : allbullet)
 			{
 				p.mx += p.vec.x * p.speed;
@@ -705,6 +707,7 @@ public:
 	{
 		while (isgaming)
 		{
+			while (pause) {}
 			if (!canshoot)
 			{
 				for (waittime = 125; waittime > 0; waittime--)
@@ -717,6 +720,7 @@ public:
 	void defpower(bool& isgaming) {
 		while (isgaming)
 		{
+			while (pause) {}
 		 	if (!canfly)
 			{
 				while (1) {
@@ -863,6 +867,7 @@ public:
 	{
 		while (game)
 		{
+			while(pause) {}
 			while (!IsAlive)
 			{
 				std::cout << "dead" << std::endl;
@@ -880,7 +885,7 @@ public:
 			if (KeyDown(fly))
 			 	flyyyy();
 			if (KeyDown(VK_ESCAPE))
-				game = false;
+				pause = true;
 			Sleep(15);
 		}
 	}
@@ -889,6 +894,7 @@ public:
 	{
 		while (game)
 		{
+			while (pause) {}
 			if (IsAlive)
 			{
 				if (KeyDown(left) || KeyDown(right) || KeyDown(up) || KeyDown(down))
@@ -1227,6 +1233,7 @@ public:
 		}Quadrant;
 		while (isgaimg)
 		{
+			while (pause) {}
 			while (!IsAlive)
 			{
 				std::cout << "dead" << std::endl;
@@ -1356,6 +1363,7 @@ public:
 	{
 		while (isgaming)
 		{
+			while (pause) {}
 			for (int i = 0; i < 4; i++)
 			{
 				wall_rock[i].deblood();

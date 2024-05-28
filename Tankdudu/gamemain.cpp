@@ -16,6 +16,62 @@ std::vector<bullet> allbullet;
 int volume_jug = 1;
 int play_game = 1;
 
+bool pause = false;
+
+void Pause(bool *isgaming)
+{
+	//画框框
+	setfillcolor(0x9BB171);
+	fillrectangle(160, 155, 485, 320);
+	//显示文字
+	RECT top{ 160,160,485,200 };
+	settextcolor(BLACK);
+	settextstyle(44, 0, "华文隶书");
+	drawtext("暂  停", &top, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	//创建按钮
+	button b1(195, 250, 100, 35, "退  出");
+	button b2(355, 250, 100, 35, "返  回");
+	b1.create();
+	b2.create();
+	//等待按钮按下
+	int choose = 0;
+	bool jug = true;
+	ExMessage msg;
+	while (jug)
+	{
+		HWND hWnd = GetHWnd();
+		if (!IsWindow(hWnd))
+			exit(0);
+		//获取鼠标消息，检测是否按在了按钮上
+		if (peekmessage(&msg, EX_MOUSE))
+		{
+			switch (msg.message)
+			{
+			case WM_LBUTTONDOWN:
+				if (b1.test(msg))
+					choose = 1;
+				if (b2.test(msg))
+					choose = 2;
+				if (choose)
+					jug = false;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	switch (choose)
+	{
+	case 1:
+		*isgaming = false;
+		break;
+	case 2:
+		break;
+	}
+	//初始化pause
+	pause = false;
+}
+
 //储存是否达成成就的结构体
 typedef struct Achievement
 {
@@ -274,7 +330,6 @@ int main()
 			s[4] = p.score2 % 10 + '0';
 			drawtext(_T(s), &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		}
-
 		int choose = 0;
 		ExMessage msg;
 		bool jug = true;

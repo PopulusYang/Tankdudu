@@ -2,7 +2,7 @@
 //作者：杨武显
 //功能：提供函数入口，打包各种头文件
 
-
+extern bool pause;
 #pragma once
 #pragma warning(disable:6031)
 #include<iostream>
@@ -42,6 +42,8 @@ void setting();
 void sefileread();
 void sefilewrite();
 
+void Pause(bool* isgaming);
+
 class TimeFun
 {
 public:
@@ -52,6 +54,7 @@ public:
 		for (; time > 0; time--)
 		{
 			Sleep(1000);
+			while (pause) {}
 		}
 		isgaming = false;
 	}

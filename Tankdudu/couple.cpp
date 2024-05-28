@@ -3,6 +3,9 @@
 //功能：为双人游戏提供入口
 #include"tankclass.h"
 #include"tankhead.h"
+
+extern bool pause;
+
 typedef struct Setting
 {
 	bool sound = true;
@@ -112,6 +115,13 @@ void couplelegame()
 		//ColliderBox::drawColliderbox(player1);
 		//ColliderBox::drawColliderbox(player2);
 		bullet::display();
+		//调用暂停模块
+		if (pause)
+		{
+			EndBatchDraw();
+			Pause(&isgaming);
+			BeginBatchDraw();
+		}
 		HWND hWnd = GetHWnd();
 		if (IsWindow(hWnd))
 			FlushBatchDraw();
@@ -137,8 +147,9 @@ void couplelegame()
 	settextcolor(WHITE);
 	settextstyle(36, 0, "华文隶书");
 	drawtext("游戏结束，请稍后。", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	bool notover = false;
 	if (time != 0)
-		std::cout << "游戏未完成" << std::endl;
+		notover = true;
 	time = 0;
 
 	//等待线程结束
@@ -169,32 +180,35 @@ void couplelegame()
 	std::cout << "All threads have been over." << std::endl;
 
 	cleardevice();
-	std::cin.sync();
-	if (score1 > score2)
+	if (!notover)
 	{
-		drawtext("P1 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		IMAGE img1;
-		loadimage(&img1, "sorce/awardsP1.png", 400, 300);
-		Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
-	}
-	if (score1 < score2)
-	{
-		drawtext("P2 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		IMAGE img1;
-		loadimage(&img1, "sorce/awardsP2.png", 400, 300);
-		Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
-	}
-	if (score1 == score2)
-		drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	button over(260, 390, 120, 40, "继续");
-	over.create();
-	jug = true;
-	while (jug)
-	{
-		if (peekmessage(&msg, EX_MOUSE))
-			if (msg.message == WM_LBUTTONDOWN)
-				if (over.test(msg))
-					jug = false;
+		std::cin.sync();
+		if (score1 > score2)
+		{
+			drawtext("P1 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			IMAGE img1;
+			loadimage(&img1, "sorce/awardsP1.png", 400, 300);
+			Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
+		}
+		if (score1 < score2)
+		{
+			drawtext("P2 WIN!!!", &settlement, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			IMAGE img1;
+			loadimage(&img1, "sorce/awardsP2.png", 400, 300);
+			Function::transparentimage(NULL, 319 - 200, 219 - 150, &img1);
+		}
+		if (score1 == score2)
+			drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		button over(260, 390, 120, 40, "继续");
+		over.create();
+		jug = true;
+		while (jug)
+		{
+			if (peekmessage(&msg, EX_MOUSE))
+				if (msg.message == WM_LBUTTONDOWN)
+					if (over.test(msg))
+						jug = false;
+		}
 	}
 	//清除缓冲区
 	std::cin.sync();
