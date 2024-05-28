@@ -50,6 +50,8 @@ void singlegame()
 	
 
 	RECT center = { 0,0,639,479 };
+	RECT say1 = { 0,100,639,479 };
+	RECT say2 = { 0,0,639,379 };
 	RECT settlement = { 0,0,639,96 };
 	settextstyle(36, 0, "»ªÎÄÁ¥Êé");
 	settextcolor(WHITE);
