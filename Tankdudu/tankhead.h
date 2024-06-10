@@ -46,14 +46,6 @@ class TimeFun
 {
 public:
 
-	//显示倒计时
-
-//倒计时60秒
-
-//在右上角显示
-
-//计时结束isgaming变为false
-
 
 	static void setTime(int& time, bool& isgaming)
 	{
@@ -68,7 +60,7 @@ public:
 		settextstyle(18, 0, "华文隶书");
 		char t[4] = { '\0' };
 		t[0] = (time / 100) + '0';
-		t[1] = (time / 10) + '0';
+		t[1] = ((time % 100) / 10) + '0';
 		t[2] = (time % 10) + '0';
 		outtextxy(x - 50, y, "时间：");
 		outtextxy(x, y, _T(t));

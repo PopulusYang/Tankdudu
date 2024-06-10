@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 //文件名：setting.cpp
 //作者：杨武显
 //功能：设置
@@ -32,7 +33,12 @@ void setting()
 	RECT upcenter{ 0,0,639,50 };
 	ExMessage msg;
 	//创建一堆按钮
-	button s1(140, 90, 120, 50, "静音");
+	char str[10];
+	if (set.sound)
+		strcpy(str, "静音");
+	else
+		strcpy(str, "解除静音");
+	button s1(140, 90, 120, 50, _T(str));
 	button s2(140, 175, 120, 50, "修改背景");
 	button s3(350, 90, 120, 50, "游戏时间");
 	button s4(350, 175, 120, 50, "清空记录");
@@ -128,6 +134,7 @@ void setting()
 				s1.changetext("静音");
 			else
 				s1.changetext("解除静音");
+			set.sound = !set.sound;
 			break;
 		case 2:
 			set.background++;
