@@ -7,6 +7,8 @@ extern bool pause;
 #pragma warning(disable:6031)
 #include<iostream>
 #include<easyx.h>
+//ºÊ»›æ…∞ÊEasyX
+#include<graphics.h>
 #include<conio.h>
 #include<thread>
 #include<cmath>

@@ -39,7 +39,8 @@ inline bool KeyDown(int vKey)
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
 }
 
-
+//±£ÁôalphaµÄÐý×ª
+//https://codebus.cn/huidong/rotateimage-alpha
 class Function
 {
 public:
