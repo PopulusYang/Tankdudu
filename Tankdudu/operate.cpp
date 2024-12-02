@@ -1,20 +1,20 @@
-//ÎÄ¼şÃû£ºoperate.cpp
-//×÷Õß£ºÖì¼ÑÔÃ
-//¹¦ÄÜ£ºÕ¹Ê¾²Ù×÷Ö¸ÄÏ
+//æ–‡ä»¶åï¼šoperate.cpp
+//ä½œè€…ï¼šæœ±ä½³æ‚¦
+//åŠŸèƒ½ï¼šå±•ç¤ºæ“ä½œæŒ‡å—
 
 #include"tankclass.h"
 #include"tankhead.h"
-//²Ù×÷Ö¸ÄÏ½øÈëÕâ¸öº¯Êı
+//æ“ä½œæŒ‡å—è¿›å…¥è¿™ä¸ªå‡½æ•°
 
 void operate()
 {
 	int operate_jug = 1;
 	int player = 1;
-	button* b1 = new button(60, 390, 120, 50, "·µ»Ø²Ëµ¥");
-	button* b2 = new button(260, 390, 120, 50, "µ¥ÈË²Ù×÷");
-	button* b3 = new button(460, 390, 120, 50, "Ë«ÈË²Ù×÷");
-	button* b4 = new button(460, 390, 120, 50, "Æä  Ëû");
-	button* b5 = new button(260, 390, 120, 50, "Ë«ÈË²Ù×÷");
+	button* b1 = new button(60, 390, 120, 50, "è¿”å›èœå•");
+	button* b2 = new button(260, 390, 120, 50, "å•äººæ“ä½œ");
+	button* b3 = new button(460, 390, 120, 50, "åŒäººæ“ä½œ");
+	button* b4 = new button(460, 390, 120, 50, "å…¶  ä»–");
+	button* b5 = new button(260, 390, 120, 50, "åŒäººæ“ä½œ");
 	IMAGE img1, img2, img3, img4;
 	IMAGE img[3];
 	loadimage(&img1, "sorce/operate.png", 550, 320);

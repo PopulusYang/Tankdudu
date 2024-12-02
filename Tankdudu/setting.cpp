@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
-//ÎÄ¼şÃû£ºsetting.cpp
-//×÷Õß£ºÑîÎäÏÔ
-//¹¦ÄÜ£ºÉèÖÃ
+//æ–‡ä»¶åï¼šsetting.cpp
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾
+//åŠŸèƒ½ï¼šè®¾ç½®
 #include "tankclass.h"
 #include "tankhead.h"
 
@@ -27,71 +27,71 @@ extern std::vector<allscore> scores;
 extern Setting set;
 void setting()
 {
-	//×¼±¸Ò³Ãæ
+	//å‡†å¤‡é¡µé¢
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
 	RECT upcenter{ 0,0,639,50 };
 	ExMessage msg;
-	//´´½¨Ò»¶Ñ°´Å¥
+	//åˆ›å»ºä¸€å †æŒ‰é’®
 	char str[10];
 	if (set.sound)
-		strcpy(str, "¾²Òô");
+		strcpy(str, "é™éŸ³");
 	else
-		strcpy(str, "½â³ı¾²Òô");
+		strcpy(str, "è§£é™¤é™éŸ³");
 	button s1(140, 90, 120, 50, _T(str));
-	button s2(140, 175, 120, 50, "ĞŞ¸Ä±³¾°");
-	button s3(350, 90, 120, 50, "ÓÎÏ·Ê±¼ä");
-	button s4(350, 175, 120, 50, "Çå¿Õ¼ÇÂ¼");
-	button s5(245, 265, 120, 50, "ÖØÖÃ³É¾Í");
-	button back(245, 350, 120, 50, "·µ»Ø");
+	button s2(140, 175, 120, 50, "ä¿®æ”¹èƒŒæ™¯");
+	button s3(350, 90, 120, 50, "æ¸¸æˆæ—¶é—´");
+	button s4(350, 175, 120, 50, "æ¸…ç©ºè®°å½•");
+	button s5(245, 265, 120, 50, "é‡ç½®æˆå°±");
+	button back(245, 350, 120, 50, "è¿”å›");
 	
 	bool issetting = true;
 	BeginBatchDraw();
-	//ÉèÖÃÖ÷Ñ­»·
+	//è®¾ç½®ä¸»å¾ªç¯
 	while (issetting)
 	{
-		//×¼±¸Ò³Ãæ
+		//å‡†å¤‡é¡µé¢
 		cleardevice();
 		putimage(0, 0, &background);
-		settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
-		drawtext("Éè   ÖÃ", &upcenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("è®¾   ç½®", &upcenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		setfillcolor(0x9BB171);
 		fillrectangle(70, 50, 570, 430);
 
 		s1.create();
 		s2.create();
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
 		switch (set.background)
 		{
 		case 1:
-			outtextxy(140, 230, "µ±Ç°±³¾°£º¹àÄ¾´Ô");
+			outtextxy(140, 230, "å½“å‰èƒŒæ™¯ï¼šçŒæœ¨ä¸›");
 			break;
 		case 2:
-			outtextxy(140, 230, "µ±Ç°±³¾°£ºÉ³Ä®");
+			outtextxy(140, 230, "å½“å‰èƒŒæ™¯ï¼šæ²™æ¼ ");
 			break;
 		case 3:
-			outtextxy(140, 230, "µ±Ç°±³¾°£º²İµØ");
+			outtextxy(140, 230, "å½“å‰èƒŒæ™¯ï¼šè‰åœ°");
 		}
 		
 		s3.create();
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
 		switch (set.gametime)
 		{
 		case 1:
-			outtextxy(350, 145, "ÓÎÏ·Ê±¼ä£º120s");
+			outtextxy(350, 145, "æ¸¸æˆæ—¶é—´ï¼š120s");
 			break;
 		case 2:
-			outtextxy(350, 145, "ÓÎÏ·Ê±¼ä£º60s");
+			outtextxy(350, 145, "æ¸¸æˆæ—¶é—´ï¼š60s");
 			break;
 		case 3:
-			outtextxy(350, 145, "ÓÎÏ·Ê±¼ä£º40s");
+			outtextxy(350, 145, "æ¸¸æˆæ—¶é—´ï¼š40s");
 		}
 		s4.create();
 		s5.create();
 		back.create();
 		FlushBatchDraw();
-		//¼ì²âÊÇ·ñ°´ÏÂ
+		//æ£€æµ‹æ˜¯å¦æŒ‰ä¸‹
 		int choose = 0;
 		bool jug = true;
 		while (jug)
@@ -99,7 +99,7 @@ void setting()
 			HWND hWnd = GetHWnd();
 			if (!IsWindow(hWnd))
 				exit(0);
-			//»ñÈ¡Êó±êÏûÏ¢£¬¼ì²âÊÇ·ñ°´ÔÚÁË°´Å¥ÉÏ
+			//è·å–é¼ æ ‡æ¶ˆæ¯ï¼Œæ£€æµ‹æ˜¯å¦æŒ‰åœ¨äº†æŒ‰é’®ä¸Š
 			if (peekmessage(&msg, EX_MOUSE))
 			{
 				switch (msg.message)
@@ -131,9 +131,9 @@ void setting()
 		case 1:
 			volume_jug = (volume_jug + 1) % 2;
 			if (volume_jug)
-				s1.changetext("¾²Òô");
+				s1.changetext("é™éŸ³");
 			else
-				s1.changetext("½â³ı¾²Òô");
+				s1.changetext("è§£é™¤é™éŸ³");
 			set.sound = !set.sound;
 			break;
 		case 2:
@@ -148,14 +148,14 @@ void setting()
 			break;
 		case 4:
 			scores.clear();
-			s4.changetext("Çå³ı³É¹¦");
+			s4.changetext("æ¸…é™¤æˆåŠŸ");
 			break;
 		case 5:
 			achieve.a1 = false;
 			achieve.a2 = false;
 			achieve.a3 = false;
 			achieve.a4 = false;
-			s5.changetext("ÖØÖÃ³É¹¦");
+			s5.changetext("é‡ç½®æˆåŠŸ");
 			break;
 		case 6:
 			issetting = false;
@@ -166,33 +166,33 @@ void setting()
 	std::cin.sync();
 }
 
-//ÎÄ¼ş´¢´æ
+//æ–‡ä»¶å‚¨å­˜
 void sefileread()
 {
-	std::ifstream file("setting.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞ¶ÁÈ¡  
+	std::ifstream file("setting.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œè¯»å–  
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-	//¶ÁÈ¡
+	//è¯»å–
 	file.read(reinterpret_cast<char*>(&set), sizeof(Setting));
-	//¹Ø±ÕÎÄ¼ş
+	//å…³é—­æ–‡ä»¶
 	file.close();
 }
 
 void sefilewrite()
 {
-	std::ofstream file("setting.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞ¶ÁÈ¡  
+	std::ofstream file("setting.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œè¯»å–  
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-	//¶ÁÈ¡
+	//è¯»å–
 	file.write(reinterpret_cast<char*>(&set), sizeof(Setting));
-	//¹Ø±ÕÎÄ¼ş
+	//å…³é—­æ–‡ä»¶
 	file.close();
 }

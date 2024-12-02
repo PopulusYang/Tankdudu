@@ -1,11 +1,10 @@
-//ÎÄ¼şÃû£ºgamemain.cpp
-//×÷Õß£ºÑîÎäÏÔ£¬Öì¼ÑÔÃ£¬ÈÎÓîĞù
-//¸ÃÎÄ¼şÎª³ÌĞòµÄÈë¿Ú£¬²¿·Öº¯ÊıµÄÊµÏÖÒÔ¼°ÎÄ¼şµÄ¶ÁĞ´µÈ
+// æ–‡ä»¶åï¼šgamemain.cpp
+// ä½œè€…ï¼šæ¨æ­¦æ˜¾ï¼Œæœ±ä½³æ‚¦ï¼Œä»»å®‡è½©
+// è¯¥æ–‡ä»¶ä¸ºç¨‹åºçš„å…¥å£ï¼Œéƒ¨åˆ†å‡½æ•°çš„å®ç°ä»¥åŠæ–‡ä»¶çš„è¯»å†™ç­‰
 
-
-#include"tankclass.h"
-#include"tankhead.h"
-#define MAXSTAR 200	// ĞÇĞÇ×ÜÊı
+#include "tankclass.h"
+#include "tankhead.h"
+#define MAXSTAR 200 // æ˜Ÿæ˜Ÿæ€»æ•°
 
 class bullet;
 std::mutex lock;
@@ -16,38 +15,36 @@ std::vector<bullet> allbullet;
 int volume_jug = 1;
 int play_game = 1;
 
+// å†°å°æ•ˆæœå±•ç¤ºæ–‡å­—
+//  https://codebus.cn/yangw/word-art-freeze
+//  å®šä¹‰å…¨å±€å˜é‡
+POINT *g_pDst; // ç‚¹é›†(ç›®æ ‡)
+POINT *g_pSrc; // ç‚¹é›†(æº)
+int g_nWidth;  // æ–‡å­—çš„å®½åº¦
+int g_nHeight; // æ–‡å­—çš„é«˜åº¦
+int g_nCount;  // ç‚¹é›†åŒ…å«çš„ç‚¹çš„æ•°é‡
 
-//±ù·âĞ§¹ûÕ¹Ê¾ÎÄ×Ö
-// https://codebus.cn/yangw/word-art-freeze
-// ¶¨ÒåÈ«¾Ö±äÁ¿
-POINT* g_pDst;		// µã¼¯(Ä¿±ê)
-POINT* g_pSrc;		// µã¼¯(Ô´)
-int g_nWidth;		// ÎÄ×ÖµÄ¿í¶È
-int g_nHeight;		// ÎÄ×ÖµÄ¸ß¶È
-int g_nCount;		// µã¼¯°üº¬µÄµãµÄÊıÁ¿
-
-
-// »ñÈ¡Ä¿±êµã¼¯
+// è·å–ç›®æ ‡ç‚¹é›†
 void GetDstPoints()
 {
-	// ÉèÖÃÁÙÊ±»æÍ¼¶ÔÏó
+	// è®¾ç½®ä¸´æ—¶ç»˜å›¾å¯¹è±¡
 	IMAGE img;
 	SetWorkingImage(&img);
 
-	// ¶¨ÒåÄ¿±ê×Ö·û´®
+	// å®šä¹‰ç›®æ ‡å­—ç¬¦ä¸²
 	TCHAR s[] = _T("PopulusYang");
 
-	// ¼ÆËãÄ¿±ê×Ö·û´®µÄ¿í¸ß£¬²¢µ÷ÕûÁÙÊ±»æÍ¼¶ÔÏóµÄ³ß´ç
+	// è®¡ç®—ç›®æ ‡å­—ç¬¦ä¸²çš„å®½é«˜ï¼Œå¹¶è°ƒæ•´ä¸´æ—¶ç»˜å›¾å¯¹è±¡çš„å°ºå¯¸
 	setcolor(BLUE);
 	setfont(150, 0, _T("Blackadder ITC"));
 	g_nWidth = textwidth(s);
 	g_nHeight = textheight(s);
 	Resize(&img, g_nWidth, g_nHeight);
 
-	// Êä³öÄ¿±ê×Ö·û´®ÖÁ img ¶ÔÏó
+	// è¾“å‡ºç›®æ ‡å­—ç¬¦ä¸²è‡³ img å¯¹è±¡
 	outtextxy(0, 0, s);
 
-	// ¼ÆËã¹¹³ÉÄ¿±ê×Ö·û´®µÄµãµÄÊıÁ¿
+	// è®¡ç®—æ„æˆç›®æ ‡å­—ç¬¦ä¸²çš„ç‚¹çš„æ•°é‡
 	int x, y;
 	g_nCount = 0;
 	for (x = 0; x < g_nWidth; x++)
@@ -55,14 +52,14 @@ void GetDstPoints()
 			if (getpixel(x, y) == BLUE)
 				g_nCount++;
 
-	// ¼ÆËãÄ¿±êÊı¾İ
+	// è®¡ç®—ç›®æ ‡æ•°æ®
 	g_pDst = new POINT[g_nCount];
 	int i = 0;
 	for (x = 0; x < g_nWidth; x++)
 		for (y = 0; y < g_nHeight; y++)
 			if (getpixel(x, y) == BLUE)
 			{
-				//´¦Àí¿ÉÄÜ·¢ÉúµÄ´íÎó
+				// å¤„ç†å¯èƒ½å‘ç”Ÿçš„é”™è¯¯
 				if (i >= g_nCount)
 					break;
 				g_pDst[i].x = x + (640 - g_nWidth) / 2;
@@ -70,18 +67,17 @@ void GetDstPoints()
 				i++;
 			}
 
-	// »Ö¸´¶ÔÆÁÄ»µÄ»æÍ¼²Ù×÷
+	// æ¢å¤å¯¹å±å¹•çš„ç»˜å›¾æ“ä½œ
 	SetWorkingImage(NULL);
 }
 
-
-// »ñÈ¡Ô´µã¼¯
+// è·å–æºç‚¹é›†
 void GetSrcPoints()
 {
-	// ÉèÖÃËæ»úÖÖ×Ó
+	// è®¾ç½®éšæœºç§å­
 	srand((unsigned int)time(NULL));
 
-	// ÉèÖÃËæ»úµÄÔ´Êı¾İ
+	// è®¾ç½®éšæœºçš„æºæ•°æ®
 	g_pSrc = new POINT[g_nCount];
 	for (int i = 0; i < g_nCount; i++)
 	{
@@ -90,14 +86,13 @@ void GetSrcPoints()
 	}
 }
 
-
-// È«ÆÁÄ£ºı´¦Àí(ºöÂÔÆÁÄ»µÚÒ»ĞĞºÍ×îºóÒ»ĞĞ)
-void Blur(DWORD* pMem)
+// å…¨å±æ¨¡ç³Šå¤„ç†(å¿½ç•¥å±å¹•ç¬¬ä¸€è¡Œå’Œæœ€åä¸€è¡Œ)
+void Blur(DWORD *pMem)
 {
 	for (int i = 640; i < 640 * 479; i++)
 	{
 		pMem[i] = RGB(
-			(GetRValue(pMem[i]) + GetRValue(pMem[i - 640]) + GetRValue(pMem[i - 1]) + GetRValue(pMem[i + 1]) + GetRValue(pMem[i + 640])) / 5+1,
+			(GetRValue(pMem[i]) + GetRValue(pMem[i - 640]) + GetRValue(pMem[i - 1]) + GetRValue(pMem[i + 1]) + GetRValue(pMem[i + 640])) / 5 + 1,
 			(GetGValue(pMem[i]) + GetGValue(pMem[i - 640]) + GetGValue(pMem[i - 1]) + GetGValue(pMem[i + 1]) + GetGValue(pMem[i + 640])) / 5,
 			(GetBValue(pMem[i]) + GetBValue(pMem[i - 640]) + GetBValue(pMem[i - 1]) + GetBValue(pMem[i + 1]) + GetBValue(pMem[i + 640])) / 5);
 	}
@@ -105,28 +100,28 @@ void Blur(DWORD* pMem)
 
 void showFreeze()
 {
-	DWORD* pBuf = GetImageBuffer();		// »ñÈ¡ÏÔÊ¾»º³åÇøÖ¸Õë
-	GetDstPoints();						// »ñÈ¡Ä¿±êµã¼¯
-	GetSrcPoints();						// »ñÈ¡Ô´µã¼¯
+	DWORD *pBuf = GetImageBuffer(); // è·å–æ˜¾ç¤ºç¼“å†²åŒºæŒ‡é’ˆ
+	GetDstPoints();					// è·å–ç›®æ ‡ç‚¹é›†
+	GetSrcPoints();					// è·å–æºç‚¹é›†
 
-	// ÔËËã
+	// è¿ç®—
 	int x, y;
 	for (int i = 2; i <= 256; i += 2)
 	{
 		COLORREF c = RGB(i - 1, i - 1, i - 1);
-		Blur(pBuf);						// È«ÆÁÄ£ºı´¦Àí
+		Blur(pBuf); // å…¨å±æ¨¡ç³Šå¤„ç†
 
 		for (int d = 0; d < g_nCount; d++)
 		{
 			x = g_pSrc[d].x + (g_pDst[d].x - g_pSrc[d].x) * i / 256;
 			y = g_pSrc[d].y + (g_pDst[d].y - g_pSrc[d].y) * i / 256;
-			pBuf[y * 640 + x] = c;		// Ö±½Ó²Ù×÷ÏÔÊ¾»º³åÇø»­µã
+			pBuf[y * 640 + x] = c; // ç›´æ¥æ“ä½œæ˜¾ç¤ºç¼“å†²åŒºç”»ç‚¹
 		}
 
-		Sleep(20);						// ÑÓÊ±
+		Sleep(20); // å»¶æ—¶
 	}
 
-	// ÇåÀíÄÚ´æ
+	// æ¸…ç†å†…å­˜
 	delete g_pDst;
 	delete g_pSrc;
 }
@@ -135,20 +130,20 @@ bool pause = false;
 
 void Pause(bool *isgaming)
 {
-	//»­¿ò¿ò
+	// ç”»æ¡†æ¡†
 	setfillcolor(0x9BB171);
 	fillrectangle(160, 155, 485, 320);
-	//ÏÔÊ¾ÎÄ×Ö
-	RECT top{ 160,160,485,200 };
+	// æ˜¾ç¤ºæ–‡å­—
+	RECT top{160, 160, 485, 200};
 	settextcolor(BLACK);
-	settextstyle(44, 0, "»ªÎÄÁ¥Êé");
-	drawtext("Ôİ  Í£", &top, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	//´´½¨°´Å¥
-	button b1(195, 250, 100, 35, "ÍË  ³ö");
-	button b2(355, 250, 100, 35, "·µ  »Ø");
+	settextstyle(44, 0, "åæ–‡éš¶ä¹¦");
+	drawtext("æš‚  åœ", &top, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	// åˆ›å»ºæŒ‰é’®
+	button b1(195, 250, 100, 35, "é€€  å‡º");
+	button b2(355, 250, 100, 35, "è¿”  å›");
 	b1.create();
 	b2.create();
-	//µÈ´ı°´Å¥°´ÏÂ
+	// ç­‰å¾…æŒ‰é’®æŒ‰ä¸‹
 	int choose = 0;
 	bool jug = true;
 	ExMessage msg;
@@ -157,7 +152,7 @@ void Pause(bool *isgaming)
 		HWND hWnd = GetHWnd();
 		if (!IsWindow(hWnd))
 			exit(0);
-		//»ñÈ¡Êó±êÏûÏ¢£¬¼ì²âÊÇ·ñ°´ÔÚÁË°´Å¥ÉÏ
+		// è·å–é¼ æ ‡æ¶ˆæ¯ï¼Œæ£€æµ‹æ˜¯å¦æŒ‰åœ¨äº†æŒ‰é’®ä¸Š
 		if (peekmessage(&msg, EX_MOUSE))
 		{
 			switch (msg.message)
@@ -183,11 +178,11 @@ void Pause(bool *isgaming)
 	case 2:
 		break;
 	}
-	//³õÊ¼»¯pause
+	// åˆå§‹åŒ–pause
 	pause = false;
 }
 
-//´¢´æÊÇ·ñ´ï³É³É¾ÍµÄ½á¹¹Ìå
+// å‚¨å­˜æ˜¯å¦è¾¾æˆæˆå°±çš„ç»“æ„ä½“
 typedef struct Achievement
 {
 	bool a1 = false, a2 = false, a3 = false, a4 = false;
@@ -203,55 +198,54 @@ typedef struct Setting
 Achieve achieve;
 Setting set;
 
-//Ğ¡ĞÇĞÇ
+// å°æ˜Ÿæ˜Ÿ
 struct STAR
 {
-	double	x;
-	int		y;
-	double	step;
-	int		color;
+	double x;
+	int y;
+	double step;
+	int color;
 };
 typedef struct allscore
 {
 	int score1;
 	int score2;
-}allscore;
+} allscore;
 
 std::vector<allscore> scores;
 
-
 void fileread()
 {
-	std::ifstream file("scores.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞ¶ÁÈ¡  
+	std::ifstream file("scores.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œè¯»å–
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-	//ÁÙÊ±´¢´æ·ÖÊı
+	// ä¸´æ—¶å‚¨å­˜åˆ†æ•°
 	int score1 = 0;
 	int score2 = 0;
 
 	while (file)
 	{
-		//¶ÁÈ¡
-		file.read(reinterpret_cast<char*>(&score1), sizeof(score1));
-		file.read(reinterpret_cast<char*>(&score2), sizeof(score2));
-		//´æÈëÄÚ´æ
-		scores.push_back(allscore{ score1, score2 });
+		// è¯»å–
+		file.read(reinterpret_cast<char *>(&score1), sizeof(score1));
+		file.read(reinterpret_cast<char *>(&score2), sizeof(score2));
+		// å­˜å…¥å†…å­˜
+		scores.push_back(allscore{score1, score2});
 		if (file.gcount() == 0)
 		{
 			if (file.eof())
 			{
-				// È·ÊµÊÇEOF£¬ÎÄ¼ş¶ÁÈ¡Íê±Ï  
+				// ç¡®å®æ˜¯EOFï¼Œæ–‡ä»¶è¯»å–å®Œæ¯•
 				std::cout << "End of file reached." << std::endl;
 				scores.pop_back();
 				break;
 			}
 			else
 			{
-				// ³öÏÖÁËÆäËû´íÎó  
+				// å‡ºç°äº†å…¶ä»–é”™è¯¯
 				std::cerr << "Error reading file." << std::endl;
 				break;
 			}
@@ -259,13 +253,12 @@ void fileread()
 	}
 }
 
-
 void filewrite()
 {
-	std::ofstream file("scores.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞ¶ÁÈ¡  
+	std::ofstream file("scores.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œè¯»å–
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
@@ -273,8 +266,8 @@ void filewrite()
 	{
 		for (allscore p : scores)
 		{
-			file.write(reinterpret_cast<char*>(&p.score1), sizeof(p.score1));
-			file.write(reinterpret_cast<char*>(&p.score2), sizeof(p.score2));
+			file.write(reinterpret_cast<char *>(&p.score1), sizeof(p.score1));
+			file.write(reinterpret_cast<char *>(&p.score2), sizeof(p.score2));
 		}
 	}
 	file.close();
@@ -289,66 +282,65 @@ void InitStar(int i)
 	star[i].color = RGB(star[i].color, star[i].color, star[i].color);
 }
 
-// ÒÆ¶¯ĞÇĞÇ
+// ç§»åŠ¨æ˜Ÿæ˜Ÿ
 void MoveStar(int i)
 {
 	putpixel((int)star[i].x, star[i].y, 0);
 	star[i].x += star[i].step;
-	if (star[i].x > 640)	InitStar(i);
+	if (star[i].x > 640)
+		InitStar(i);
 	putpixel((int)star[i].x, star[i].y, star[i].color);
 }
 
-
-
-int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
+int ColliderDectect(const ColliderBox &box1, const ColliderBox &box2)
 {
-	// ¼ì²âXÖáÉÏµÄÅö×²
+	// æ£€æµ‹Xè½´ä¸Šçš„ç¢°æ’
 	bool xOverlap = box1.mx + box1.displaceX < box2.mx + box2.width && box1.mx + box1.width > box2.mx + box2.displaceX;
-	// ¼ì²âYÖáÉÏµÄÅö×²
+	// æ£€æµ‹Yè½´ä¸Šçš„ç¢°æ’
 	bool yOverlap = box1.my + box1.displaceY < box2.my + box2.height && box1.my + box1.height > box2.my + box2.displaceY;
 
 	if (xOverlap && yOverlap)
 	{
-		// ÅĞ¶ÏÅö×²¸ü¶à·¢ÉúÔÚXÖá»¹ÊÇYÖá
+		// åˆ¤æ–­ç¢°æ’æ›´å¤šå‘ç”Ÿåœ¨Xè½´è¿˜æ˜¯Yè½´
 		double xOverlapAmount = min(box1.mx + box1.width - box2.mx - box2.displaceX, box2.mx + box2.width - box1.mx - box1.displaceX);
 		double yOverlapAmount = min(box1.my + box1.height - box2.my - box2.displaceY, box2.my + box2.height - box1.my - box1.displaceY);
 
 		if (xOverlapAmount < yOverlapAmount)
 		{
-			return 1; // XÖáÉÏÅö×²
+			return 1; // Xè½´ä¸Šç¢°æ’
 		}
 		else
 		{
-			return 2; // YÖáÉÏÅö×²
+			return 2; // Yè½´ä¸Šç¢°æ’
 		}
 	}
 
-	return 0; // Ã»ÓĞÅö×²
+	return 0; // æ²¡æœ‰ç¢°æ’
 }
-//near==true
+// near==true
 bool isPointNear(int x1, int y1, int x2, int y2, int range)
 {
 	return abs(x1 - x2) <= range && abs(y1 - y2) <= range;
 }
 
-bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range)
+bool angleDectect(const ColliderBox &box1, const ColliderBox &box2, int range)
 {
-	// »ñÈ¡ box1 ºÍ box2 µÄËÄ¸ö½ÇµÄ×ø±ê
+	// è·å– box1 å’Œ box2 çš„å››ä¸ªè§’çš„åæ ‡
 	int box1Corners[4][2] = {
-		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.displaceY)}, // ×óÉÏ½Ç
-		{(int)(box1.mx + box1.width), (int)(box1.my + box1.displaceY)}, // ÓÒÉÏ½Ç
-		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.height)}, // ×óÏÂ½Ç
-		{(int)(box1.mx + box1.width),(int)(box1.my + box1.height)} // ÓÒÏÂ½Ç
+		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.displaceY)}, // å·¦ä¸Šè§’
+		{(int)(box1.mx + box1.width), (int)(box1.my + box1.displaceY)},		// å³ä¸Šè§’
+		{(int)(box1.mx + box1.displaceX), (int)(box1.my + box1.height)},	// å·¦ä¸‹è§’
+		{(int)(box1.mx + box1.width), (int)(box1.my + box1.height)}			// å³ä¸‹è§’
 	};
 
 	int box2Corners[4][2] = {
-		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.displaceY)}, // ×óÉÏ½Ç
-		{(int)(box2.mx + box2.width), (int)(box2.my + box2.displaceY)}, // ÓÒÉÏ½Ç
-		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.height)}, // ×óÏÂ½Ç
-		{(int)(box2.mx + box2.width), (int)(box2.my + box2.height)} // ÓÒÏÂ½Ç
+		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.displaceY)}, // å·¦ä¸Šè§’
+		{(int)(box2.mx + box2.width), (int)(box2.my + box2.displaceY)},		// å³ä¸Šè§’
+		{(int)(box2.mx + box2.displaceX), (int)(box2.my + box2.height)},	// å·¦ä¸‹è§’
+		{(int)(box2.mx + box2.width), (int)(box2.my + box2.height)}			// å³ä¸‹è§’
 	};
 
-	// ¼ì²é box1 µÄÃ¿¸ö½ÇÊÇ·ñ½Ó½ü box2 µÄÈÎÒâÒ»¸ö½Ç
+	// æ£€æŸ¥ box1 çš„æ¯ä¸ªè§’æ˜¯å¦æ¥è¿‘ box2 çš„ä»»æ„ä¸€ä¸ªè§’
 	for (int i = 0; i < 4; ++i)
 	{
 		for (int j = 0; j < 4; ++j)
@@ -363,14 +355,13 @@ bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range)
 	return false;
 }
 
-
 static void starting()
 {
-	// »ñµÃ´°¿Ú¾ä±ú
+	// è·å¾—çª—å£å¥æŸ„
 	HWND hWnd = GetHWnd();
-	// Ê¹ÓÃ Windows API ĞŞ¸Ä´°¿ÚÃû³Æ
-	SetWindowText(hWnd, "Ì¹¿Ë´óÕ½");
-	//ÉèÖÃÍ¼±ê
+	// ä½¿ç”¨ Windows API ä¿®æ”¹çª—å£åç§°
+	SetWindowText(hWnd, "å¦å…‹å¤§æˆ˜");
+	// è®¾ç½®å›¾æ ‡
 	HICON newIcon = (HICON)LoadImage(NULL, TEXT("sorce/tankico.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)newIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)newIcon);
@@ -378,45 +369,42 @@ static void starting()
 	IMAGE img;
 	loadimage(&img, "sorce/start.jpg", 640, 480, true);
 	putimage(0, 0, &img);
-	//Õ¹Ê¾±êÌâ
+	// å±•ç¤ºæ ‡é¢˜
 	setbkmode(TRANSPARENT);
-	RECT* title = new RECT{ 180,80,455,140 };
+	RECT *title = new RECT{180, 80, 455, 140};
 	settextcolor(BLACK);
-	settextstyle(44, 0, "»ªÎÄÁ¥Êé");
-	//Êä³ö±êÌâ
-	drawtext("Ì¹¿Ë´óÕ½biubiu", title, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	delete(title);
-	//·Ö¸îÏß
+	settextstyle(44, 0, "åæ–‡éš¶ä¹¦");
+	// è¾“å‡ºæ ‡é¢˜
+	drawtext("å¦å…‹å¤§æˆ˜biubiu", title, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	delete (title);
+	// åˆ†å‰²çº¿
 	setlinecolor(BLACK);
 	line(140, 160, 500, 160);
-	//Èı¸ö°´Å¥
-	settextstyle(24, 0, "»ªÎÄÁ¥Êé");
+	// ä¸‰ä¸ªæŒ‰é’®
+	settextstyle(24, 0, "åæ–‡éš¶ä¹¦");
 }
-
-
-
 
 int main()
 {
-	RECT center = { 0,0,639,479 };
+	RECT center = {0, 0, 639, 479};
 	Acfileread();
 	sefileread();
 	fileread();
 	srand((unsigned)time(NULL));
-	// »æÍ¼´°¿Ú³õÊ¼»¯
-	//ÎªÁË·½±ãµ÷ÊÔ£¬ÎÒ°Ñ¿ØÖÆÌ¨´ò¿ª£¬Íê³Éºó¹Øµô¼´¿É
+	// ç»˜å›¾çª—å£åˆå§‹åŒ–
+	// ä¸ºäº†æ–¹ä¾¿è°ƒè¯•ï¼Œæˆ‘æŠŠæ§åˆ¶å°æ‰“å¼€ï¼Œå®Œæˆåå…³æ‰å³å¯
 	initgraph(640, 480);
 	mciSendString("open music/start.wav alias start", NULL, 0, NULL);
 	mciSendString("open music/fire.wav alias fire", NULL, 0, NULL);
 	mciSendString("open music/blast.wav alias blast", NULL, 0, NULL);
 	mciSendString("open music/bang.wav alias bang", NULL, 0, NULL);
-	button* b1 = new button(260, 230, 120, 50, "µ¥ÈËÓÎÏ·");
-	button* b2 = new button(260, 310, 120, 50, "Ë«ÈËÓÎÏ·");
-	button* b3 = new button(460, 390, 120, 50, "Éè ÖÃ");
-	button* b5 = new button(260, 390, 120, 50, "ÍË³öÓÎÏ·");
-	button* b4 = new button(60, 390, 120, 50, "²Ù×÷Ö¸ÄÏ");
-	button* b6 = new button(460, 310, 120, 50, "³É¾Í");
-	//Õ¹Ê¾ÒÕÊõ×Ö
+	button *b1 = new button(260, 230, 120, 50, "å•äººæ¸¸æˆ");
+	button *b2 = new button(260, 310, 120, 50, "åŒäººæ¸¸æˆ");
+	button *b3 = new button(460, 390, 120, 50, "è®¾ ç½®");
+	button *b5 = new button(260, 390, 120, 50, "é€€å‡ºæ¸¸æˆ");
+	button *b4 = new button(60, 390, 120, 50, "æ“ä½œæŒ‡å—");
+	button *b6 = new button(460, 310, 120, 50, "æˆå°±");
+	// å±•ç¤ºè‰ºæœ¯å­—
 	showFreeze();
 	Sleep(1500);
 	while (play_game)
@@ -430,17 +418,17 @@ int main()
 		b6->create();
 		setfillcolor(0x9BB171);
 		fillrectangle(70, 220, 180, 370);
-		RECT position{ 70,220,180,240 };
-		settextstyle(18, 0, "»ªÎÄÁ¥Êé");
+		RECT position{70, 220, 180, 240};
+		settextstyle(18, 0, "åæ–‡éš¶ä¹¦");
 		int i = 0;
-		drawtext("µ¥ÈË³É¼¨", &position, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("å•äººæˆç»©", &position, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		for (allscore p : scores)
 		{
 			if (i > 5)
 				break;
 			i++;
-			RECT pos{ 70,220 + 20 * i,180,240 + 20 * i };
-			char s[6] = { '\0' };
+			RECT pos{70, 220 + 20 * i, 180, 240 + 20 * i};
+			char s[6] = {'\0'};
 			s[0] = p.score1 / 10 + '0';
 			s[1] = p.score1 % 10 + '0';
 			s[2] = ':';
@@ -456,7 +444,7 @@ int main()
 			HWND hWnd = GetHWnd();
 			if (!IsWindow(hWnd))
 				exit(0);
-			//»ñÈ¡Êó±êÏûÏ¢£¬¼ì²âÊÇ·ñ°´ÔÚÁË°´Å¥ÉÏ
+			// è·å–é¼ æ ‡æ¶ˆæ¯ï¼Œæ£€æµ‹æ˜¯å¦æŒ‰åœ¨äº†æŒ‰é’®ä¸Š
 			if (peekmessage(&msg, EX_MOUSE))
 			{
 				switch (msg.message)
@@ -511,24 +499,24 @@ int main()
 			Acfilewrite();
 			sefilewrite();
 			cleardevice();
-			settextstyle(36, 0, "»ªÎÄÁ¥Êé");
+			settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
 			settextcolor(WHITE);
-			drawtext("ÓÎÏ·½áÊø,ÈÎÒâ¼üÍË³ö¡£¸ĞĞ»ÓÎÍæ", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			drawtext("æ¸¸æˆç»“æŸ,ä»»æ„é”®é€€å‡ºã€‚æ„Ÿè°¢æ¸¸ç©", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 			break;
 		case 6:
 			std::cout << "Button 6 has been pushed" << std::endl;
 			checkachieve();
 		}
 	}
-	//ÊÍ·Å¿Õ¼ä
-	delete(b1);
-	delete(b2);
-	delete(b3);
-	delete(b4);
-	delete(b5);
-	delete(b6);
-	
-	//ÒÔÏÂÊÇĞÇĞÇµÄ´úÂë
+	// é‡Šæ”¾ç©ºé—´
+	delete (b1);
+	delete (b2);
+	delete (b3);
+	delete (b4);
+	delete (b5);
+	delete (b6);
+
+	// ä»¥ä¸‹æ˜¯æ˜Ÿæ˜Ÿçš„ä»£ç 
 	for (int i = 0; i < MAXSTAR; i++)
 	{
 		InitStar(i);
@@ -539,10 +527,10 @@ int main()
 	{
 		for (int i = 0; i < MAXSTAR; i++)
 			MoveStar(i);
-		drawtext("ÓÎÏ·½áÊø,ÈÎÒâ¼üÍË³ö¡£¸ĞĞ»ÓÎÍæ", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("æ¸¸æˆç»“æŸ,ä»»æ„é”®é€€å‡ºã€‚æ„Ÿè°¢æ¸¸ç©", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 		Sleep(20);
 	}
-	// °´ÈÎÒâ¼üÍË³ö
+	// æŒ‰ä»»æ„é”®é€€å‡º
 	closegraph();
 	return 0;
 }

@@ -1,6 +1,6 @@
-//ÎÄ¼şÃû£ºcouple.cpp
-//×÷Õß£ºÑîÎäÏÔ£¬Öì¼ÑÔÃ, ÈÎÓîĞù
-//¹¦ÄÜ£ºÎªË«ÈËÓÎÏ·Ìá¹©Èë¿Ú
+//æ–‡ä»¶åï¼šcouple.cpp
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾ï¼Œæœ±ä½³æ‚¦, ä»»å®‡è½©
+//åŠŸèƒ½ï¼šä¸ºåŒäººæ¸¸æˆæä¾›å…¥å£
 #include"tankclass.h"
 #include"tankhead.h"
 
@@ -14,7 +14,7 @@ typedef struct Setting
 } Setting;
 
 extern Setting set;
-//Ë«ÈËÓÎÏ·½øÈëÕâ¸öº¯Êı£¬±ÜÃâmainº¯Êı¹ı³¤£¨CÓïÑÔ¿ÎÉèÒòÎªÕâ¸öÎÊÌâÎÒÒªËÀÁË£©
+//åŒäººæ¸¸æˆè¿›å…¥è¿™ä¸ªå‡½æ•°ï¼Œé¿å…mainå‡½æ•°è¿‡é•¿ï¼ˆCè¯­è¨€è¯¾è®¾å› ä¸ºè¿™ä¸ªé—®é¢˜æˆ‘è¦æ­»äº†ï¼‰
 void couplelegame()
 {
 	bool jug = true;
@@ -40,11 +40,11 @@ void couplelegame()
 	RECT say1 = { 0,100,639,479 };
 	RECT say2 = { 0,0,639,379 };
 	RECT settlement = { 0,0,639,96 };
-	settextstyle(36, 0, "»ªÎÄÁ¥Êé");
+	settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
 	settextcolor(WHITE);
-	drawtext("ÇëÔÚ¹æ¶¨Ê±¼äÄÚ¾¡×Ô¼ºËùÄÜÕ¨»Ù¶Ô·½£¡", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("×¼±¸¿ªÕ½£¡", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("°´ÈÎÒâ¼ü¿ªÊ¼ÓÎÏ·.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("è¯·åœ¨è§„å®šæ—¶é—´å†…å°½è‡ªå·±æ‰€èƒ½ç‚¸æ¯å¯¹æ–¹ï¼", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("å‡†å¤‡å¼€æˆ˜ï¼", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("æŒ‰ä»»æ„é”®å¼€å§‹æ¸¸æˆ.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 	while (jug)
 	{
@@ -54,7 +54,7 @@ void couplelegame()
 
 	Player player1('W', 'S', 'A', 'D', 'R', VK_SPACE);
 	Player player2(VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SHIFT, VK_RETURN, 5);
-	//×¼±¸µØÍ¼
+	//å‡†å¤‡åœ°å›¾
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
@@ -70,23 +70,23 @@ void couplelegame()
 		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
 	int time = MAXTIME / set.gametime;
-	//¶àÏß³Ì
-	//¶¯Í¼
+	//å¤šçº¿ç¨‹
+	//åŠ¨å›¾
 	std::thread thread1(&Player::changepng, &player1, std::ref(isgaming));
 	std::thread thread10(&Player::changepng, &player2, std::ref(isgaming));
-	//Íæ¼Ò¿ØÖÆ
+	//ç©å®¶æ§åˆ¶
 	std::thread thread2(&Player::control, &player1, std::ref(isgaming));
 	std::thread thread3(&Player::control, &player2, std::ref(isgaming));
-	//×Óµ¯¿ØÖÆ
+	//å­å¼¹æ§åˆ¶
 	std::thread thread4(&bullet::bullMove, std::ref(isgaming));
-	//Íæ¼ÒÀäÈ´
+	//ç©å®¶å†·å´
 	std::thread thread5(&Player::wait, &player1, std::ref(isgaming));
 	std::thread thread6(&Player::wait, &player2, std::ref(isgaming));
-	//¼ÆÊ±
+	//è®¡æ—¶
 	std::thread thread7(&TimeFun::setTime, std::ref(time), std::ref(isgaming));
-	//¼ì²â¿ÛÑª
+	//æ£€æµ‹æ‰£è¡€
 	std::thread thread8(&otherFun::checkdead, wall_rock, wall_wire_mesh, std::ref(player1), std::ref(player2));
-	//ÄÜÁ¿
+	//èƒ½é‡
 	std::thread thread9(&Player::defpower, &player1, std::ref(isgaming));
 	std::thread thread11(&Player::defpower, &player2, std::ref(isgaming));
 	BeginBatchDraw();
@@ -111,11 +111,11 @@ void couplelegame()
 		}
 		player1.display();
 		player2.display();
-		//µ÷ÊÔÄ£Ê½£ºÏÔÊ¾Åö×²Ïä
+		//è°ƒè¯•æ¨¡å¼ï¼šæ˜¾ç¤ºç¢°æ’ç®±
 		//ColliderBox::drawColliderbox(player1);
 		//ColliderBox::drawColliderbox(player2);
 		bullet::display();
-		//µ÷ÓÃÔİÍ£Ä£¿é
+		//è°ƒç”¨æš‚åœæ¨¡å—
 		if (pause)
 		{
 			EndBatchDraw();
@@ -127,7 +127,7 @@ void couplelegame()
 			FlushBatchDraw();
 		else
 			exit(0);
-		//¼Æ³É¼¨
+		//è®¡æˆç»©
 		if (wait)
 		{
 			if (!player1.IsAlive)
@@ -136,7 +136,7 @@ void couplelegame()
 				score1++;
 			wait = false;
 		}
-		//È«²¿¸´»î£¬»Ö¸´
+		//å…¨éƒ¨å¤æ´»ï¼Œæ¢å¤
 		if (player1.IsAlive && player2.IsAlive)
 			wait = true;
 	}
@@ -145,14 +145,14 @@ void couplelegame()
 	fillrectangle(160, 120, 480, 360);
 
 	settextcolor(WHITE);
-	settextstyle(36, 0, "»ªÎÄÁ¥Êé");
-	drawtext("ÓÎÏ·½áÊø£¬ÇëÉÔºó¡£", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
+	drawtext("æ¸¸æˆç»“æŸï¼Œè¯·ç¨åã€‚", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	bool notover = false;
 	if (time != 0)
 		notover = true;
 	time = 0;
 
-	//µÈ´ıÏß³Ì½áÊø
+	//ç­‰å¾…çº¿ç¨‹ç»“æŸ
 	thread1.join();
 	std::cout << "thread1 have been over." << std::endl;
 	thread2.join();
@@ -199,7 +199,7 @@ void couplelegame()
 		}
 		if (score1 == score2)
 			drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		button over(260, 390, 120, 40, "¼ÌĞø");
+		button over(260, 390, 120, 40, "ç»§ç»­");
 		over.create();
 		jug = true;
 		while (jug)
@@ -210,6 +210,6 @@ void couplelegame()
 						jug = false;
 		}
 	}
-	//Çå³ı»º³åÇø
+	//æ¸…é™¤ç¼“å†²åŒº
 	std::cin.sync();
 }

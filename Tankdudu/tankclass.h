@@ -1,16 +1,16 @@
-//ÎÄ¼şÃû£ºtankclass.h
-//×÷Õß£ºÑîÎäÏÔ£¬Öì¼ÑÔÃ£¬ÈÎÓîĞù
-//¹¦ÄÜ£º·â×°ÁËÌ¹¿Ë´óÕ½ÓÎÏ·µÄ¸÷ÖÖÀà£¬¶¨ÒåÒ»Ğ©±ØÒªµÄºê£¬Ìá¹©ÁË²¿·Ö±È½ÏÓĞÓÃµÄº¯Êı
+//æ–‡ä»¶åï¼štankclass.h
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾ï¼Œæœ±ä½³æ‚¦ï¼Œä»»å®‡è½©
+//åŠŸèƒ½ï¼šå°è£…äº†å¦å…‹å¤§æˆ˜æ¸¸æˆçš„å„ç§ç±»ï¼Œå®šä¹‰ä¸€äº›å¿…è¦çš„å®ï¼Œæä¾›äº†éƒ¨åˆ†æ¯”è¾ƒæœ‰ç”¨çš„å‡½æ•°
 
 #pragma once
-//×î´óÉúÃüÖµ
+//æœ€å¤§ç”Ÿå‘½å€¼
 #define MAXHEALTH 100
-//ÕÏ°­ÎïµÄ³¬¼¶ÑªÁ¿
+//éšœç¢ç‰©çš„è¶…çº§è¡€é‡
 #define SUPER_OBSTACLE 99999
-//×î³¤ÓÎÏ·Ê±¼ä
+//æœ€é•¿æ¸¸æˆæ—¶é—´
 #define MAXTIME 120
 #define PI 3.14159265359
-//µØÍ¼´óĞ¡
+//åœ°å›¾å¤§å°
 #define ROWS 640
 #define COLS 480
 
@@ -18,11 +18,11 @@
 #define RIGHT 2
 #define UP 3
 #define DOWN 4
-//ĞÇĞÇ
+//æ˜Ÿæ˜Ÿ
 #define MAXSTAR 200
 #include"tankhead.h"
 
-//Ò»¶ÑÍâ²¿±äÁ¿
+//ä¸€å †å¤–éƒ¨å˜é‡
 extern bool pause;
 extern int volume_jug;
 extern int IDnum;
@@ -33,29 +33,29 @@ class bullet;
 extern std::vector<bullet> allbullet;
 extern unsigned char map[ROWS][COLS];
 
-//¼ì²âÄ³¸ö°´¼üÊÇ·ñ±»°´ÏÂ
+//æ£€æµ‹æŸä¸ªæŒ‰é”®æ˜¯å¦è¢«æŒ‰ä¸‹
 inline bool KeyDown(int vKey)
 {
 	return ((GetAsyncKeyState(vKey) & 0x8000) ? 1 : 0);
 }
 
-//±£ÁôalphaµÄĞı×ª
+//ä¿ç•™alphaçš„æ—‹è½¬
 //https://codebus.cn/huidong/rotateimage-alpha
 class Function
 {
 public:
-	//ÖØĞ´Í¼Æ¬Ğı×ªº¯Êı
+	//é‡å†™å›¾ç‰‡æ—‹è½¬å‡½æ•°
 	static void RotateImage(IMAGE* pTo, IMAGE* pFrom, double rad)
 	{
 		IMAGE* pWorking = GetWorkingImage();
 		SetWorkingImage(pFrom);
 		int iWidth = getwidth();
-		int iHeight = getheight();												// »ñÈ¡Ô­Í¼³¤¿í
+		int iHeight = getheight();												// è·å–åŸå›¾é•¿å®½
 
-		while (rad > 2 * PI)													// »¯¼ò»¡¶È
+		while (rad > 2 * PI)													// åŒ–ç®€å¼§åº¦
 			rad -= 2 * PI;
 
-		double pad = rad;														// ´¦Àí»¡¶È
+		double pad = rad;														// å¤„ç†å¼§åº¦
 		if (pad > PI / 2 && pad <= PI)
 		{
 			pad -= PI / 2;
@@ -72,21 +72,21 @@ public:
 		}
 
 		int	tWidth = int(iWidth * cos(pad) + iHeight * sin(pad));
-		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// ¼ÆËãĞÂÍ¼´óĞ¡
+		int	tHeight = int(iHeight * cos(pad) + iWidth * sin(pad));				// è®¡ç®—æ–°å›¾å¤§å°
 
 		int iMinX = -(iWidth / 2), iMinY = -(iHeight / 2);
-		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// ¼ÆËãÔ­Í¼×îĞ¡£¨´ó£©×ø±ê
+		int iMaxX = iMinX + iWidth, iMaxY = iMinY + iHeight;					// è®¡ç®—åŸå›¾æœ€å°ï¼ˆå¤§ï¼‰åæ ‡
 
 		int tMinX = -(tWidth / 2), tMinY = -(tHeight / 2);
-		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// ¼ÆËãĞÂÍ¼×îĞ¡£¨´ó£©×ø±ê
+		int tMaxX = tMinX + tWidth, tMaxY = tMinY + tHeight;					// è®¡ç®—æ–°å›¾æœ€å°ï¼ˆå¤§ï¼‰åæ ‡
 
-		setorigin(-iMinX, -iMinY);												// ÉèÖÃÍ¼Æ¬ÖĞĞÄÎªÔ­µã
+		setorigin(-iMinX, -iMinY);												// è®¾ç½®å›¾ç‰‡ä¸­å¿ƒä¸ºåŸç‚¹
 
 		SetWorkingImage(NULL);
-		pTo->Resize(tWidth, tHeight);											// ³õÊ¼»¯ĞÂÍ¼
+		pTo->Resize(tWidth, tHeight);											// åˆå§‹åŒ–æ–°å›¾
 
 		DWORD* dst = GetImageBuffer(pTo);
-		DWORD* src = GetImageBuffer(pFrom);										// »ñÈ¡ĞÂÍ¼¡¢Ô­Í¼µÄ»º³åÇø
+		DWORD* src = GetImageBuffer(pFrom);										// è·å–æ–°å›¾ã€åŸå›¾çš„ç¼“å†²åŒº
 
 		SetWorkingImage(pTo);
 		for (int y1 = 0; y1 < tHeight; y1++)
@@ -96,7 +96,7 @@ public:
 			dst += tWidth;
 		}
 		SetWorkingImage(pWorking);
-		for (int y1 = 0; y1 < tHeight; y1++)									// ³õÊ¼»¯ĞÂÍ¼
+		for (int y1 = 0; y1 < tHeight; y1++)									// åˆå§‹åŒ–æ–°å›¾
 			dst -= tWidth;
 
 		for (int y1 = tMinY; y1 < tMaxY; y1++)
@@ -104,24 +104,24 @@ public:
 			for (int x1 = tMinX; x1 < tMaxX; x1++)
 			{
 				int x = int(x1 * cos(rad) - y1 * sin(rad));
-				int y = int(x1 * sin(rad) + y1 * cos(rad));						// ¼ÆËã±ä»»ºó×ø±ê
+				int y = int(x1 * sin(rad) + y1 * cos(rad));						// è®¡ç®—å˜æ¢ååæ ‡
 
 				int sxy = (iHeight - (y - iMinY) - 1) * iWidth + (x - iMinX);
-				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// ¼ÆËã×ø±êÔÚ»º³åÇøµÄÎ»ÖÃ
+				int dxy = (tHeight - (y1 - tMinY) - 1) * tWidth + (x1 - tMinX);	// è®¡ç®—åæ ‡åœ¨ç¼“å†²åŒºçš„ä½ç½®
 
-				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// Ô½½çÌØÅĞ
+				if (x >= iMinX && x < iMaxX && y >= iMinY && y < iMaxY)			// è¶Šç•Œç‰¹åˆ¤
 					dst[dxy] = src[sxy];
 			}
 		}
 
 		SetWorkingImage(pFrom);
 		setorigin(0, 0);
-		SetWorkingImage(pWorking);												// »¹Ô­Ô­Í¼×ø±ê
+		SetWorkingImage(pWorking);												// è¿˜åŸåŸå›¾åæ ‡
 	}
 
-	// transparentimage º¯Êı£º
-		// ¸ù¾İ png µÄ alpha ĞÅÏ¢ÊµÏÖ°ëÍ¸Ã÷ÌùÍ¼£¨»ùÓÚÖ±½Ó²Ù×÷ÏÔÊ¾»º³åÇø£©
-		//x,yÍ¼Æ¬×óÉÏ½Ç×ø±ê
+	// transparentimage å‡½æ•°ï¼š
+		// æ ¹æ® png çš„ alpha ä¿¡æ¯å®ç°åŠé€æ˜è´´å›¾ï¼ˆåŸºäºç›´æ¥æ“ä½œæ˜¾ç¤ºç¼“å†²åŒºï¼‰
+		//x,yå›¾ç‰‡å·¦ä¸Šè§’åæ ‡
 
 	static void transparentimage(IMAGE* dstimg, int x, int y, IMAGE* srcimg)
 	{
@@ -166,7 +166,7 @@ public:
 		}
 	}
 };
-class Vec//·½ÏòÏòÁ¿
+class Vec//æ–¹å‘å‘é‡
 {
 public:
 
@@ -175,9 +175,9 @@ public:
 	int angle;
 	Vec(double x, double y) :x(x), y(y)
 	{
-		// Ê¹ÓÃatan2¼ÆËã·´ÕıÇĞÖµ£¬½á¹ûÎª»¡¶È  
+		// ä½¿ç”¨atan2è®¡ç®—åæ­£åˆ‡å€¼ï¼Œç»“æœä¸ºå¼§åº¦  
 		double radians = atan2(y, x);
-		// ½«»¡¶È×ª»»Îª¶È  
+		// å°†å¼§åº¦è½¬æ¢ä¸ºåº¦  
 		angle = (int)(radians * 180.0 / std::acos(-1.0));
 
 	}
@@ -186,7 +186,7 @@ public:
 	{
 		switch (userKey)
 		{
-		case 2://ÑØ×ÅÏòÁ¿·½ÏòÔö¼Ó
+		case 2://æ²¿ç€å‘é‡æ–¹å‘å¢åŠ 
 			angle += 2;
 			y = std::sin(PI / 180 * angle);
 			x = std::cos(PI / 180 * angle);
@@ -210,11 +210,11 @@ public:
 };
 class ColliderBox;
 extern std::vector<ColliderBox> allbox;
-//Åö×²Ïä
+//ç¢°æ’ç®±
 class ColliderBox
 {
 public:
-	//×ø±êÒÔ¼°³¤¿í
+	//åæ ‡ä»¥åŠé•¿å®½
 
 	ColliderBox() :mx(0), my(0), height(0), width(0), p(NULL), ID(IDnum), mhealth(MAXHEALTH), speed(0), IsAlive(true), tag(0), displaceX(0), displaceY(0) {}
 	ColliderBox(int x, int y, int w, int h, double s, int health, int tag, Vec vec)
@@ -252,20 +252,20 @@ public:
 	int height;
 	int ID;
 	ColliderBox* p;
-	int mhealth;//½¡¿µÖµ/ÑªÁ¿
-	//Î»ÖÃ
+	int mhealth;//å¥åº·å€¼/è¡€é‡
+	//ä½ç½®
 	double speed;
 	bool IsAlive;
 	Vec vec;
 public:
-	virtual void Dead()//ËÀÍö
+	virtual void Dead()//æ­»äº¡
 	{}
-	virtual void Move(int)//ÒÆ¶¯
+	virtual void Move(int)//ç§»åŠ¨
 	{}
 	unsigned char tag;
 };
 
-//µ÷ÊÔÄ£Ê½£¬»æÖÆÅö×²Ïä
+//è°ƒè¯•æ¨¡å¼ï¼Œç»˜åˆ¶ç¢°æ’ç®±
 void ColliderBox::drawColliderbox(ColliderBox& obj)
 {
 	setfillcolor(WHITE);
@@ -275,19 +275,19 @@ void ColliderBox::drawColliderbox(ColliderBox& obj)
 
 
 
-class obstacle : public ColliderBox//ÕÏ°­Îï
+class obstacle : public ColliderBox//éšœç¢ç‰©
 {
 private:
 	int kind;
-	//ÏÂÃæÕâĞĞÎªÊäÈëÍ¼Æ¬
-	//ÈıÖÖ²»Í¬µÄÕÏ°­Îï£¨3Îª²»¿É»÷´©µÄ£©
+	//ä¸‹é¢è¿™è¡Œä¸ºè¾“å…¥å›¾ç‰‡
+	//ä¸‰ç§ä¸åŒçš„éšœç¢ç‰©ï¼ˆ3ä¸ºä¸å¯å‡»ç©¿çš„ï¼‰
 	IMAGE img1, img2, img3;
 public:
-	//Ô­µãÖ¸Í¼Æ¬×óÉÏ½Ç
-	//Ô­µãµÄx×ø±ê£¬Ô­µãµÄy×ø±ê£¬¿í¶È£¬¸ß¶È,ËÙ¶È£¬ÑªÁ¿,ÕÏ°­ÎïÀàĞÍ
+	//åŸç‚¹æŒ‡å›¾ç‰‡å·¦ä¸Šè§’
+	//åŸç‚¹çš„xåæ ‡ï¼ŒåŸç‚¹çš„yåæ ‡ï¼Œå®½åº¦ï¼Œé«˜åº¦,é€Ÿåº¦ï¼Œè¡€é‡,éšœç¢ç‰©ç±»å‹
 	obstacle(int x, int y, int w, int h, int s, int blood, int kind) :ColliderBox(x, y, w, h, s, 1, blood), kind(kind)
 	{
-		//´Ë´¦µÄÔØÈëÍ¼Æ¬ĞèÒª¸Ä³ÉÈıÖÖÕÏ°­Îï
+		//æ­¤å¤„çš„è½½å…¥å›¾ç‰‡éœ€è¦æ”¹æˆä¸‰ç§éšœç¢ç‰©
 		loadimage(&img1, "sorce/wall1.png", w, h);
 		loadimage(&img2, "sorce/wall2.png", w, h);
 		loadimage(&img3, "sorce/wall3.png", w, h);
@@ -351,7 +351,7 @@ public:
 		Function::transparentimage(NULL, (int)mx, (int)my, &temp);
 	}
 };
-class bullet//×Óµ¯Àà
+class bullet//å­å¼¹ç±»
 {
 private:
 	int kind;
@@ -360,7 +360,7 @@ private:
 	Vec vec;
 	double speed;
 public:
-	//³õÊ¼x×ø±ê£¬³õÊ¼y×ø±ê£¬¿í¶È£¬¸ß¶È£¬ËÙ¶È,ÖÖÀà,
+	//åˆå§‹xåæ ‡ï¼Œåˆå§‹yåæ ‡ï¼Œå®½åº¦ï¼Œé«˜åº¦ï¼Œé€Ÿåº¦,ç§ç±»,
 	bullet(double x, double y, int kind, Vec vec) :mx(x), my(y), vec(vec), kind(kind), speed(10.0) {}
 	inline double getx() { return mx; };
 	inline double gety() { return my; }
@@ -379,9 +379,9 @@ public:
 			Sleep(15);
 		}
 	}
-	//¼ì²âÂß¼­ÓÅ»¯,²»ÔÙ¶Ô×Óµ¯Ì×ÓÃÅö×²Ïä¼ì²âº¯Êı£¬¼ò»¯¼ì²âÂß¼­£¬ÊµÏÖ×Óµ¯µÄ¼´Ê±Éú³ÉºÍÏú»Ù¶ø²»Õ¼ÓÃ´¢´æ¿Õ¼ä
-	//Âß¼­ÉÏ¸ü¸ÄÒ»ÏÂ£ºÅöÉÏ·µ»ØallboxÊı£¬Ã»ÅöÉÏ·µ»Ø0¡£
-	static int bull_OBSdec(bullet& thisbull)//×Óµ¯×¨ÊôÕÏ°­ÎïÅö×²¼ì²â,Collider==ture
+	//æ£€æµ‹é€»è¾‘ä¼˜åŒ–,ä¸å†å¯¹å­å¼¹å¥—ç”¨ç¢°æ’ç®±æ£€æµ‹å‡½æ•°ï¼Œç®€åŒ–æ£€æµ‹é€»è¾‘ï¼Œå®ç°å­å¼¹çš„å³æ—¶ç”Ÿæˆå’Œé”€æ¯è€Œä¸å ç”¨å‚¨å­˜ç©ºé—´
+	//é€»è¾‘ä¸Šæ›´æ”¹ä¸€ä¸‹ï¼šç¢°ä¸Šè¿”å›allboxæ•°ï¼Œæ²¡ç¢°ä¸Šè¿”å›0ã€‚
+	static int bull_OBSdec(bullet& thisbull)//å­å¼¹ä¸“å±éšœç¢ç‰©ç¢°æ’æ£€æµ‹,Collider==ture
 	{
 		int jug = -1;
 		for (int i = 0; i < 10; i++)//OBS number define MAX==4
@@ -405,12 +405,12 @@ public:
 		{
 			if (p.speed < 4.0)
 			{
-				allbullet.erase(allbullet.begin() + i);//×Óµ¯Ïû³ı²Ù×÷
+				allbullet.erase(allbullet.begin() + i);//å­å¼¹æ¶ˆé™¤æ“ä½œ
 				i--;
 			}
 			else if (bull_OBSdec(p)>0)
 			{
-				/*¼ÓÈëÕÏ°­ÎïµôÑª²Ù×÷º¯Êı*/
+				/*åŠ å…¥éšœç¢ç‰©æ‰è¡€æ“ä½œå‡½æ•°*/
 				int t = bull_OBSdec(p)-1;
 				for (int j = 0; j < allbox.size(); j++)
 				{
@@ -438,7 +438,7 @@ public:
 
 bool isPointNear(int x1, int y1, int x2, int y2, int range);
 bool angleDectect(const ColliderBox& box1, const ColliderBox& box2, int range = 5);
-class Tank : public ColliderBox//Ì¹¿ËÀà
+class Tank : public ColliderBox//å¦å…‹ç±»
 {
 	friend bullet;
 protected:
@@ -448,7 +448,7 @@ protected:
 	int waittime = 0;
 	int power = 0;
 	int powerlevel = 0;
-	int movepng = 1;//ÏÔÊ¾ÄÄÕÅÍ¼Æ¬
+	int movepng = 1;//æ˜¾ç¤ºå“ªå¼ å›¾ç‰‡
 	IMAGE img1, img2, img3, img4;
 
 
@@ -468,7 +468,7 @@ public:
 	inline void changespeed(double newspeed) { this->speed = newspeed; };
 public:
 	
-	//³õÊ¼x×ø±ê£¬³õÊ¼y×ø±ê£¬¿í¶È£¬¸ß¶È£¬ËÙ¶È
+	//åˆå§‹xåæ ‡ï¼Œåˆå§‹yåæ ‡ï¼Œå®½åº¦ï¼Œé«˜åº¦ï¼Œé€Ÿåº¦
 	Tank(int x, int y, double s) :ColliderBox(x , y , 97 - 22, 80 - 12, s, 2, MAXHEALTH, 12, 20)
 	{
 		loadimage(&img1, "sorce/tank1.png", 97, 80);
@@ -477,12 +477,12 @@ public:
 		loadimage(&img4, "sorce/tank_dead.png", 97, 80);
 	}
 	/*********************************************
-	ÑîÎäÏÔµÄÉè¼ÆË¼Â·£º
-	Moveº¯Êı¿ÉÒÔ½ÓÊÜ²ÎÊı£¬²»Í¬µÄ²ÎÊıÍê³É²»Í¬µÄ¶¯×÷
+	æ¨æ­¦æ˜¾çš„è®¾è®¡æ€è·¯ï¼š
+	Moveå‡½æ•°å¯ä»¥æ¥å—å‚æ•°ï¼Œä¸åŒçš„å‚æ•°å®Œæˆä¸åŒçš„åŠ¨ä½œ
 	**********************************************/
 	void Move(int input) override
 	{
-		//¼ì²â¼üÅÌ£¬Íê³É¶¯×÷
+		//æ£€æµ‹é”®ç›˜ï¼Œå®ŒæˆåŠ¨ä½œ
 		switch (input)
 		{
 		case LEFT:
@@ -509,7 +509,7 @@ public:
 			}
 
 
-			for (int i = 0; i < allbox.size(); i++)//¸ÄÁËÕâ
+			for (int i = 0; i < allbox.size(); i++)//æ”¹äº†è¿™
 			{
 				if (allbox[i].getID() != this->getID())
 				{
@@ -524,7 +524,7 @@ public:
 			{
 				for (int stay=1; stay < allbox.size(); stay++) {
 					switch (ColliderDectect(*this, allbox[stay])) {
-					case 1://×óÓÒ
+					case 1://å·¦å³
 						if (!angleDectect(*this, allbox[stay],10)) {
 							mx -= vec.x * speed ;//
 							my += vec.y * speed * 0.1;
@@ -546,7 +546,7 @@ public:
 						}
 						break;
 					
-					case 2://ÉÏÏÂ			
+					case 2://ä¸Šä¸‹			
 						if (!angleDectect(*this, allbox[stay],10)) {
 							mx += vec.x * speed * 0.1;
 							my -= vec.y * speed;//
@@ -681,7 +681,7 @@ public:
 			movepng = 5;
 			Sleep(2500);
 			movepng = 1;
-			//¹éÎ»
+			//å½’ä½
 			if (tag == 5)
 				mx = 500;
 			else
@@ -692,13 +692,13 @@ public:
 			IsAlive = true;
 		}
 	}
-	void shoot(int kind)//·¢Éä
+	void shoot(int kind)//å‘å°„
 	{
 		if (canshoot)
 		{
 			canshoot = false;
 			lock2.lock();
-			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//¹¹Ôì×Óµ¯¶ÔÏó			
+			allbullet.push_back(bullet((mx + 48.5 + 37.5 * cos((double)vec.angle / 180.0 * PI)), (my + 40 + 37.5 * sin((double)vec.angle / 180.0 * PI)), kind, vec));//æ„é€ å­å¼¹å¯¹è±¡			
 			if(volume_jug)
 				mciSendString("play music/fire.wav", 0, 0, 0);
 			lock2.unlock();
@@ -775,7 +775,7 @@ public:
 		}
 		double temp1, temp2;
 		double co, si;
-		//Í¨¹ı¼ÆËãÅÅ³ıÎó²î
+		//é€šè¿‡è®¡ç®—æ’é™¤è¯¯å·®
 		co = cos(PI / 180.0 * (double)vec.angle);
 		si = sin(PI / 180.0 * (double)vec.angle);
 		if (co < 0.0)
@@ -791,7 +791,7 @@ public:
 		temp1 -= 97.0 / 2;
 		temp2 -= 80.0 / 2;
 
-		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);//ÏÔÊ¾Ì¹¿Ë
+		Function::transparentimage(NULL, (int)(mx - temp1), (int)(my - temp2), &temp);//æ˜¾ç¤ºå¦å…‹
 		if (mhealth < 100)
 		{
 			setfillcolor(RED);
@@ -908,12 +908,12 @@ public:
 };
 #define VIEW 50;
 
-//¶¨ÒåµĞÈËÀà£¬Ğ´Ò»¸öµĞÈËAI
+//å®šä¹‰æ•Œäººç±»ï¼Œå†™ä¸€ä¸ªæ•ŒäººAI
 class Enemy : public Tank
 {
 private:
 
-	// ¼ÆËãÁ½µãÖ®¼äµÄ¾àÀë  
+	// è®¡ç®—ä¸¤ç‚¹ä¹‹é—´çš„è·ç¦»  
 	inline double distance(double x, double y)
 	{
 		return sqrt((x - mx) * (x - mx) + (y - my) * (y - my));
@@ -921,7 +921,7 @@ private:
 	enum types { m_road, m_wall };
 	enum direct { p_up, p_down, p_left, p_right, p_lup, p_ldown, p_rup, p_rdown };
 
-	class MyPoint//µã×ø±ê
+	class MyPoint//ç‚¹åæ ‡
 	{
 	public:
 		int row = 0;
@@ -941,8 +941,8 @@ private:
 	struct treeNode
 	{
 		MyPoint pos;
-		std::vector<treeNode*> child;//°Ë²æÊ÷µÄ×ÓÊı×é
-		treeNode* father = NULL;//Ö¸Ïò¸¸½Úµã
+		std::vector<treeNode*> child;//å…«å‰æ ‘çš„å­æ•°ç»„
+		treeNode* father = NULL;//æŒ‡å‘çˆ¶èŠ‚ç‚¹
 	};
 
 	treeNode* createNode(MyPoint pos)
@@ -953,7 +953,7 @@ private:
 		return pNew;
 	}
 
-	void displaypoint(treeNode* p)//µ÷ÊÔÓÃ£¬ÏÔÊ¾¹ì¼£
+	void displaypoint(treeNode* p)//è°ƒè¯•ç”¨ï¼Œæ˜¾ç¤ºè½¨è¿¹
 	{
 		setfillcolor(BLACK);
 		while (p)
@@ -965,11 +965,11 @@ private:
 
 	treeNode* Astar(int x1, int y1, int x2, int y2)
 	{
-		//Êı×ÖÃèÊö
+		//æ•°å­—æè¿°
 		static bool isFind[ROWS][COLS] = { 0 };
 		memset(isFind, 0, sizeof(isFind));
 		scan();
-		//È·¶¨ÆğµãÓëÖÕµã
+		//ç¡®å®šèµ·ç‚¹ä¸ç»ˆç‚¹
 		MyPoint begpos;
 		begpos.row = x1;
 		begpos.col = y1;
@@ -979,7 +979,7 @@ private:
 
 
 		treeNode* pRoot = NULL;
-		//Æğµã×÷ÎªµÚÒ»¸ö½Úµã
+		//èµ·ç‚¹ä½œä¸ºç¬¬ä¸€ä¸ªèŠ‚ç‚¹
 		pRoot = createNode(begpos);
 		isFind[begpos.row][begpos.col] = 1;
 		treeNode* pCurrent = pRoot;
@@ -987,7 +987,7 @@ private:
 
 		std::vector<treeNode*> buff;
 		std::vector<treeNode*>::iterator it;
-		std::vector<treeNode*>::iterator itmin;//ÕÒ×îĞ¡ÓÃµÄµü´úÆ÷
+		std::vector<treeNode*>::iterator itmin;//æ‰¾æœ€å°ç”¨çš„è¿­ä»£å™¨
 		bool isFindend = false;
 		int time = 0;
 		while (time < 700)
@@ -1035,13 +1035,13 @@ private:
 				}
 				if (canWalk(pChild->pos, map, isFind))
 				{
-					//¼ÆËãh
+					//è®¡ç®—h
 					pChild->pos.h = getH(pChild->pos, endpos);
-					//¼ÆËãf
+					//è®¡ç®—f
 					pChild->pos.f = pChild->pos.g + pChild->pos.h;
-					//´æÈëÊı×é
+					//å­˜å…¥æ•°ç»„
 					buff.push_back(pChild);
-					//·ÅÈë°Ë²æÊ÷
+					//æ”¾å…¥å…«å‰æ ‘
 					pCurrent->child.push_back(pChild);
 					pChild->father = pCurrent;
 				}
@@ -1050,26 +1050,26 @@ private:
 					delete pChild;
 				}
 			}
-			//ÕÒ²»µ½ÖÕµã
+			//æ‰¾ä¸åˆ°ç»ˆç‚¹
 			if (buff.empty())
 				break;
-			//ÕÒ×îĞ¡
+			//æ‰¾æœ€å°
 			itmin = buff.begin();
 			for (it = buff.begin(); it != buff.end(); it++)
 			{
 				if ((*itmin)->pos.f > (*it)->pos.f)
 					itmin = it;
 			}
-			//×ß
+			//èµ°
 			pCurrent = *itmin;
 			time++;
-			//ÏÔÊ¾¹ì¼££¨µ÷ÊÔ£©
+			//æ˜¾ç¤ºè½¨è¿¹ï¼ˆè°ƒè¯•ï¼‰
 			//displaypoint(pCurrent);
-			//±ê¼Ç
+			//æ ‡è®°
 			isFind[pCurrent->pos.row][pCurrent->pos.col] = true;
-			//Çå¿Õbuff
+			//æ¸…ç©ºbuff
 			buff.clear();
-			//ÅĞ¶ÏÊÇ·ñÎªÖÕµã
+			//åˆ¤æ–­æ˜¯å¦ä¸ºç»ˆç‚¹
 			if (pCurrent->pos.row>=endpos.row-3&& pCurrent->pos.row <= endpos.row + 3&& pCurrent->pos.col >= endpos.col - 3 && pCurrent->pos.col <= endpos.col + 3)
 			{
 				isFindend = true;
@@ -1079,13 +1079,13 @@ private:
 		}
 		if (isFindend)
 		{
-			std::cout << "ÕÒµ½ÖÕµã" << std::endl;
+			std::cout << "æ‰¾åˆ°ç»ˆç‚¹" << std::endl;
 			std::cout << "path:";
 			treeNode* retree;
 			retree = pCurrent;
 			return retree;
 		}
-		std::cout << "Ñ°Â·Ê§°Ü" << std::endl;
+		std::cout << "å¯»è·¯å¤±è´¥" << std::endl;
 		freetree(pRoot);
 		return NULL;
 	}
@@ -1114,12 +1114,12 @@ private:
 	bool canWalk(MyPoint pos, unsigned char map[ROWS][COLS], bool isFind[ROWS][COLS])
 	{
 		if (pos.row < 0 || pos.col < 0 || pos.row >= ROWS || pos.col >= COLS)
-			return false;//Ô½½ç·µ»Øfalse
+			return false;//è¶Šç•Œè¿”å›false
 		if (isFind[pos.row][pos.col])
-			return false;//×ß¹ıµÄ·µ»Øfalse
+			return false;//èµ°è¿‡çš„è¿”å›false
 		if (map[pos.row][pos.col] == 1)
-			return false;//ÕÏ°­Îï²»ÄÜ×ß
-		//´ı¶¨map[pos.row][pos.col+i] == 3
+			return false;//éšœç¢ç‰©ä¸èƒ½èµ°
+		//å¾…å®šmap[pos.row][pos.col+i] == 3
 		for (int i = 12; i < 86; i++)
 		{
 			if (map[pos.row + i][pos.col] == 1)
@@ -1154,7 +1154,7 @@ private:
 		}
 		return sqrt(x * x + y * y);
 	}
-	//ÊÍ·Å°Ë²æÊ÷µÄÄÚ´æ
+	//é‡Šæ”¾å…«å‰æ ‘çš„å†…å­˜
 	void freetree(treeNode* root)
 	{
 		treeNode* temp1;
@@ -1166,7 +1166,7 @@ private:
 			temp2 = temp1;
 			bool jug = true;
 			i = 0;
-			while(1)//Óöµ½ÓĞ×ÓÏîµÄ¾Í¸³Öµ£¬Ã»ÓĞ×ÓÏîµÄÖ±½ÓÊÍ·Å
+			while(1)//é‡åˆ°æœ‰å­é¡¹çš„å°±èµ‹å€¼ï¼Œæ²¡æœ‰å­é¡¹çš„ç›´æ¥é‡Šæ”¾
 			{
 				if (temp2->child[i]->child.empty())
 				{
@@ -1178,7 +1178,7 @@ private:
 					temp1 = temp2->child[i];
 					i++;
 				}
-				if (temp1 == temp2 && temp2->child.empty())//¼ì²âÊÇ·ñÊÇ×îºóÒ»¸ö½Úµã
+				if (temp1 == temp2 && temp2->child.empty())//æ£€æµ‹æ˜¯å¦æ˜¯æœ€åä¸€ä¸ªèŠ‚ç‚¹
 				{
 					jug = false;
 					break;
@@ -1215,11 +1215,11 @@ public:
 	}
 	void aicontrol(bool& isgaimg)
 	{
-		//Ñ°Â·
-		//¹¥»÷
-		typedef struct Quadrant//ÏóÏŞ
+		//å¯»è·¯
+		//æ”»å‡»
+		typedef struct Quadrant//è±¡é™
 		{
-			int qua = 0;//ÏóÏŞÊı
+			int qua = 0;//è±¡é™æ•°
 			inline void calqua(int angle)
 			{
 				qua = angle / 90 + 1;
@@ -1251,11 +1251,11 @@ public:
 					break;
 			}
 			Point p2{ (double)road->pos.row,(double)road->pos.col };
-			//ÊÍ·Å°Ë²æÊ÷ÄÚ´æ
+			//é‡Šæ”¾å…«å‰æ ‘å†…å­˜
 			while (road->father != NULL)
 				road = road->father;
-			freetree(road);//ÊÍ·Å¿Õ¼ä
-			//ÕÒ³öÂ·¾¶ÖĞµÄÁ½¸öµã£¬Çó³öÆäÏòÁ¿
+			freetree(road);//é‡Šæ”¾ç©ºé—´
+			//æ‰¾å‡ºè·¯å¾„ä¸­çš„ä¸¤ä¸ªç‚¹ï¼Œæ±‚å‡ºå…¶å‘é‡
 			Vec temp;
 			temp.x = (double)(p2.x - p1.x) / sqrt((double)(p2.x - p1.x) * (double)(p2.x - p1.x) + (double)(p2.y - p1.y) * (double)(p2.y - p1.y));
 			temp.y = (double)(p2.y - p1.y) / sqrt((double)(p2.x - p1.x) * (double)(p2.x - p1.x) + (double)(p2.y - p1.y) * (double)(p2.y - p1.y));
@@ -1264,7 +1264,7 @@ public:
 			temp.angle = (int)(acos((long double)tempcos) / PI * 180.0);
 			if (tempsin < 0)
 				temp.angle = 360 - temp.angle;
-			//½«Ì¹¿Ë×ªÏò·½ÏòÏòÁ¿
+			//å°†å¦å…‹è½¬å‘æ–¹å‘å‘é‡
 			Quadrant q1, q2;
 			q1.calqua(temp.angle);
 			q2.calqua(vec.angle);
@@ -1277,7 +1277,7 @@ public:
 				changepng();
 				Sleep(10);
 			}
-			//ÒÆ¶¯
+			//ç§»åŠ¨
 			if (temp.angle >= vec.angle - 3 && temp.angle <= vec.angle + 3)
 			{
 				Move(3);
@@ -1310,11 +1310,11 @@ public:
 	}
 };
 
-//´´½¨°´Å¥Àà
+//åˆ›å»ºæŒ‰é’®ç±»
 class button
 {
 private:
-	//Î»ÖÃĞÅÏ¢ºÍ´óĞ¡ĞÅÏ¢
+	//ä½ç½®ä¿¡æ¯å’Œå¤§å°ä¿¡æ¯
 	int x;
 	int y;
 	int w;
@@ -1325,7 +1325,7 @@ public:
 	{
 		std::cout << "A button has been created" << std::endl;
 	}
-	//´´½¨²¢ÏÔÊ¾°´Å¥
+	//åˆ›å»ºå¹¶æ˜¾ç¤ºæŒ‰é’®
 	void create()
 	{
 		setbkmode(TRANSPARENT);
@@ -1334,7 +1334,7 @@ public:
 		setfillcolor(0x9BB171);
 		fillroundrect(x, y, x + w, y + h, 10, 10);
 		RECT r = { x,y,x + w,y + h };
-		settextstyle(24, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(24, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
 		drawtext(str, &r, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
@@ -1342,7 +1342,7 @@ public:
 	{
 		std::cout << "The button has been deleted." << std::endl;
 	}
-	//¼ì²âÒ»´Î°´Å¥ÊÇ·ñ±»°´ÏÂ
+	//æ£€æµ‹ä¸€æ¬¡æŒ‰é’®æ˜¯å¦è¢«æŒ‰ä¸‹
 	inline bool test(ExMessage msg) const
 	{
 		if (msg.x >= x && msg.x <= x + w && msg.y >= y && msg.y <= y + h)

@@ -1,31 +1,31 @@
-´ËÎÄµµÓÃÓÚ´¢´æ¸÷ÖÖ±»ÆúÓÃµÄº¯ÊıºÍÀà
+æ­¤æ–‡æ¡£ç”¨äºå‚¨å­˜å„ç§è¢«å¼ƒç”¨çš„å‡½æ•°å’Œç±»
 
 
 /*
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
-	int jug = 0;//´ËÎª·µ»ØÖµ
-	// xÖá·½ÏòÅö×²£¿
+	int jug = 0;//æ­¤ä¸ºè¿”å›å€¼
+	// xè½´æ–¹å‘ç¢°æ’ï¼Ÿ
 	bool collisionX = box1.mx + box1.width >= box2.mx &&
 		box2.mx + box2.width >= box1.mx;
-	// yÖá·½ÏòÅö×²£¿
+	// yè½´æ–¹å‘ç¢°æ’ï¼Ÿ
 	bool collisionY = box1.my + box1.height >= box2.my &&
 		box2.my + box2.height >= box1.my;
-	// Ö»ÓĞÁ½¸öÖáÏò¶¼ÓĞÅö×²Ê±²ÅÅö×²
+	// åªæœ‰ä¸¤ä¸ªè½´å‘éƒ½æœ‰ç¢°æ’æ—¶æ‰ç¢°æ’
 	return collisionX && collisionY;
 }
 
 void starting()
 {
-	// »æÍ¼´°¿Ú³õÊ¼»¯
-	//ÎªÁË·½±ãµ÷ÊÔ£¬ÎÒ°Ñ¿ØÖÆÌ¨´ò¿ª£¬Íê³Éºó¹Øµô¼´¿É
+	// ç»˜å›¾çª—å£åˆå§‹åŒ–
+	//ä¸ºäº†æ–¹ä¾¿è°ƒè¯•ï¼Œæˆ‘æŠŠæ§åˆ¶å°æ‰“å¼€ï¼Œå®Œæˆåå…³æ‰å³å¯
 
 	initgraph(640, 480, EX_SHOWCONSOLE);
-	// »ñµÃ´°¿Ú¾ä±ú
+	// è·å¾—çª—å£å¥æŸ„
 	HWND hWnd = GetHWnd();
-	// Ê¹ÓÃ Windows API ĞŞ¸Ä´°¿ÚÃû³Æ
-	SetWindowText(hWnd, "Ì¹¿Ë´óÕ½");
-	//ÉèÖÃÍ¼±ê
+	// ä½¿ç”¨ Windows API ä¿®æ”¹çª—å£åç§°
+	SetWindowText(hWnd, "å¦å…‹å¤§æˆ˜");
+	//è®¾ç½®å›¾æ ‡
 	HICON newIcon = (HICON)LoadImage(NULL, TEXT("sorce/tankico.ico"), IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)newIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)newIcon);
@@ -33,19 +33,19 @@ void starting()
 	IMAGE img;
 	loadimage(&img, "sorce/start.jpg", 640, 480, true);
 	putimage(0, 0, &img);
-	//Õ¹Ê¾±êÌâ
+	//å±•ç¤ºæ ‡é¢˜
 	setbkmode(TRANSPARENT);
 	RECT* title = new RECT{ 180,80,455,140 };
 	settextcolor(BLACK);
-	settextstyle(44, 0, "»ªÎÄÁ¥Êé");
-	//Êä³ö±êÌâ
-	drawtext("Ì¹¿Ë´óÕ½biubiu", title, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	settextstyle(44, 0, "åæ–‡éš¶ä¹¦");
+	//è¾“å‡ºæ ‡é¢˜
+	drawtext("å¦å…‹å¤§æˆ˜biubiu", title, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	delete(title);
-	//·Ö¸îÏß
+	//åˆ†å‰²çº¿
 	setlinecolor(BLACK);
 	line(140, 160, 500, 160);
-	//Èı¸ö°´Å¥
-	settextstyle(24, 0, "»ªÎÄÁ¥Êé");
+	//ä¸‰ä¸ªæŒ‰é’®
+	settextstyle(24, 0, "åæ–‡éš¶ä¹¦");
 }
 
 /*
@@ -59,12 +59,12 @@ allbox distrub:
 
 
 
-//¼ì²âÊÇ·ñÅö×²,Ö»Ğè´«ÈëÁ½¸ö¶ÔÏóµÄÅö×²Ïä¶ÔÏó£¬¼´¿É¼ì²âÊÇ·ñÅö×²
+//æ£€æµ‹æ˜¯å¦ç¢°æ’,åªéœ€ä¼ å…¥ä¸¤ä¸ªå¯¹è±¡çš„ç¢°æ’ç®±å¯¹è±¡ï¼Œå³å¯æ£€æµ‹æ˜¯å¦ç¢°æ’
 /*bool ColliderDectect(const ColliderBox& box1, const ColliderBox& box2) {
-	if (!((box1.mx > box2.mx + box2.width) &&//ÓÒ±ß
-		(box1.mx + box1.width < box2.mx) &&//×ó±ß
-		(box1.my > box2.my + box2.height) &&//ÏÂ±ß
-		(box1.my + box1.height < box2.my))//ÉÏ±ß
+	if (!((box1.mx > box2.mx + box2.width) &&//å³è¾¹
+		(box1.mx + box1.width < box2.mx) &&//å·¦è¾¹
+		(box1.my > box2.my + box2.height) &&//ä¸‹è¾¹
+		(box1.my + box1.height < box2.my))//ä¸Šè¾¹
 		)
 	{
 		return true;
@@ -76,13 +76,13 @@ allbox distrub:
 int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 	int jug = 0;
-	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//×óÏÂ
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//å·¦ä¸‹
 		jug += 1;
-	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//×óÉÏ
+	if (box1.mx >= box2.mx && box1.mx <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//å·¦ä¸Š
 		jug += 2;
-	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//ÓÒÏÂ
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my >= box2.my && box1.my <= box2.my + box2.height)//å³ä¸‹
 		jug += 4;
-	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//ÓÒÉÏ
+	if (box1.mx + box1.width >= box2.mx && box1.mx + box1.width <= box2.mx + box2.width && box1.my + box1.height >= box2.my && box1.my + box1.height <= box2.my + box2.height)//å³ä¸Š
 		jug += 8;
 	return jug;
 }
@@ -91,36 +91,36 @@ int ColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 /*
 int dustiColliderDectect(const ColliderBox& box1, const ColliderBox& box2) // AABB - AABB collision
 {
-	int jug = 0;//´ËÎª·µ»ØÖµ
-	// xÖá·½ÏòÅö×²£¿
+	int jug = 0;//æ­¤ä¸ºè¿”å›å€¼
+	// xè½´æ–¹å‘ç¢°æ’ï¼Ÿ
 	bool collisionX = box1.mx + box1.width >= box2.mx &&
 		box2.mx + box2.width >= box1.mx;
-	// yÖá·½ÏòÅö×²£¿
+	// yè½´æ–¹å‘ç¢°æ’ï¼Ÿ
 	bool collisionY = box1.my + box1.height >= box2.my &&
 		box2.my + box2.height >= box1.my;
-	// Ö»ÓĞÁ½¸öÖáÏò¶¼ÓĞÅö×²Ê±²ÅÅö×²
+	// åªæœ‰ä¸¤ä¸ªè½´å‘éƒ½æœ‰ç¢°æ’æ—¶æ‰ç¢°æ’
 	return collisionX && collisionY;
 }
 int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 {
 
-		// ¼ì²â±¾BOXµÄÓÒ±ßÊÇ·ñÓë±ğµÄÅö×²Ïä·¢ÉúÅö×²
+		// æ£€æµ‹æœ¬BOXçš„å³è¾¹æ˜¯å¦ä¸åˆ«çš„ç¢°æ’ç®±å‘ç”Ÿç¢°æ’
 		if (box1.mx + box1.width > box2.mx && box1.mx < box2.mx &&
 			(box1.my > box2.my - box2.height && box1.my - box1.height < box2.my)) {
 			return 114;
 		}
-		// ¼ì²â±¾BOXµÄ×ó±ßÊÇ·ñÓë±ğµÄÅö×²Ïä·¢ÉúÅö×²
+		// æ£€æµ‹æœ¬BOXçš„å·¦è¾¹æ˜¯å¦ä¸åˆ«çš„ç¢°æ’ç®±å‘ç”Ÿç¢°æ’
 		 if (box1.mx < box2.mx + box2.width && box1.mx > box2.mx &&
 			(box1.my > box2.my -box2.height &&box1.my - box1.height <box2.my)) {
 			return 514;
 		}
-		// ¼ì²â±¾BOXµÄÉÏ±ßÊÇ·ñÓë±ğµÄÅö×²Ïä·¢ÉúÅö×²
+		// æ£€æµ‹æœ¬BOXçš„ä¸Šè¾¹æ˜¯å¦ä¸åˆ«çš„ç¢°æ’ç®±å‘ç”Ÿç¢°æ’
 		 if (box1.my < box2.my + box2.height && box1.my + box1.height > box2.my&&
 			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
 		 {
 			return 191;
 		}
-		// ¼ì²â±¾BOXµÄÏÂ±ßÊÇ·ñÓë±ğµÄÅö×²Ïä·¢ÉúÅö×²
+		// æ£€æµ‹æœ¬BOXçš„ä¸‹è¾¹æ˜¯å¦ä¸åˆ«çš„ç¢°æ’ç®±å‘ç”Ÿç¢°æ’
 		 if (box1.my -box1.height< box2.my &&
 			 (box1.mx < box2.mx + box2.width && box1.mx + box1.width > box2.mx))
 		 {
@@ -132,8 +132,8 @@ int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 
 
 //tankclass.h
-	//×Óµ¯¼ì²â¿ÉÒÔ¸ÄµÄºÍÉÏÃæÄÇ¸öÒ»Ñù£¬»òÕßÖ±½ÓºÏ²¢
-	/*static int bull_PLAdec(bullet& thisbull) //×Óµ¯×¨ÊôÈËÎïÅö×²¼ì²â,Ğ´Õâ¸öÖ÷ÒªÊÇ±£ÏÕ£¬ºóĞø¿ÉÒÔºÏ²¢¼ò»¯£¬Collider==ture
+	//å­å¼¹æ£€æµ‹å¯ä»¥æ”¹çš„å’Œä¸Šé¢é‚£ä¸ªä¸€æ ·ï¼Œæˆ–è€…ç›´æ¥åˆå¹¶
+	/*static int bull_PLAdec(bullet& thisbull) //å­å¼¹ä¸“å±äººç‰©ç¢°æ’æ£€æµ‹,å†™è¿™ä¸ªä¸»è¦æ˜¯ä¿é™©ï¼Œåç»­å¯ä»¥åˆå¹¶ç®€åŒ–ï¼ŒCollider==ture
 	{
 		int jug = -1;
 		for (int i = 0; i <2; i++)
@@ -150,26 +150,26 @@ int dustiiColliderDectect(const ColliderBox& box1, const ColliderBox& box2)
 		return jug;
 	} */
 
-	/*class Entity : public ColliderBox//¼Ì³ĞÁËÅö×²ÏäµÄÊôĞÔ
+	/*class Entity : public ColliderBox//ç»§æ‰¿äº†ç¢°æ’ç®±çš„å±æ€§
 {
 protected:
-	int mhealth;//½¡¿µÖµ/ÑªÁ¿
-	//Î»ÖÃ
+	int mhealth;//å¥åº·å€¼/è¡€é‡
+	//ä½ç½®
 	double speed;
 	bool IsAlive;
 	ColliderBox mybox;
 	Vec vec;
 public:
-	//Ä¬ÈÏ¹¹Ôìº¯Êı
+	//é»˜è®¤æ„é€ å‡½æ•°
 	Entity() :mhealth(MAXHEALTH), speed(0), IsAlive(true) {};
-	//x×ø±ê£¬y×ø±ê£¬¿í¶È£¬¸ß¶È£¬ËÙ¶È£¬ÉúÃüÖµ
-	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true), vec(vec) //myboxÃ»ÓÃ
+	//xåæ ‡ï¼Œyåæ ‡ï¼Œå®½åº¦ï¼Œé«˜åº¦ï¼Œé€Ÿåº¦ï¼Œç”Ÿå‘½å€¼
+	Entity(int x, int y, int w, int h, int s, int health, Vec vec) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true), vec(vec) //myboxæ²¡ç”¨
 	{
 
 	};
 	Entity(int x, int y, int w, int h, int s, int health) :mhealth(health), ColliderBox(x, y, h, w), speed(s), IsAlive(true) {};
 
 	virtual ~Entity() {}
-	virtual void Dead() = 0;//ËÀÍö
-	virtual void Move(int) = 0;//ÒÆ¶¯
+	virtual void Dead() = 0;//æ­»äº¡
+	virtual void Move(int) = 0;//ç§»åŠ¨
 };*/

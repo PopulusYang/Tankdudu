@@ -1,6 +1,6 @@
-//ÎÄ¼şÃû£ºsingle.cpp
-//×÷Õß£ºÑîÎäÏÔ£¬Öì¼ÑÔÃ,ÈÎÓîĞù
-//¹¦ÄÜ£ºÎªµ¥ÈËÓÎÏ·Ìá¹©Èë¿Ú
+//æ–‡ä»¶åï¼šsingle.cpp
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾ï¼Œæœ±ä½³æ‚¦,ä»»å®‡è½©
+//åŠŸèƒ½ï¼šä¸ºå•äººæ¸¸æˆæä¾›å…¥å£
 
 #include"tankclass.h"
 #include"tankhead.h"
@@ -26,7 +26,7 @@ typedef struct Setting
 
 extern Setting set;
 
-//µ¥ÈËÓÎÏ·½øÈëÕâ¸öº¯Êı£¬±ÜÃâmainº¯Êı¹ı³¤£¨CÓïÑÔ¿ÎÉèÒòÎªÕâ¸öÎÊÌâÎÒÒªËÀÁË£©
+//å•äººæ¸¸æˆè¿›å…¥è¿™ä¸ªå‡½æ•°ï¼Œé¿å…mainå‡½æ•°è¿‡é•¿ï¼ˆCè¯­è¨€è¯¾è®¾å› ä¸ºè¿™ä¸ªé—®é¢˜æˆ‘è¦æ­»äº†ï¼‰
 void singlegame()
 {
 	bool jug = true;
@@ -54,11 +54,11 @@ void singlegame()
 	RECT say1 = { 0,100,639,479 };
 	RECT say2 = { 0,0,639,379 };
 	RECT settlement = { 0,0,639,96 };
-	settextstyle(36, 0, "»ªÎÄÁ¥Êé");
+	settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
 	settextcolor(WHITE);
-	drawtext("ÇëÔÚ¹æ¶¨Ê±¼äÄÚ¾¡×Ô¼ºËùÄÜÕ¨»Ù¶Ô·½£¡", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("×¼±¸¿ªÕ½£¡", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext("°´ÈÎÒâ¼ü¿ªÊ¼ÓÎÏ·.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("è¯·åœ¨è§„å®šæ—¶é—´å†…å°½è‡ªå·±æ‰€èƒ½ç‚¸æ¯å¯¹æ–¹ï¼", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("å‡†å¤‡å¼€æˆ˜ï¼", &say2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("æŒ‰ä»»æ„é”®å¼€å§‹æ¸¸æˆ.", &say1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	_getch();
 	while (jug)
 	{
@@ -68,7 +68,7 @@ void singlegame()
 
 	Player player('W', 'S', 'A', 'D', 'R', 'J');
 	Enemy enemy;
-	//×¼±¸µØÍ¼
+	//å‡†å¤‡åœ°å›¾
 	obstacle wall_rock[4] =
 	{
 		obstacle(100, 80, 150, 70, 0, SUPER_OBSTACLE, 3),
@@ -83,26 +83,26 @@ void singlegame()
 		obstacle(250, 80,147, 75, 0, 50, 1),
 		obstacle(250, 330,147, 75, 0, 50, 1),
 	};
-	//³õÊ¼»¯Ê±¼ä
+	//åˆå§‹åŒ–æ—¶é—´
 	int time = MAXTIME / set.gametime;
-	//Æô¶¯ÓÎÏ·ĞèÒªµÄÏß³Ì
-	//¶¯Í¼
+	//å¯åŠ¨æ¸¸æˆéœ€è¦çš„çº¿ç¨‹
+	//åŠ¨å›¾
 	std::thread thread1(&Player::changepng, &player, std::ref(isgaming));
-	//Íæ¼Ò¿ØÖÆ
+	//ç©å®¶æ§åˆ¶
 	std::thread thread2(&Player::control, &player, std::ref(isgaming));
-	//AI¿ØÖÆ
+	//AIæ§åˆ¶
 	std::thread thread3(&Enemy::aicontrol, &enemy, std::ref(isgaming));
-	//×Óµ¯¿ØÖÆ
+	//å­å¼¹æ§åˆ¶
 	std::thread thread4(&bullet::bullMove, std::ref(isgaming));
-	//Íæ¼ÒÀäÈ´
+	//ç©å®¶å†·å´
 	std::thread thread5(&Player::wait, &player, std::ref(isgaming));
-	//AIÀäÈ´
+	//AIå†·å´
 	std::thread thread6(&Enemy::wait, &enemy, std::ref(isgaming));
-	//¼ÆÊ±
+	//è®¡æ—¶
 	std::thread thread7(&TimeFun::setTime, std::ref(time), std::ref(isgaming));
-	//¼ì²â¿ÛÑª
+	//æ£€æµ‹æ‰£è¡€
 	std::thread thread8(&otherFun::checkdead, wall_rock, wall_wire_mesh, std::ref(player), std::ref(enemy));
-	//ÄÜÁ¿
+	//èƒ½é‡
 	std::thread thread9(&Player::defpower, &player, std::ref(isgaming));
 	BeginBatchDraw();
 	char s[12] = "score ";
@@ -112,7 +112,7 @@ void singlegame()
 		putimage(0, 0, &background);
 
 		TimeFun::showTime(time, 540, 0);
-		//ÏÔÊ¾·ÖÊı
+		//æ˜¾ç¤ºåˆ†æ•°
 		s[6] = score1 / 10 + '0';
 		s[7] = score1 % 10 + '0';
 		s[8] = ':';
@@ -126,11 +126,11 @@ void singlegame()
 		}
 		player.display();
 		enemy.display();
-		//µ÷ÊÔÄ£Ê½£ºÏÔÊ¾Åö×²Ïä
+		//è°ƒè¯•æ¨¡å¼ï¼šæ˜¾ç¤ºç¢°æ’ç®±
 		//ColliderBox::drawColliderbox(player);
 		//ColliderBox::drawColliderbox(enemy);
 		bullet::display();
-		//µ÷ÓÃÔİÍ£Ä£¿é
+		//è°ƒç”¨æš‚åœæ¨¡å—
 		if (pause)
 		{
 			EndBatchDraw();
@@ -142,7 +142,7 @@ void singlegame()
 			FlushBatchDraw();
 		else
 			exit(0);
-		//¼Æ³É¼¨
+		//è®¡æˆç»©
 		if (wait)
 		{
 			if (!player.IsAlive)
@@ -151,7 +151,7 @@ void singlegame()
 				score1++;
 			wait = false;
 		}
-		//È«²¿¸´»î£¬»Ö¸´
+		//å…¨éƒ¨å¤æ´»ï¼Œæ¢å¤
 		if (player.IsAlive && enemy.IsAlive)
 			wait = true;
 	}
@@ -160,12 +160,12 @@ void singlegame()
 	fillrectangle(160, 120, 480, 360);
 
 	settextcolor(WHITE);
-	settextstyle(36, 0, "»ªÎÄÁ¥Êé");
+	settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
 	bool notover = false;
 	if (time != 0)
 		notover = true;
-	drawtext("Í³¼ÆÖĞ£¬ÇëÉÔºó¡£", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	//µÈ´ıÏß³Ì½áÊø
+	drawtext("ç»Ÿè®¡ä¸­ï¼Œè¯·ç¨åã€‚", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	//ç­‰å¾…çº¿ç¨‹ç»“æŸ
 	time = 0;
 	thread1.join();
 	std::cout << "thread1 have been over." << std::endl;
@@ -188,7 +188,7 @@ void singlegame()
 	allbox.clear();
 	IDnum = 0;
 	std::cout << "All threads have been over." << std::endl;
-	//Çå³ı»º³åÇø
+	//æ¸…é™¤ç¼“å†²åŒº
 	cleardevice();
 	if (!notover)
 	{
@@ -234,7 +234,7 @@ void singlegame()
 
 		if (score1 == score2)
 			drawtext("SCORE DRAW", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-		button over(260, 390, 120, 40, "¼ÌĞø");
+		button over(260, 390, 120, 40, "ç»§ç»­");
 		over.create();
 		jug = true;
 		while (jug)
@@ -244,14 +244,14 @@ void singlegame()
 					if (over.test(msg))
 						jug = false;
 		}
-		//¼ì²âÊÇ·ñ½âËøÁËĞÂ³É¾Í
+		//æ£€æµ‹æ˜¯å¦è§£é”äº†æ–°æˆå°±
 		jug = unlockachieve(wall_wire_mesh, score1, score2);
 		if (jug)
 		{
 			cleardevice();
-			settextstyle(36, 0, "»ªÎÄÁ¥Êé");
+			settextstyle(36, 0, "åæ–‡éš¶ä¹¦");
 			settextcolor(WHITE);
-			drawtext("Äú½âËøÁËĞÂ³É¾Í£¬¿ìÈ¥¿´¿´°É£¡", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+			drawtext("æ‚¨è§£é”äº†æ–°æˆå°±ï¼Œå¿«å»çœ‹çœ‹å§ï¼", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 			over.create();
 			while (jug)
 			{

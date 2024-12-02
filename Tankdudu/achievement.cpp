@@ -1,6 +1,6 @@
-//ÎÄ¼şÃû£ºachievement.cpp
-//×÷Õß£ºÑîÎäÏÔ
-//¹¦ÄÜ£ºÌá¹©ÁË³É¾ÍµÄÏà¹Øº¯Êı
+//æ–‡ä»¶åï¼šachievement.cpp
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾
+//åŠŸèƒ½ï¼šæä¾›äº†æˆå°±çš„ç›¸å…³å‡½æ•°
 
 #include "tankhead.h"
 #include"tankclass.h"
@@ -14,56 +14,56 @@ extern Achieve achieve;
 
 void Acfileread()
 {
-	std::ifstream file("achievement.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞ¶ÁÈ¡  
+	std::ifstream file("achievement.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œè¯»å–  
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-	//¶ÁÈ¡
+	//è¯»å–
 	file.read(reinterpret_cast<char*>(&achieve.a1), sizeof(bool));
 	file.read(reinterpret_cast<char*>(&achieve.a2), sizeof(bool));
 	file.read(reinterpret_cast<char*>(&achieve.a3), sizeof(bool));
 	file.read(reinterpret_cast<char*>(&achieve.a4), sizeof(bool));
-	//¹Ø±ÕÎÄ¼ş
+	//å…³é—­æ–‡ä»¶
 	file.close();
 }
 
 void Acfilewrite()
 {
-	std::ofstream file("achievement.bin", std::ios::binary); // ´ò¿ªÎÄ¼şÒÔ½øĞĞĞ´Èë
+	std::ofstream file("achievement.bin", std::ios::binary); // æ‰“å¼€æ–‡ä»¶ä»¥è¿›è¡Œå†™å…¥
 
 	if (!file)
-	{ // ¼ì²éÎÄ¼şÊÇ·ñ³É¹¦´ò¿ª  
+	{ // æ£€æŸ¥æ–‡ä»¶æ˜¯å¦æˆåŠŸæ‰“å¼€  
 		std::cerr << "Unable to open file";
 		exit(-1);
 	}
-	//Ğ´ÈëÎÄ¼ş
+	//å†™å…¥æ–‡ä»¶
 	file.write(reinterpret_cast<char*>(&achieve.a1), sizeof(bool));
 	file.write(reinterpret_cast<char*>(&achieve.a2), sizeof(bool));
 	file.write(reinterpret_cast<char*>(&achieve.a3), sizeof(bool));
 	file.write(reinterpret_cast<char*>(&achieve.a4), sizeof(bool));
-	//¹Ø±ÕÎÄ¼ş
+	//å…³é—­æ–‡ä»¶
 	file.close();
 }
 
 void checkachieve()
 {
-	//Ò³Ãæ×¼±¸
+	//é¡µé¢å‡†å¤‡
 	IMAGE background;
 	loadimage(&background, "sorce/bk3.jpg", 640, 480, 1);
 	cleardevice();
 	putimage(0, 0, &background);
 	RECT upcenter{ 0,0,639,50 };
-	settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+	settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 	settextcolor(RED);
-	drawtext("³É   ¾Í", &upcenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext("æˆ   å°±", &upcenter, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	setfillcolor(0x9BB171);
 	fillrectangle(70, 50, 570, 430);
-	button back(260, 350, 120, 50, "·µ»Ø");
+	button back(260, 350, 120, 50, "è¿”å›");
 	back.create();
-	//¼ÓÔØ³É¾ÍµÄÍ¼Æ¬
+	//åŠ è½½æˆå°±çš„å›¾ç‰‡
 	IMAGE a1, a2, a3, a4;
 	loadimage(&a1, "sorce/achievement/cleaner.png", 80, 80, 1);
 	loadimage(&a2, "sorce/achievement/Killer.png", 80, 80, 1);
@@ -72,83 +72,83 @@ void checkachieve()
 
 
 	settextcolor(BLACK);
-	//³É¾Í1
+	//æˆå°±1
 	if (achieve.a1)
 	{
 		putimage(105, 85, &a1);
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(190, 90, "ÇåÀíÕß");
-		settextstyle(18, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(190, 110, "´ò»µµØÍ¼ÉÏËùÓĞ");
-		outtextxy(190, 130, "ÌúË¿Íø");
-		outtextxy(190, 150, "¡°ÄãÕæ°®¸É¾»¡±");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(190, 90, "æ¸…ç†è€…");
+		settextstyle(18, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(190, 110, "æ‰“ååœ°å›¾ä¸Šæ‰€æœ‰");
+		outtextxy(190, 130, "é“ä¸ç½‘");
+		outtextxy(190, 150, "â€œä½ çœŸçˆ±å¹²å‡€â€");
 	}
 	else
 	{
 		RECT center{ 105,85,300,165 };
-		settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
-		drawtext("Î´½âËø", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("æœªè§£é”", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
-	//³É¾Í2
+	//æˆå°±2
 	if (achieve.a2)
 	{
 		putimage(330, 85, &a2);
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(415, 90, "É±ÊÖ");
-		settextstyle(18, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(415, 110, "µ¥ÈËÓÎÏ·ÖĞÉ±ËÀ");
-		outtextxy(415, 130, "¶ÔÊÖ5´Î");
-		outtextxy(415, 150, "¡°ËÀÉñ£¬À´ÊÕÈË£¡¡±");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(415, 90, "æ€æ‰‹");
+		settextstyle(18, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(415, 110, "å•äººæ¸¸æˆä¸­æ€æ­»");
+		outtextxy(415, 130, "å¯¹æ‰‹5æ¬¡");
+		outtextxy(415, 150, "â€œæ­»ç¥ï¼Œæ¥æ”¶äººï¼â€");
 	}
 	else
 	{
 		RECT center{ 330,85,525,165 };
-		settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
-		drawtext("Î´½âËø", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("æœªè§£é”", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
-	//³É¾Í3
+	//æˆå°±3
 	if (achieve.a3)
 	{
 		putimage(105, 200, &a3);
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(190, 205, "Ê§°ÜÕß");
-		settextstyle(18, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(190, 225, "µ¥ÈËÓÎÏ·ÖĞ±»¶ÔÊÖ");
-		outtextxy(190, 245, "É±ËÀ5´Î");
-		outtextxy(190, 265, "¡°±ğ°ÚÀÃ£¬AIºÜÉµ¡±");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(190, 205, "å¤±è´¥è€…");
+		settextstyle(18, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(190, 225, "å•äººæ¸¸æˆä¸­è¢«å¯¹æ‰‹");
+		outtextxy(190, 245, "æ€æ­»5æ¬¡");
+		outtextxy(190, 265, "â€œåˆ«æ‘†çƒ‚ï¼ŒAIå¾ˆå‚»â€");
 	}
 	else
 	{
 		RECT center{ 105,200,300,280 };
-		settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
-		drawtext("Î´½âËø", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("æœªè§£é”", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
-	//³É¾Í4
+	//æˆå°±4
 	if (achieve.a4)
 	{
 		putimage(330, 200, &a4);
-		settextstyle(20, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(415, 205, "Ê¤ÀûÕß");
-		settextstyle(18, 0, "Î¢ÈíÑÅºÚ");
-		outtextxy(415, 225, "µÃµ½Ò»´ÎÊ¤Àû");
-		outtextxy(415, 265, "¡°²»¹ıÈç´Ë£¡¡±");
+		settextstyle(20, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(415, 205, "èƒœåˆ©è€…");
+		settextstyle(18, 0, "å¾®è½¯é›…é»‘");
+		outtextxy(415, 225, "å¾—åˆ°ä¸€æ¬¡èƒœåˆ©");
+		outtextxy(415, 265, "â€œä¸è¿‡å¦‚æ­¤ï¼â€");
 	}
 	else
 	{
 		RECT center{ 330,200,525,280 };
-		settextstyle(40, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(40, 0, "åæ–‡éš¶ä¹¦");
 		settextcolor(BLACK);
-		drawtext("Î´½âËø", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext("æœªè§£é”", &center, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
-	//»­¿ò¿ò
+	//ç”»æ¡†æ¡†
 	rectangle(105, 85, 300, 165);
 	rectangle(105, 200, 300, 280);
 	rectangle(330, 85, 525, 165);
 	rectangle(330, 200, 525, 280);
-	//°´Å¥ÍË³ö
+	//æŒ‰é’®é€€å‡º
 	bool jug = true;
 	ExMessage msg;
 	while (jug)
@@ -161,7 +161,7 @@ void checkachieve()
 	std::cin.sync();
 }
 
-//¼ì²âÊÇ·ñÍê³É³É¾Í
+//æ£€æµ‹æ˜¯å¦å®Œæˆæˆå°±
 bool unlockachieve(obstacle* wall,int score1, int score2)
 {
 	bool rejug = false;

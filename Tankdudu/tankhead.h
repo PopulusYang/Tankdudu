@@ -1,13 +1,13 @@
-//ÎÄ¼şÃû£ºtankhead.h
-//×÷Õß£ºÑîÎäÏÔ
-//¹¦ÄÜ£ºÌá¹©º¯ÊıÈë¿Ú£¬´ò°ü¸÷ÖÖÍ·ÎÄ¼ş
+//æ–‡ä»¶åï¼štankhead.h
+//ä½œè€…ï¼šæ¨æ­¦æ˜¾
+//åŠŸèƒ½ï¼šæä¾›å‡½æ•°å…¥å£ï¼Œæ‰“åŒ…å„ç§å¤´æ–‡ä»¶
 
 extern bool pause;
 #pragma once
 #pragma warning(disable:6031)
 #include<iostream>
 #include<easyx.h>
-//¼æÈİ¾É°æEasyX
+//å…¼å®¹æ—§ç‰ˆEasyX
 #include<graphics.h>
 #include<conio.h>
 #include<thread>
@@ -24,23 +24,23 @@ class obstacle;
 
 #pragma comment(lib,"winmm.lib")
 
-void singlegame();//µ¥ÈËÓÎÏ·º¯ÊıÈë¿Ú
+void singlegame();//å•äººæ¸¸æˆå‡½æ•°å…¥å£
 
-void couplelegame();//Ë«ÈËÓÎÏ·º¯ÊıÈë¿Ú
+void couplelegame();//åŒäººæ¸¸æˆå‡½æ•°å…¥å£
 
-void operate();//²Ù×÷Ö¸ÄÏ½øÈëÕâ¸öº¯Êı
+void operate();//æ“ä½œæŒ‡å—è¿›å…¥è¿™ä¸ªå‡½æ•°
 
-void checkachieve();//³É¾ÍÏµÍ³
+void checkachieve();//æˆå°±ç³»ç»Ÿ
 
-bool unlockachieve(obstacle* wall, int score1, int score2);//¼ì²âÊÇ·ñÍê³É³É¾Í
+bool unlockachieve(obstacle* wall, int score1, int score2);//æ£€æµ‹æ˜¯å¦å®Œæˆæˆå°±
 
-//³É¾ÍµÄ´¢´æ
+//æˆå°±çš„å‚¨å­˜
 void Acfileread();
 void Acfilewrite();
 
-//ÉèÖÃ½çÃæÈë¿Ú
+//è®¾ç½®ç•Œé¢å…¥å£
 void setting();
-//ÉèÖÃµÄ´¢´æ
+//è®¾ç½®çš„å‚¨å­˜
 void sefileread();
 void sefilewrite();
 
@@ -62,12 +62,12 @@ public:
 	}
 	static void showTime(int& time, int x, int y)
 	{
-		settextstyle(18, 0, "»ªÎÄÁ¥Êé");
+		settextstyle(18, 0, "åæ–‡éš¶ä¹¦");
 		char t[4] = { '\0' };
 		t[0] = (time / 100) + '0';
 		t[1] = ((time % 100) / 10) + '0';
 		t[2] = (time % 10) + '0';
-		outtextxy(x - 50, y, "Ê±¼ä£º");
+		outtextxy(x - 50, y, "æ—¶é—´ï¼š");
 		outtextxy(x, y, _T(t));
 	}
 };
